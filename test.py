@@ -38,5 +38,24 @@ def depthLimitedSearch(graph,limit,goal):
 #ans = depthLimitedSearch(graph,3,'a')
 #print(f'The answer is: {ans}')
 
-f = frozenset([3,4,5,4])
-print(list(f))
+from functools import wraps
+class limiter():
+    def __init__(self, amount, period):
+        self.amount = amount
+        self.period = period
+
+    def __call__(self, func):
+        @wraps(func)
+        def wrapper():
+            originalResult = func()
+            # needs editing
+            modifiedResult = originalResult.upper()
+            return modifiedResult
+        return wrapper
+limit = limiter(2,4)
+
+@limit
+def reef():
+    return 'yeah'
+
+print(reef())
