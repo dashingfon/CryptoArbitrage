@@ -2,101 +2,101 @@
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "WETH",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap",
       "from": "WETH"
     },
     {
       "to": "USDT",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "WETH",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap",
       "from": "WETH"
     },
     {
       "to": "USDT",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "WETH",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "WETH"
     },
     {
       "to": "USDT",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "WETH",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "WETH"
     },
     {
       "to": "USDT",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDC",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
       "to": "USDT",
@@ -107,13 +107,13 @@
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDC",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
       "to": "USDT",
@@ -124,101 +124,101 @@
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDC",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap",
       "from": "USDC"
     },
     {
       "to": "USDT",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDC",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap",
       "from": "USDC"
     },
     {
       "to": "USDT",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDC",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "USDC"
     },
     {
       "to": "USDT",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDC",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "USDC"
     },
     {
       "to": "USDT",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDC",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
       "to": "USDT",
@@ -229,113 +229,113 @@
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "WBTC",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "WBTC"
     },
     {
       "to": "USDT",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "WBTC",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "WBTC"
     },
     {
       "to": "USDT",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "AURORA",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "AURORA"
     },
     {
       "to": "USDT",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "AURORA",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "AURORA"
     },
     {
       "to": "USDT",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDT",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDT",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
@@ -377,113 +377,113 @@
   [
     {
       "from": "USDT",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap"
     },
     {
       "to": "USDT",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "WETH",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap",
       "from": "WETH"
     },
     {
       "to": "USDC",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "WETH",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap",
       "from": "WETH"
     },
     {
       "to": "USDC",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "WETH",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "WETH"
     },
     {
       "to": "USDC",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "WETH",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "WETH"
     },
     {
       "to": "USDC",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDT",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
       "to": "USDC",
@@ -494,13 +494,13 @@
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDT",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
       "to": "USDC",
@@ -511,101 +511,101 @@
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDT",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap",
       "from": "USDT"
     },
     {
       "to": "USDC",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDT",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap",
       "from": "USDT"
     },
     {
       "to": "USDC",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDT",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "USDT"
     },
     {
       "to": "USDC",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDT",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "USDT"
     },
     {
       "to": "USDC",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDT",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
       "to": "USDC",
@@ -616,113 +616,113 @@
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "WBTC",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "WBTC"
     },
     {
       "to": "USDC",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "WBTC",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "WBTC"
     },
     {
       "to": "USDC",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "AURORA",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "AURORA"
     },
     {
       "to": "USDC",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "AURORA",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "AURORA"
     },
     {
       "to": "USDC",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDC",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "USDC",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
@@ -764,18 +764,18 @@
   [
     {
       "from": "USDC",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap"
     },
     {
       "to": "USDC",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "WETH",
       "via": "trisolaris"
     },
@@ -785,14 +785,14 @@
       "from": "WETH"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris",
       "from": "AURORA"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "WETH",
       "via": "trisolaris"
     },
@@ -802,26 +802,26 @@
       "from": "WETH"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "AURORA"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "WETH",
       "via": "trisolaris"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap",
       "from": "WETH"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "WETH",
       "via": "trisolaris"
     },
@@ -831,14 +831,14 @@
       "from": "WETH"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris",
       "from": "WBTC"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "WETH",
       "via": "trisolaris"
     },
@@ -848,36 +848,14 @@
       "from": "WETH"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "WBTC"
     }
   ],
   [
     {
-      "from": "WNEAR",
-      "to": "WETH",
-      "via": "trisolaris"
-    },
-    {
-      "to": "WBTC",
-      "via": "auroraswap",
-      "from": "WETH"
-    },
-    {
-      "to": "WETH",
-      "via": "wannaswap",
-      "from": "WBTC"
-    },
-    {
-      "to": "WNEAR",
-      "via": "auroraswap",
-      "from": "WETH"
-    }
-  ],
-  [
-    {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "WETH",
       "via": "trisolaris"
     },
@@ -892,26 +870,48 @@
       "from": "WBTC"
     },
     {
-      "to": "WNEAR",
-      "via": "wannaswap",
+      "to": "NEAR",
+      "via": "auroraswap",
       "from": "WETH"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "WETH",
       "via": "trisolaris"
     },
     {
-      "to": "WNEAR",
+      "to": "WBTC",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "WETH"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
       "to": "USDC",
       "via": "trisolaris"
     },
@@ -921,14 +921,14 @@
       "from": "USDC"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris",
       "from": "USDT"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "USDC",
       "via": "trisolaris"
     },
@@ -943,14 +943,14 @@
       "from": "USDT"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap",
       "from": "USDC"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "USDC",
       "via": "trisolaris"
     },
@@ -965,14 +965,14 @@
       "from": "USDT"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "USDC"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "USDC",
       "via": "trisolaris"
     },
@@ -982,14 +982,14 @@
       "from": "USDC"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap",
       "from": "USDT"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "USDC",
       "via": "trisolaris"
     },
@@ -999,36 +999,14 @@
       "from": "USDC"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "USDT"
     }
   ],
   [
     {
-      "from": "WNEAR",
-      "to": "USDC",
-      "via": "trisolaris"
-    },
-    {
-      "to": "USDT",
-      "via": "trisolaris",
-      "from": "USDC"
-    },
-    {
-      "to": "USDC",
-      "via": "wannaswap",
-      "from": "USDT"
-    },
-    {
-      "to": "WNEAR",
-      "via": "auroraswap",
-      "from": "USDC"
-    }
-  ],
-  [
-    {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "USDC",
       "via": "trisolaris"
     },
@@ -1043,115 +1021,137 @@
       "from": "USDT"
     },
     {
-      "to": "WNEAR",
-      "via": "wannaswap",
-      "from": "USDC"
-    }
-  ],
-  [
-    {
-      "from": "WNEAR",
-      "to": "USDC",
-      "via": "trisolaris"
-    },
-    {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap",
       "from": "USDC"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "USDC",
       "via": "trisolaris"
     },
     {
-      "to": "WNEAR",
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "USDC"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
       "to": "USDT",
       "via": "trisolaris"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap",
       "from": "USDT"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "USDT",
       "via": "trisolaris"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "USDT"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "WBTC",
       "via": "trisolaris"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "WBTC"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "AURORA",
       "via": "trisolaris"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "AURORA"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "USDC",
       "via": "auroraswap"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "USDC"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "USDT",
       "via": "auroraswap"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "USDT"
     }
   ],
   [
     {
-      "from": "WNEAR",
+      "from": "NEAR",
       "to": "WETH",
       "via": "auroraswap"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "WETH"
     }
@@ -1163,14 +1163,14 @@
       "via": "trisolaris"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris",
       "from": "AURORA"
     },
     {
       "to": "WETH",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
@@ -1180,14 +1180,14 @@
       "via": "trisolaris"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris",
       "from": "AURORA"
     },
     {
       "to": "WBTC",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
       "to": "WETH",
@@ -1202,14 +1202,14 @@
       "via": "trisolaris"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris",
       "from": "AURORA"
     },
     {
       "to": "WBTC",
       "via": "trisolaris",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
       "to": "WETH",
@@ -1224,14 +1224,14 @@
       "via": "trisolaris"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris",
       "from": "AURORA"
     },
     {
       "to": "WETH",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
@@ -1241,14 +1241,14 @@
       "via": "trisolaris"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris",
       "from": "AURORA"
     },
     {
       "to": "WBTC",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
       "to": "WETH",
@@ -1263,14 +1263,14 @@
       "via": "trisolaris"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris",
       "from": "AURORA"
     },
     {
       "to": "WBTC",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     },
     {
       "to": "WETH",
@@ -1285,50 +1285,50 @@
       "via": "trisolaris"
     },
     {
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris",
       "from": "AURORA"
     },
     {
       "to": "WETH",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "WETH",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "WETH",
       "via": "auroraswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "WETH",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "trisolaris"
     },
     {
       "to": "WETH",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [
     {
       "from": "WETH",
-      "to": "WNEAR",
+      "to": "NEAR",
       "via": "auroraswap"
     },
     {
       "to": "WETH",
       "via": "wannaswap",
-      "from": "WNEAR"
+      "from": "NEAR"
     }
   ],
   [

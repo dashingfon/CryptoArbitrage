@@ -1,25 +1,30 @@
 import Config as Cfg
 import Controller as Ctr
-import requests, json
+import requests, json, time
 
 from functools import wraps
 
-class limiter():
-    def __init__(self, amount, period):
-        pass
 
-    def __call__(self, func):
+def RateLimited(maxPerSecond):
+    mininterval = 1.0 / float(maxPerSecond)
+
+    def decorate(func):
+        lastTimeCalled = [0.0]
+
         @wraps(func)
-        def wrapper():
-            originalResult = func()
-            # needs editing
-            modifiedResult = 6
-            return modifiedResult
-        return wrapper
-
+        def ratelimitedFunction(*args,**kwargs):
+            elapsed = time.process_time_ns() - lastTimeCalled[0]
+            lefttowait = mininterval - elapsed
+            if lefttowait > 0:
+                print(f'waiting {lefttowait} ...')
+                time.sleep(lefttowait)
+            ret = func(*args, **kwargs)
+            lastTimeCalled[0] = time.process_time_ns()
+            return ret
+        return ratelimitedFunction
+    return decorate
 
 class Aurora():
-    
     def __init__(self):
         self.source = 'https://explorer.mainnet.aurora.dev/api'
         self.impact = 0.005
@@ -34,19 +39,6 @@ class Aurora():
         self.graph = {}
         self.arbRoutes = []
 
-    
-    def getPrice(self, session, address):
-        price = {}
-        parameters = self.params
-        parameters['address'] = address
-        response = session.get(self.source, headers = self.headers, params = parameters)
-
-        if response.status_code == 200:
-            for i in response.json()['result']:
-                price[i['symbol']] = int(i['balance']) / 10**int(i['decimals'])
-        
-        return price
-        
 
     def buildGraph(self):
         graph = {}
@@ -116,6 +108,19 @@ class Aurora():
         else:
             return route
 
+    @RateLimited(1)
+    def getPrice(self, session, address):
+        price = {}
+        parameters = self.params
+        parameters['address'] = address
+        response = session.get(self.source, headers = self.headers, params = parameters)
+
+        if response.status_code == 200:
+            for i in response.json()['result']:
+                price[i['symbol']] = int(i['balance']) / 10**int(i['decimals'])
+        
+        return price
+
     def pollRoute(self, route):
         rates = []
         liquidity = []
@@ -128,7 +133,7 @@ class Aurora():
             price = self.getPrice(
                 session, 
                 Cfg.AuroraExchanges[swap['via']][frozenset([swap['from'],swap['to']])])
-
+            print(price)
             rate = self.r1 * price[swap['to']] / (1 + (self.impact * self.r1)) / price[swap['from']] 
                 
             if index == 0:
@@ -151,20 +156,22 @@ class Aurora():
         except ValueError:
             capital = least * self.impact
         else:
-            capital = liquidity[index] * rates[index] * self.impact 
+            capital = liquidity[index] / rates[index] * self.impact 
 
         EP = (capital * rates[-1]) - capital
 
         return [capital,rates[-1],EP]
 
     def pollRoutes(self, routes = []):
+        print('polling routes ...')
         if not routes:
             with open(self.routePath) as RO:
                 routes = json.load(RO)
 
         result = []
-
-        for route in routes:
+        routeLenght = len(routes)
+        for pos, route in enumerate(routes):
+            print(f'{pos + 1} / {routeLenght}')
             capital, index, EP = self.pollRoute(route)
             result.append({
                 'route' : route,
@@ -176,12 +183,14 @@ class Aurora():
         return sorted(result, key = lambda v : v['EP'])
     
     def screenRoutes(self, expectedProfit = 50, routes = [], save = True):
+        print('screening routes...')
         newRoute = []
         if not routes:
             with open(self.routePath) as RO:
                 routes = json.load(RO)
-
-        for route in routes:
+        routeLenght = len(routes)
+        for pos, route in enumerate(routes):
+            print(f'{pos + 1} / {routeLenght}')
             _, _, EP = self.pollRoute(route)
             if EP >= expectedProfit:
                 newRoute.append(route)
@@ -192,26 +201,46 @@ class Aurora():
         else:
             return newRoute    
 
-    def executeArb(self, capital = 100, index = 1.1, routes = []):
+    def executeArb(self, expectedProfit = 50, routes = []):
         if not routes:
             with open(self.routePath) as RO:
                 routes = json.load(RO)
 
         for route in routes:
-            Capital, Index = self.pollRoute(route)
-            if Capital >= capital and Index >= index:
+            _, _, EP = self.pollRoute(route)
+            if EP >= expectedProfit:
                 pass
 
 
 Aurora = Aurora()
+route = [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }]
 
+results = Aurora.pollRoute(route)
 '''
-Aurora.buildGraph()
-#print(Aurora.graph)
-Aurora.getArbRoute()
+with open('Dump.json','w') as DP:
+    json.dump(results, DP, indent = 2)
 '''
-price = Aurora.getPrice(requests.Session(), '0xec538fafafcbb625c394c35b11252cef732368cd')
-print(price)
+print(results)
 # test get price
 # then poll route
           

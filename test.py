@@ -1,61 +1,75 @@
-
-graph = {}
-graph['a'] = ['b','c']
-graph['b'] = ['d','e']
-graph['e'] = ['f','g','a']
-graph['f'] = ['h','i']
-graph['c'] = ['j','a','b']
-graph['j'] = ['k','a']
-graph['k'] = ['l','m']
-
-
-def dive(graph,depth, limit, node,goal,path):
-    result = []
-    if depth <= limit and node in graph:
-        for i in graph[node]:
-            if i == goal:
-                result.append(path + [i])
-            elif depth < limit:
-                result += dive(graph,depth + 1,limit,i,goal,path + [i]) 
-
-    return result         
-
-def depthLimitedSearch(graph,limit,goal):
-    result = []
-    path = [goal]
-    depth = 1
-    if goal in graph:
-        start = graph[goal]
-    else:
-        start = []
-
-    for i in start:
-        result += dive(graph,depth + 1,limit,i,goal,path + [i])
-        
-    return result
-
-
-#ans = depthLimitedSearch(graph,3,'a')
-#print(f'The answer is: {ans}')
-
 from functools import wraps
-class limiter():
-    def __init__(self, amount, period):
-        self.amount = amount
-        self.period = period
+import time
+import dotenv
 
-    def __call__(self, func):
-        @wraps(func)
-        def wrapper():
-            originalResult = func()
-            # needs editing
-            modifiedResult = originalResult.upper()
-            return modifiedResult
-        return wrapper
-limit = limiter(2,4)
+# definition
 
-@limit
-def reef():
-    return 'yeah'
+def RateLimited(maxPerSecond):
+    mininterval = 1.0 / float(maxPerSecond)
+    def decorate(func):
+        lastTimeCalled = [0.0]
+        def ratelimitedFunction(*args,**kwargs):
+            elapsed = time.process_time_ns() - lastTimeCalled[0]
+            lefttowait = mininterval - elapsed
+            if lefttowait > 0:
+                print('waiting...')
+                time.sleep(lefttowait)
+            ret = func(*args, **kwargs)
+            lastTimeCalled[0] = time.process_time_ns()
+            return ret
+        return ratelimitedFunction
+    return decorate
 
-print(reef())
+#  Ratelimit module Usage
+
+"""
+from ratelimit import limits, RateLimitException, sleep_and_retry
+
+AMOUNT = 1
+PERIOD = 1
+
+@sleep_and_retry
+@limits(calls = AMOUNT, period = PERIOD)
+def test(self):
+    print('testing...')
+
+"""
+
+class test():
+    def __init__(self):
+        pass
+    
+    @RateLimited(10)
+    def test(self):
+        print('testing...')
+
+
+test = test()
+for i in range(20):
+    test.test()
+
+
+#print(reef())
+
+"""
+arbitrage to do list
+
+1. find out working with 
+* .env
+* time
+* infura
+* retelimit
+
+2. setup infura account
+
+2. install web3 and other dependencies
+
+2. poll routes
+
+3. create addresses
+
+4. start writing controller
+
+
+
+"""
