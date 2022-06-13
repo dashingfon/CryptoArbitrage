@@ -31,7 +31,7 @@ class Aurora():
         self.r1 = 0.997
         self.exchanges = Cfg.AuroraExchanges
         self.tokens = Cfg.AuroraTokens
-        self.routePath = r'Data\Aurora\arbRoute.json'
+        self.routePath = r'CryptoArbitrage\Data\Aurora\arbRoute.json'
         self.params = Cfg.AuroraParams
         self.headers = Cfg.AuroraHeaders
         # the depth limited search depth
@@ -180,7 +180,7 @@ class Aurora():
                 'EP' : EP
             })
 
-        return sorted(result, key = lambda v : v['EP'])
+        return sorted(result, key = lambda v : v['EP'], reverse = True)
     
     def screenRoutes(self, expectedProfit = 50, routes = [], save = True):
         print('screening routes...')
@@ -212,35 +212,13 @@ class Aurora():
                 pass
 
 
-Aurora = Aurora()
-route = [
-    {
-      "from": "USDT",
-      "to": "NEAR",
-      "via": "trisolaris"
-    },
-    {
-      "to": "WETH",
-      "via": "trisolaris",
-      "from": "NEAR"
-    },
-    {
-      "to": "NEAR",
-      "via": "auroraswap",
-      "from": "WETH"
-    },
-    {
-      "to": "USDT",
-      "via": "auroraswap",
-      "from": "NEAR"
-    }]
+if __name__ == '__main__':
+    Aurora = Aurora()
+    results = Aurora.pollRoutes()
 
-results = Aurora.pollRoute(route)
-'''
-with open('Dump.json','w') as DP:
-    json.dump(results, DP, indent = 2)
-'''
-print(results)
+    with open('CryptoArbitrage\Dump.json','w') as DP:
+        json.dump(results, DP, indent = 2)
+
 # test get price
 # then poll route
           

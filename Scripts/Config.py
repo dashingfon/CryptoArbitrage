@@ -1,3 +1,9 @@
+# Aurora Network
+
+AuroraTokenLookup = {
+
+}
+
 AuroraTokens = {
     'NEAR' : '0xc42c30ac6cc15fac9bd938618bcaa1a1fae8501d',
     'USDC' : '0xb12bfca5a55806aaf64e99521918a4bf0fc40802',
