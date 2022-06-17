@@ -1,24 +1,7 @@
-from functools import wraps
+'''from functools import wraps
 import time
 import dotenv
-
-# definition
-
-def RateLimited(maxPerSecond):
-    mininterval = 1.0 / float(maxPerSecond)
-    def decorate(func):
-        lastTimeCalled = [0.0]
-        def ratelimitedFunction(*args,**kwargs):
-            elapsed = time.process_time_ns() - lastTimeCalled[0]
-            lefttowait = mininterval - elapsed
-            if lefttowait > 0:
-                print('waiting...')
-                time.sleep(lefttowait)
-            ret = func(*args, **kwargs)
-            lastTimeCalled[0] = time.process_time_ns()
-            return ret
-        return ratelimitedFunction
-    return decorate
+'''
 
 #  Ratelimit module Usage
 
@@ -35,41 +18,24 @@ def test(self):
 
 """
 
-class test():
-    def __init__(self):
-        pass
-    
-    @RateLimited(10)
-    def test(self):
-        print('testing...')
+'''
+import os
+curr = os.path.dirname(__file__)
+parent = os.path.split(curr)[0]
+file = os.path.join(parent, 'Data', 'Aurora', 'arbRoute.json')
+print(file)
+'''
+from operator import eq
 
 
-test = test()
-for i in range(20):
-    test.test()
+def main():
+    print('Hello World')
 
+def equal(list1,list2):
+    list_dif = [i for i in list1 + list2 if i not in list1 or i not in list2]
 
-#print(reef())
+    return False if list_dif else True
 
-"""
-arbitrage to do list
-
-1. find out working with 
-* .env
-* time
-* infura
-* retelimit
-
-2. setup infura account
-
-2. install web3 and other dependencies
-
-2. poll routes
-
-3. create addresses
-
-4. start writing controller
-
-
-
-"""
+r = [{'e':4},{'r':2}]
+e = [{'r':2},{'e':4}]
+print(equal(r,e))

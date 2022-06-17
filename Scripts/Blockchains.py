@@ -1,6 +1,6 @@
-import Config as Cfg
-import Controller as Ctr
-import requests, json, time
+import scripts.Config as Cfg
+import requests, json, time, os
+import scripts.Controller as Ctr
 
 from functools import wraps
 
@@ -31,7 +31,9 @@ class Aurora():
         self.r1 = 0.997
         self.exchanges = Cfg.AuroraExchanges
         self.tokens = Cfg.AuroraTokens
-        self.routePath = r'CryptoArbitrage\Data\Aurora\arbRoute.json'
+        
+        path = os.path.join(os.path.split(os.path.dirname(__file__))[0], 'data', 'Aurora', 'arbRoute.json')
+        self.routePath = path
         self.params = Cfg.AuroraParams
         self.headers = Cfg.AuroraHeaders
         # the depth limited search depth
@@ -40,9 +42,12 @@ class Aurora():
         self.arbRoutes = []
 
 
-    def buildGraph(self):
+    def buildGraph(self, exchanges = {}):
         graph = {}
-        for dex, tokens in self.exchanges.items():
+        if not exchanges:
+            exchanges = self.exchanges
+
+        for dex, tokens in exchanges.items():
             for pools in tokens.keys():
                 pool = list(pools)
                 if pool[0] not in graph:
@@ -90,7 +95,8 @@ class Aurora():
             new_path = [{**path, **i}]
             # recursive function to search the node to the specified depth
             result += self.dive(depth + 1, i['to'],goal,new_path,followed)
-        
+            followed = []
+            
         return result
            
     def getArbRoute(self, tokens = Cfg.startTokens,save = True):
@@ -133,6 +139,7 @@ class Aurora():
             price = self.getPrice(
                 session, 
                 Cfg.AuroraExchanges[swap['via']][frozenset([swap['from'],swap['to']])])
+
             print(price)
             rate = self.r1 * price[swap['to']] / (1 + (self.impact * self.r1)) / price[swap['from']] 
                 
@@ -214,13 +221,17 @@ class Aurora():
 
 if __name__ == '__main__':
     Aurora = Aurora()
+    Aurora.buildGraph()
+    print(Aurora.graph)
+    '''Aurora = Aurora()
     results = Aurora.pollRoutes()
+    path = os.path.join(os.path.split(os.path.dirname(__file__))[0], 'Dump.json')
 
-    with open('CryptoArbitrage\Dump.json','w') as DP:
-        json.dump(results, DP, indent = 2)
+    with open(path,'w') as DP:
+        json.dump(results, DP, indent = 2)'''
 
 # test get price
 # then poll route
           
 
-
+ 

@@ -1,6 +1,0 @@
-requests
-web3
-dotenv
-_pytest
-_brownie
-_ganache cli

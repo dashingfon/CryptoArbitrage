@@ -2,100 +2,73 @@
   {
     "route": [
       {
-        "from": "USDC",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "WETH",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "auroraswap",
-        "from": "WETH"
-      },
-      {
-        "to": "USDC",
-        "via": "wannaswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 1.0275189728723648,
-    "capital": 86.22418143990078,
-    "EP": 2.372800909986495
-  },
-  {
-    "route": [
-      {
-        "from": "USDC",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "WETH",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "auroraswap",
-        "from": "WETH"
-      },
-      {
-        "to": "USDC",
-        "via": "auroraswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 1.0224794251478742,
-    "capital": 86.22418143990078,
-    "EP": 1.938270032614966
-  },
-  {
-    "route": [
-      {
-        "from": "NEAR",
-        "to": "WETH",
-        "via": "trisolaris"
-      },
-      {
-        "to": "NEAR",
-        "via": "auroraswap",
-        "from": "WETH"
-      }
-    ],
-    "index": 1.0425767866721596,
-    "capital": 18.585151141444136,
-    "EP": 0.7912960154191104
-  },
-  {
-    "route": [
-      {
-        "from": "NEAR",
-        "to": "WETH",
-        "via": "trisolaris"
-      },
-      {
+        "from": "WETH",
         "to": "WBTC",
-        "via": "auroraswap",
-        "from": "WETH"
+        "via": "auroraswap"
       },
       {
         "to": "WETH",
         "via": "wannaswap",
         "from": "WBTC"
+      }
+    ],
+    "index": 0.9820270945431335,
+    "capital": 0.011535229712218004,
+    "EP": -0.0002073215930409305
+  },
+  {
+    "route": [
+      {
+        "from": "WETH",
+        "to": "AURORA",
+        "via": "trisolaris"
       },
       {
         "to": "NEAR",
+        "via": "trisolaris",
+        "from": "AURORA"
+      },
+      {
+        "to": "WBTC",
+        "via": "wannaswap",
+        "from": "NEAR"
+      },
+      {
+        "to": "WETH",
         "via": "auroraswap",
-        "from": "WETH"
+        "from": "WBTC"
       }
     ],
-    "index": 1.0332405008341388,
-    "capital": 4.054600195768066,
-    "EP": 0.13477694118952765
+    "index": 0.9737962619405676,
+    "capital": 0.01165814094548274,
+    "EP": -0.0003054868715953729
+  },
+  {
+    "route": [
+      {
+        "from": "WETH",
+        "to": "AURORA",
+        "via": "trisolaris"
+      },
+      {
+        "to": "NEAR",
+        "via": "trisolaris",
+        "from": "AURORA"
+      },
+      {
+        "to": "WBTC",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "WETH",
+        "via": "auroraswap",
+        "from": "WBTC"
+      }
+    ],
+    "index": 0.9709503074162658,
+    "capital": 0.011692312147361272,
+    "EP": -0.00033965807347390714
   },
   {
     "route": [
@@ -110,80 +83,9 @@
         "from": "NEAR"
       }
     ],
-    "index": 1.0423881023142534,
-    "capital": 0.05054996861562349,
-    "EP": 0.002142717241661346
-  },
-  {
-    "route": [
-      {
-        "from": "WETH",
-        "to": "WBTC",
-        "via": "auroraswap"
-      },
-      {
-        "to": "WETH",
-        "via": "wannaswap",
-        "from": "WBTC"
-      }
-    ],
-    "index": 0.991051381906535,
-    "capital": 0.011028083070950608,
-    "EP": -9.868610370494454e-05
-  },
-  {
-    "route": [
-      {
-        "from": "WETH",
-        "to": "AURORA",
-        "via": "trisolaris"
-      },
-      {
-        "to": "NEAR",
-        "via": "trisolaris",
-        "from": "AURORA"
-      },
-      {
-        "to": "WBTC",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "WETH",
-        "via": "auroraswap",
-        "from": "WBTC"
-      }
-    ],
-    "index": 0.971622639036129,
-    "capital": 0.01117052437719198,
-    "EP": -0.00031699000240729795
-  },
-  {
-    "route": [
-      {
-        "from": "WETH",
-        "to": "AURORA",
-        "via": "trisolaris"
-      },
-      {
-        "to": "NEAR",
-        "via": "trisolaris",
-        "from": "AURORA"
-      },
-      {
-        "to": "WBTC",
-        "via": "wannaswap",
-        "from": "NEAR"
-      },
-      {
-        "to": "WETH",
-        "via": "auroraswap",
-        "from": "WBTC"
-      }
-    ],
-    "index": 0.9663697360812845,
-    "capital": 0.011231244077237695,
-    "EP": -0.00037770970245301454
+    "index": 0.9843785684428022,
+    "capital": 0.04984305376297472,
+    "EP": -0.0007786198529600372
   },
   {
     "route": [
@@ -208,75 +110,9 @@
         "from": "WBTC"
       }
     ],
-    "index": 0.9731243388607514,
-    "capital": 0.06135339800024353,
-    "EP": -0.0016489131343959962
-  },
-  {
-    "route": [
-      {
-        "from": "WETH",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "WETH",
-        "via": "wannaswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9826468376316453,
-    "capital": 0.13684862469935052,
-    "EP": -0.002374756404293854
-  },
-  {
-    "route": [
-      {
-        "from": "WETH",
-        "to": "AURORA",
-        "via": "trisolaris"
-      },
-      {
-        "to": "NEAR",
-        "via": "trisolaris",
-        "from": "AURORA"
-      },
-      {
-        "to": "WETH",
-        "via": "wannaswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9822320711818031,
-    "capital": 0.13690641167240675,
-    "EP": -0.002432543377350077
-  },
-  {
-    "route": [
-      {
-        "from": "WETH",
-        "to": "AURORA",
-        "via": "trisolaris"
-      },
-      {
-        "to": "NEAR",
-        "via": "trisolaris",
-        "from": "AURORA"
-      },
-      {
-        "to": "WBTC",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "WETH",
-        "via": "wannaswap",
-        "from": "WBTC"
-      }
-    ],
-    "index": 0.9784139578587151,
-    "capital": 0.15151348751765079,
-    "EP": -0.00327057652652904
+    "index": 0.9778703115319906,
+    "capital": 0.050518456704980466,
+    "EP": -0.0011179577087658404
   },
   {
     "route": [
@@ -291,9 +127,9 @@
         "from": "NEAR"
       }
     ],
-    "index": 0.9277675370361554,
-    "capital": 0.054485597520592635,
-    "EP": -0.003935628904969152
+    "index": 0.9744716759896782,
+    "capital": 0.05114879682095826,
+    "EP": -0.0013057430579835397
   },
   {
     "route": [
@@ -313,9 +149,75 @@
         "from": "NEAR"
       }
     ],
-    "index": 0.9273759346487274,
-    "capital": 0.05450860511575693,
-    "EP": -0.003958636500133443
+    "index": 0.9720415447650009,
+    "capital": 0.051240155176114126,
+    "EP": -0.0014325955847257904
+  },
+  {
+    "route": [
+      {
+        "from": "WETH",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "WETH",
+        "via": "wannaswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9746758669348814,
+    "capital": 0.12224098056411603,
+    "EP": -0.003095646857816256
+  },
+  {
+    "route": [
+      {
+        "from": "WETH",
+        "to": "AURORA",
+        "via": "trisolaris"
+      },
+      {
+        "to": "NEAR",
+        "via": "trisolaris",
+        "from": "AURORA"
+      },
+      {
+        "to": "WETH",
+        "via": "wannaswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9736293350472017,
+    "capital": 0.12237237459625597,
+    "EP": -0.0032270408899561925
+  },
+  {
+    "route": [
+      {
+        "from": "WETH",
+        "to": "AURORA",
+        "via": "trisolaris"
+      },
+      {
+        "to": "NEAR",
+        "via": "trisolaris",
+        "from": "AURORA"
+      },
+      {
+        "to": "WBTC",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "WETH",
+        "via": "wannaswap",
+        "from": "WBTC"
+      }
+    ],
+    "index": 0.9750124504515435,
+    "capital": 0.158781117912536,
+    "EP": -0.003967551051198809
   },
   {
     "route": [
@@ -335,9 +237,9 @@
         "from": "NEAR"
       }
     ],
-    "index": 0.98239778512958,
-    "capital": 0.7144910654993213,
-    "EP": -0.012576625257914364
+    "index": 0.9778961880706648,
+    "capital": 0.6714136329096396,
+    "EP": -0.014840800668626364
   },
   {
     "route": [
@@ -352,36 +254,19 @@
         "from": "WETH"
       },
       {
-        "to": "NEAR",
+        "to": "WETH",
         "via": "wannaswap",
         "from": "WBTC"
-      }
-    ],
-    "index": 0.9846722738938066,
-    "capital": 4.054574044001915,
-    "EP": -0.062147400423742116
-  },
-  {
-    "route": [
-      {
-        "from": "NEAR",
-        "to": "WETH",
-        "via": "trisolaris"
-      },
-      {
-        "to": "WBTC",
-        "via": "auroraswap",
-        "from": "WETH"
       },
       {
         "to": "NEAR",
-        "via": "trisolaris",
-        "from": "WBTC"
+        "via": "auroraswap",
+        "from": "WETH"
       }
     ],
-    "index": 0.9793488204363808,
-    "capital": 4.054574044001915,
-    "EP": -0.08373173663667322
+    "index": 0.9792038366365424,
+    "capital": 4.03342261754538,
+    "EP": -0.0838797156683384
   },
   {
     "route": [
@@ -406,70 +291,53 @@
         "from": "WETH"
       }
     ],
-    "index": 0.9755356226813972,
-    "capital": 4.054600195768066,
-    "EP": -0.09919326906535098
+    "index": 0.9776069554825562,
+    "capital": 4.03342261754538,
+    "EP": -0.09032061223235877
   },
   {
     "route": [
       {
         "from": "NEAR",
-        "to": "USDC",
+        "to": "WETH",
         "via": "trisolaris"
       },
       {
-        "to": "NEAR",
+        "to": "WBTC",
         "via": "auroraswap",
-        "from": "USDC"
+        "from": "WETH"
+      },
+      {
+        "to": "NEAR",
+        "via": "trisolaris",
+        "from": "WBTC"
       }
     ],
-    "index": 0.9867981976974926,
-    "capital": 9.953285689192604,
-    "EP": -0.13140130992909782
+    "index": 0.9764130375864678,
+    "capital": 4.0334208159813985,
+    "EP": -0.09513614518451163
   },
   {
     "route": [
       {
         "from": "NEAR",
-        "to": "AURORA",
+        "to": "WETH",
         "via": "trisolaris"
+      },
+      {
+        "to": "WBTC",
+        "via": "auroraswap",
+        "from": "WETH"
       },
       {
         "to": "NEAR",
         "via": "wannaswap",
-        "from": "AURORA"
+        "from": "WBTC"
       }
     ],
-    "index": 0.9862846309530634,
-    "capital": 11.51424964018833,
-    "EP": -0.1579221831137403
-  },
-  {
-    "route": [
-      {
-        "from": "NEAR",
-        "to": "USDC",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDT",
-        "via": "trisolaris",
-        "from": "USDC"
-      },
-      {
-        "to": "USDC",
-        "via": "auroraswap",
-        "from": "USDT"
-      },
-      {
-        "to": "NEAR",
-        "via": "auroraswap",
-        "from": "USDC"
-      }
-    ],
-    "index": 0.9815615788959896,
-    "capital": 10.006386344411181,
-    "EP": -0.18450196514767292
+    "index": 0.9733675559235312,
+    "capital": 4.0334208159813985,
+    "EP": -0.10741985431848988
   },
   {
     "route": [
@@ -484,87 +352,9 @@
         "from": "USDC"
       }
     ],
-    "index": 0.9793453940445142,
-    "capital": 9.821884379263507,
-    "EP": -0.20286715159402924
-  },
-  {
-    "route": [
-      {
-        "from": "NEAR",
-        "to": "WBTC",
-        "via": "trisolaris"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "WBTC"
-      }
-    ],
-    "index": 0.9895220175417062,
-    "capital": 22.040540397733768,
-    "EP": -0.23094039565877011
-  },
-  {
-    "route": [
-      {
-        "from": "NEAR",
-        "to": "USDC",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDT",
-        "via": "trisolaris",
-        "from": "USDC"
-      },
-      {
-        "to": "USDC",
-        "via": "wannaswap",
-        "from": "USDT"
-      },
-      {
-        "to": "NEAR",
-        "via": "auroraswap",
-        "from": "USDC"
-      }
-    ],
-    "index": 0.9736984902920599,
-    "capital": 10.087192778041016,
-    "EP": -0.2653083987775098
-  },
-  {
-    "route": [
-      {
-        "from": "USDC",
-        "to": "NEAR",
-        "via": "auroraswap"
-      },
-      {
-        "to": "USDC",
-        "via": "wannaswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.989023086435684,
-    "capital": 45.40808322114058,
-    "EP": -0.4984406046397254
-  },
-  {
-    "route": [
-      {
-        "from": "NEAR",
-        "to": "USDT",
-        "via": "auroraswap"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "USDT"
-      }
-    ],
-    "index": 0.9865790509980581,
-    "capital": 46.000340020900566,
-    "EP": -0.6173682174924906
+    "index": 0.990024519467841,
+    "capital": 11.584971163543527,
+    "EP": -0.11556565430755228
   },
   {
     "route": [
@@ -575,150 +365,47 @@
       },
       {
         "to": "NEAR",
-        "via": "wannaswap",
+        "via": "auroraswap",
         "from": "WETH"
       }
     ],
-    "index": 0.9843439696221654,
-    "capital": 49.44085612679964,
-    "EP": -0.7740475454273223
-  },
-  {
-    "route": [
-      {
-        "from": "USDC",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDC",
-        "via": "auroraswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9805700499162026,
-    "capital": 45.574897725315935,
-    "EP": -0.8855179878770656
+    "index": 0.9908068154243238,
+    "capital": 17.41576480582383,
+    "EP": -0.1601063403865055
   },
   {
     "route": [
       {
         "from": "NEAR",
-        "to": "USDT",
-        "via": "trisolaris"
-      },
-      {
-        "to": "NEAR",
-        "via": "auroraswap",
-        "from": "USDT"
-      }
-    ],
-    "index": 0.9801893177973783,
-    "capital": 46.930056455083324,
-    "EP": -0.9297164341827511
-  },
-  {
-    "route": [
-      {
-        "from": "USDT",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDC",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "auroraswap",
-        "from": "USDC"
-      },
-      {
-        "to": "USDT",
-        "via": "auroraswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9754825435297724,
-    "capital": 46.14801756551632,
-    "EP": -1.1314320118498458
-  },
-  {
-    "route": [
-      {
-        "from": "NEAR",
-        "to": "USDC",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDT",
-        "via": "trisolaris",
-        "from": "USDC"
-      },
-      {
-        "to": "NEAR",
-        "via": "auroraswap",
-        "from": "USDT"
-      }
-    ],
-    "index": 0.9742851159239342,
-    "capital": 47.21445423835456,
-    "EP": -1.2141142174540036
-  },
-  {
-    "route": [
-      {
-        "from": "USDT",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDC",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "auroraswap",
-        "from": "USDC"
-      },
-      {
-        "to": "USDT",
-        "via": "wannaswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9731029066788598,
-    "capital": 46.14801756551632,
-    "EP": -1.2412475350453107
-  },
-  {
-    "route": [
-      {
-        "from": "USDT",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
         "to": "AURORA",
-        "via": "trisolaris",
-        "from": "NEAR"
+        "via": "trisolaris"
       },
       {
         "to": "NEAR",
         "via": "wannaswap",
         "from": "AURORA"
-      },
-      {
-        "to": "USDT",
-        "via": "auroraswap",
-        "from": "NEAR"
       }
     ],
-    "index": 0.9739980276905582,
-    "capital": 53.43890655676724,
-    "EP": -1.389516968535908
+    "index": 0.9837123610315512,
+    "capital": 10.991441027756558,
+    "EP": -0.17902462320309454
+  },
+  {
+    "route": [
+      {
+        "from": "NEAR",
+        "to": "USDC",
+        "via": "trisolaris"
+      },
+      {
+        "to": "NEAR",
+        "via": "auroraswap",
+        "from": "USDC"
+      }
+    ],
+    "index": 0.9792863201971479,
+    "capital": 11.8300142916438,
+    "EP": -0.2450431281002743
   },
   {
     "route": [
@@ -733,9 +420,501 @@
         "from": "WETH"
       }
     ],
-    "index": 0.9292078470140382,
-    "capital": 19.68806302969965,
-    "EP": -1.3937603699957535
+    "index": 0.9825673610434733,
+    "capital": 17.533167393185703,
+    "EP": -0.3056493769297539
+  },
+  {
+    "route": [
+      {
+        "from": "NEAR",
+        "to": "WBTC",
+        "via": "trisolaris"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "WBTC"
+      }
+    ],
+    "index": 0.9812960658190569,
+    "capital": 17.33688694529415,
+    "EP": -0.3242679923272327
+  },
+  {
+    "route": [
+      {
+        "from": "USDC",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDC",
+        "via": "auroraswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9890827476375662,
+    "capital": 38.513928992816425,
+    "EP": -0.4204662822834351
+  },
+  {
+    "route": [
+      {
+        "from": "NEAR",
+        "to": "USDC",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDT",
+        "via": "trisolaris",
+        "from": "USDC"
+      },
+      {
+        "to": "USDC",
+        "via": "wannaswap",
+        "from": "USDT"
+      },
+      {
+        "to": "NEAR",
+        "via": "auroraswap",
+        "from": "USDC"
+      }
+    ],
+    "index": 0.9645969838451811,
+    "capital": 12.010167310872419,
+    "EP": -0.42519614732889366
+  },
+  {
+    "route": [
+      {
+        "from": "NEAR",
+        "to": "USDC",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDT",
+        "via": "trisolaris",
+        "from": "USDC"
+      },
+      {
+        "to": "USDC",
+        "via": "auroraswap",
+        "from": "USDT"
+      },
+      {
+        "to": "NEAR",
+        "via": "auroraswap",
+        "from": "USDC"
+      }
+    ],
+    "index": 0.9636597949353742,
+    "capital": 12.02184756947388,
+    "EP": -0.43687640593035404
+  },
+  {
+    "route": [
+      {
+        "from": "NEAR",
+        "to": "WETH",
+        "via": "trisolaris"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "WETH"
+      }
+    ],
+    "index": 0.9891905703544741,
+    "capital": 41.6605040155354,
+    "EP": -0.4503262871530822
+  },
+  {
+    "route": [
+      {
+        "from": "NEAR",
+        "to": "USDT",
+        "via": "auroraswap"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "USDT"
+      }
+    ],
+    "index": 0.9867315114397025,
+    "capital": 54.51284462573796,
+    "EP": -0.7233030553058768
+  },
+  {
+    "route": [
+      {
+        "from": "USDC",
+        "to": "NEAR",
+        "via": "auroraswap"
+      },
+      {
+        "to": "USDC",
+        "via": "wannaswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9799503077393724,
+    "capital": 38.70608934614918,
+    "EP": -0.7760451800026473
+  },
+  {
+    "route": [
+      {
+        "from": "USDC",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "AURORA",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "AURORA"
+      },
+      {
+        "to": "USDC",
+        "via": "auroraswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9737022669421116,
+    "capital": 36.51338332909628,
+    "EP": -0.9602192078289278
+  },
+  {
+    "route": [
+      {
+        "from": "NEAR",
+        "to": "USDT",
+        "via": "trisolaris"
+      },
+      {
+        "to": "NEAR",
+        "via": "auroraswap",
+        "from": "USDT"
+      }
+    ],
+    "index": 0.9814743443534087,
+    "capital": 55.54179275226068,
+    "EP": -1.028948126522721
+  },
+  {
+    "route": [
+      {
+        "from": "USDC",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDT",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "USDT"
+      },
+      {
+        "to": "USDC",
+        "via": "auroraswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9734295426680076,
+    "capital": 39.133251088851466,
+    "EP": -1.0397883783184696
+  },
+  {
+    "route": [
+      {
+        "from": "USDC",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "AURORA",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "AURORA"
+      },
+      {
+        "to": "USDC",
+        "via": "wannaswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9695251458350435,
+    "capital": 36.51338332909628,
+    "EP": -1.1127400320233676
+  },
+  {
+    "route": [
+      {
+        "from": "USDC",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDT",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "auroraswap",
+        "from": "USDT"
+      },
+      {
+        "to": "USDC",
+        "via": "auroraswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9709049058149426,
+    "capital": 39.235008992522,
+    "EP": -1.141546281989001
+  },
+  {
+    "route": [
+      {
+        "from": "USDT",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "AURORA",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "AURORA"
+      },
+      {
+        "to": "USDT",
+        "via": "auroraswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9688142559943469,
+    "capital": 36.64700426864744,
+    "EP": -1.1428640936961187
+  },
+  {
+    "route": [
+      {
+        "from": "USDC",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "WETH",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "auroraswap",
+        "from": "WETH"
+      },
+      {
+        "to": "USDC",
+        "via": "auroraswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9794728757362732,
+    "capital": 57.928811389400366,
+    "EP": -1.1891119098402143
+  },
+  {
+    "route": [
+      {
+        "from": "USDT",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "AURORA",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "AURORA"
+      },
+      {
+        "to": "USDT",
+        "via": "wannaswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9663015591990516,
+    "capital": 36.64700426864744,
+    "EP": -1.2349469038791199
+  },
+  {
+    "route": [
+      {
+        "from": "USDT",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDC",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "auroraswap",
+        "from": "USDC"
+      },
+      {
+        "to": "USDT",
+        "via": "wannaswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9670682588068596,
+    "capital": 39.35060931701627,
+    "EP": -1.295884081820354
+  },
+  {
+    "route": [
+      {
+        "from": "USDT",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDC",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "auroraswap",
+        "from": "USDC"
+      },
+      {
+        "to": "USDT",
+        "via": "auroraswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9663700305723426,
+    "capital": 39.36477204930768,
+    "EP": -1.3238360805449219
+  },
+  {
+    "route": [
+      {
+        "from": "NEAR",
+        "to": "USDT",
+        "via": "trisolaris"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "USDT"
+      }
+    ],
+    "index": 0.9840264953007442,
+    "capital": 83.44068527090509,
+    "EP": -1.3328401782839308
+  },
+  {
+    "route": [
+      {
+        "from": "NEAR",
+        "to": "USDC",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDT",
+        "via": "trisolaris",
+        "from": "USDC"
+      },
+      {
+        "to": "NEAR",
+        "via": "auroraswap",
+        "from": "USDT"
+      }
+    ],
+    "index": 0.9747883263241041,
+    "capital": 55.922750769189214,
+    "EP": -1.4099061434512592
+  },
+  {
+    "route": [
+      {
+        "from": "USDC",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "WETH",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "auroraswap",
+        "from": "WETH"
+      },
+      {
+        "to": "USDC",
+        "via": "wannaswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9752709990826554,
+    "capital": 57.928811389400366,
+    "EP": -1.4325216299891679
+  },
+  {
+    "route": [
+      {
+        "from": "USDT",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "WETH",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "auroraswap",
+        "from": "WETH"
+      },
+      {
+        "to": "USDT",
+        "via": "wannaswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9737857227487916,
+    "capital": 58.207877983617074,
+    "EP": -1.52587745166705
   },
   {
     "route": [
@@ -760,352 +939,9 @@
         "from": "NEAR"
       }
     ],
-    "index": 0.9833222235495224,
-    "capital": 88.24850335337676,
-    "EP": -1.4717888110168502
-  },
-  {
-    "route": [
-      {
-        "from": "USDC",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "AURORA",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "AURORA"
-      },
-      {
-        "to": "USDC",
-        "via": "wannaswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9718878704064597,
-    "capital": 53.42770587314611,
-    "EP": -1.5019665913914366
-  },
-  {
-    "route": [
-      {
-        "from": "USDT",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "AURORA",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "AURORA"
-      },
-      {
-        "to": "USDT",
-        "via": "wannaswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9716220122356615,
-    "capital": 53.43890655676724,
-    "EP": -1.5164886364075727
-  },
-  {
-    "route": [
-      {
-        "from": "USDC",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "AURORA",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "AURORA"
-      },
-      {
-        "to": "USDC",
-        "via": "auroraswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9671211698052288,
-    "capital": 46.20866664147057,
-    "EP": -1.519286904031702
-  },
-  {
-    "route": [
-      {
-        "from": "NEAR",
-        "to": "USDT",
-        "via": "trisolaris"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "USDT"
-      }
-    ],
-    "index": 0.9825862838381665,
-    "capital": 91.28125404367951,
-    "EP": -1.5895458488128469
-  },
-  {
-    "route": [
-      {
-        "from": "USDC",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDT",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "USDT"
-      },
-      {
-        "to": "USDC",
-        "via": "auroraswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9641083829495174,
-    "capital": 46.35306624004212,
-    "EP": -1.6636865026032481
-  },
-  {
-    "route": [
-      {
-        "from": "USDT",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "WETH",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "auroraswap",
-        "from": "WETH"
-      },
-      {
-        "to": "USDT",
-        "via": "wannaswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9809234622236531,
-    "capital": 88.24850335337676,
-    "EP": -1.6834759079267627
-  },
-  {
-    "route": [
-      {
-        "from": "USDC",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDT",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "auroraswap",
-        "from": "USDT"
-      },
-      {
-        "to": "USDC",
-        "via": "auroraswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9617564927475268,
-    "capital": 46.4664185523418,
-    "EP": -1.7770388149029372
-  },
-  {
-    "route": [
-      {
-        "from": "NEAR",
-        "to": "USDC",
-        "via": "trisolaris"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "USDC"
-      }
-    ],
-    "index": 0.9819583682218032,
-    "capital": 101.74790625967483,
-    "EP": -1.8356982589395443
-  },
-  {
-    "route": [
-      {
-        "from": "NEAR",
-        "to": "USDC",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDT",
-        "via": "trisolaris",
-        "from": "USDC"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "USDT"
-      }
-    ],
-    "index": 0.976667643762702,
-    "capital": 91.8344216353079,
-    "EP": -2.142713440441227
-  },
-  {
-    "route": [
-      {
-        "from": "USDT",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "WBTC",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "WBTC"
-      },
-      {
-        "to": "USDT",
-        "via": "auroraswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9771951789755111,
-    "capital": 102.29257675494219,
-    "EP": -2.332763905030248
-  },
-  {
-    "route": [
-      {
-        "from": "NEAR",
-        "to": "USDC",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDT",
-        "via": "trisolaris",
-        "from": "USDC"
-      },
-      {
-        "to": "USDC",
-        "via": "auroraswap",
-        "from": "USDT"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "USDC"
-      }
-    ],
-    "index": 0.976747432829621,
-    "capital": 102.29073007265686,
-    "EP": -2.378522071921566
-  },
-  {
-    "route": [
-      {
-        "from": "USDC",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "WBTC",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "WBTC"
-      },
-      {
-        "to": "USDC",
-        "via": "wannaswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9750780009819288,
-    "capital": 102.27114631466803,
-    "EP": -2.5488014080311814
-  },
-  {
-    "route": [
-      {
-        "from": "USDT",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "WBTC",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "WBTC"
-      },
-      {
-        "to": "USDT",
-        "via": "wannaswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9748113642431531,
-    "capital": 102.29257675494219,
-    "EP": -2.576610456509542
-  },
-  {
-    "route": [
-      {
-        "from": "USDT",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDT",
-        "via": "auroraswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9875425380494549,
-    "capital": 213.4926676747143,
-    "EP": -2.65957678427813
+    "index": 0.9734328679929947,
+    "capital": 58.207877983617074,
+    "EP": -1.546416378238412
   },
   {
     "route": [
@@ -1130,26 +966,217 @@
         "from": "NEAR"
       }
     ],
-    "index": 0.9702956541340524,
-    "capital": 102.27114631466803,
-    "EP": -3.0378975022378256
+    "index": 0.9703917162508109,
+    "capital": 57.64738202277947,
+    "EP": -1.7068400443283593
+  },
+  {
+    "route": [
+      {
+        "from": "NEAR",
+        "to": "USDC",
+        "via": "trisolaris"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "USDC"
+      }
+    ],
+    "index": 0.983505496538815,
+    "capital": 113.73774918767208,
+    "EP": -1.8760476976434433
+  },
+  {
+    "route": [
+      {
+        "from": "USDT",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "WBTC",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "WBTC"
+      },
+      {
+        "to": "USDT",
+        "via": "auroraswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9671053520444647,
+    "capital": 57.76351659873076,
+    "EP": -1.9001105431889727
+  },
+  {
+    "route": [
+      {
+        "from": "NEAR",
+        "to": "USDC",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDT",
+        "via": "trisolaris",
+        "from": "USDC"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "USDT"
+      }
+    ],
+    "index": 0.9773230914606482,
+    "capital": 84.01300021460428,
+    "EP": -1.9051551219831282
   },
   {
     "route": [
       {
         "from": "USDC",
-        "to": "USDT",
+        "to": "NEAR",
         "via": "trisolaris"
+      },
+      {
+        "to": "WBTC",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "WBTC"
+      },
+      {
+        "to": "USDC",
+        "via": "wannaswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9662287971967092,
+    "capital": 57.64738202277947,
+    "EP": -1.9468214293700683
+  },
+  {
+    "route": [
+      {
+        "from": "USDT",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "WBTC",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "WBTC"
+      },
+      {
+        "to": "USDT",
+        "via": "wannaswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9660259991537897,
+    "capital": 57.76351659873076,
+    "EP": -1.9624577618053607
+  },
+  {
+    "route": [
+      {
+        "from": "USDT",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDT",
+        "via": "auroraswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9859952234322298,
+    "capital": 181.54331899170154,
+    "EP": -2.5424736198502274
+  },
+  {
+    "route": [
+      {
+        "from": "USDC",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "WETH",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "WETH"
       },
       {
         "to": "USDC",
         "via": "auroraswap",
-        "from": "USDT"
+        "from": "NEAR"
       }
     ],
-    "index": 0.9947007483212041,
-    "capital": 585.8286991299444,
-    "EP": -3.1044537173511344
+    "index": 0.9783917642707325,
+    "capital": 138.49917743774643,
+    "EP": -2.9927228743844694
+  },
+  {
+    "route": [
+      {
+        "from": "USDT",
+        "to": "NEAR",
+        "via": "auroraswap"
+      },
+      {
+        "to": "USDT",
+        "via": "wannaswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9816198155983039,
+    "capital": 181.87957253052173,
+    "EP": -3.3429800820126445
+  },
+  {
+    "route": [
+      {
+        "from": "USDC",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "WETH",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "WETH"
+      },
+      {
+        "to": "USDC",
+        "via": "wannaswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9741945255168867,
+    "capital": 138.49917743774643,
+    "EP": -3.574036989301959
   },
   {
     "route": [
@@ -1174,16 +1201,26 @@
         "from": "USDC"
       }
     ],
-    "index": 0.9689301418182883,
-    "capital": 103.11600773740064,
-    "EP": -3.2037997366653315
+    "index": 0.9687528723627128,
+    "capital": 115.46980110335741,
+    "EP": -3.6080996133287755
   },
   {
     "route": [
       {
         "from": "USDT",
         "to": "NEAR",
-        "via": "auroraswap"
+        "via": "trisolaris"
+      },
+      {
+        "to": "WETH",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "WETH"
       },
       {
         "to": "USDT",
@@ -1191,9 +1228,80 @@
         "from": "NEAR"
       }
     ],
-    "index": 0.9817715096672807,
-    "capital": 214.22375054588025,
-    "EP": -3.904975565864447
+    "index": 0.9738678352473735,
+    "capital": 139.00105570908562,
+    "EP": -3.6323984885788434
+  },
+  {
+    "route": [
+      {
+        "from": "USDT",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "WETH",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "WETH"
+      },
+      {
+        "to": "USDT",
+        "via": "auroraswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9735149507378177,
+    "capital": 139.00105570908562,
+    "EP": -3.681449807950486
+  },
+  {
+    "route": [
+      {
+        "from": "NEAR",
+        "to": "USDC",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDT",
+        "via": "trisolaris",
+        "from": "USDC"
+      },
+      {
+        "to": "USDC",
+        "via": "auroraswap",
+        "from": "USDT"
+      },
+      {
+        "to": "NEAR",
+        "via": "wannaswap",
+        "from": "USDC"
+      }
+    ],
+    "index": 0.9678116456498708,
+    "capital": 115.58209905080776,
+    "EP": -3.7203975607791335
+  },
+  {
+    "route": [
+      {
+        "from": "USDT",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDT",
+        "via": "wannaswap",
+        "from": "NEAR"
+      }
+    ],
+    "index": 0.9834379664319683,
+    "capital": 273.4425402987149,
+    "EP": -4.528764531355137
   },
   {
     "route": [
@@ -1213,26 +1321,9 @@
         "from": "AURORA"
       }
     ],
-    "index": 0.9845183700041823,
-    "capital": 262.68907390403854,
-    "EP": -4.0668550461263635
-  },
-  {
-    "route": [
-      {
-        "from": "USDT",
-        "to": "USDC",
-        "via": "auroraswap"
-      },
-      {
-        "to": "USDT",
-        "via": "wannaswap",
-        "from": "USDC"
-      }
-    ],
-    "index": 0.992120014888309,
-    "capital": 582.63937338,
-    "EP": -4.591189587719327
+    "index": 0.9781368629323957,
+    "capital": 234.76721232894457,
+    "EP": -5.132747742127094
   },
   {
     "route": [
@@ -1252,53 +1343,26 @@
         "from": "AURORA"
       }
     ],
-    "index": 0.9824098665991281,
-    "capital": 262.68907390403854,
-    "EP": -4.620735852923531
+    "index": 0.9778612333250238,
+    "capital": 234.76721232894457,
+    "EP": -5.197456536685081
   },
   {
     "route": [
       {
-        "from": "USDT",
+        "from": "USDC",
         "to": "NEAR",
         "via": "trisolaris"
       },
       {
-        "to": "USDT",
+        "to": "USDC",
         "via": "wannaswap",
         "from": "NEAR"
       }
     ],
-    "index": 0.985133481494857,
-    "capital": 416.2691415351247,
-    "EP": -6.188472895751886
-  },
-  {
-    "route": [
-      {
-        "from": "USDT",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "WETH",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "WETH"
-      },
-      {
-        "to": "USDT",
-        "via": "auroraswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9722945764865863,
-    "capital": 229.41020769867276,
-    "EP": -6.3559069625919165
+    "index": 0.9848396452416266,
+    "capital": 371.881256101877,
+    "EP": -5.637851770493967
   },
   {
     "route": [
@@ -1323,80 +1387,9 @@
         "from": "NEAR"
       }
     ],
-    "index": 0.9706982125711104,
-    "capital": 217.19736181649887,
-    "EP": -6.364270926062659
-  },
-  {
-    "route": [
-      {
-        "from": "USDC",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDC",
-        "via": "wannaswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9854030367149778,
-    "capital": 463.6064206536146,
-    "EP": -6.767245900981379
-  },
-  {
-    "route": [
-      {
-        "from": "USDC",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "WETH",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "WETH"
-      },
-      {
-        "to": "USDC",
-        "via": "wannaswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9700580994091726,
-    "capital": 229.39286364538785,
-    "EP": -6.868458319515412
-  },
-  {
-    "route": [
-      {
-        "from": "USDT",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "WETH",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "WETH"
-      },
-      {
-        "to": "USDT",
-        "via": "wannaswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.9699227575323677,
-    "capital": 229.4101979955764,
-    "EP": -6.9000261496604764
+    "index": 0.9686043365828025,
+    "capital": 184.8028535607833,
+    "EP": -5.802008188931978
   },
   {
     "route": [
@@ -1421,75 +1414,9 @@
         "from": "NEAR"
       }
     ],
-    "index": 0.9664967521848637,
-    "capital": 217.62331650675398,
-    "EP": -7.2910879032775995
-  },
-  {
-    "route": [
-      {
-        "from": "USDC",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "WETH",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "NEAR",
-        "via": "wannaswap",
-        "from": "WETH"
-      },
-      {
-        "to": "USDC",
-        "via": "auroraswap",
-        "from": "NEAR"
-      }
-    ],
-    "index": 0.965300373063901,
-    "capital": 229.39286364538785,
-    "EP": -7.959846790298371
-  },
-  {
-    "route": [
-      {
-        "from": "USDC",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDT",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "USDC",
-        "via": "auroraswap",
-        "from": "USDT"
-      }
-    ],
-    "index": 0.9845220612138589,
-    "capital": 591.885411581461,
-    "EP": -9.161166168867794
-  },
-  {
-    "route": [
-      {
-        "from": "USDC",
-        "to": "USDT",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDC",
-        "via": "wannaswap",
-        "from": "USDT"
-      }
-    ],
-    "index": 0.9867324045243311,
-    "capital": 987.8258063798098,
-    "EP": -13.106073199473713
+    "index": 0.9667397852100866,
+    "capital": 184.61953153835725,
+    "EP": -6.140485273378943
   },
   {
     "route": [
@@ -1514,9 +1441,9 @@
         "from": "NEAR"
       }
     ],
-    "index": 0.9688602342708806,
-    "capital": 423.2879894123668,
-    "EP": -13.181088826251084
+    "index": 0.9692535915308167,
+    "capital": 277.3547618733348,
+    "EP": -8.52766279943063
   },
   {
     "route": [
@@ -1541,9 +1468,9 @@
         "from": "NEAR"
       }
     ],
-    "index": 0.9683302468365409,
-    "capital": 423.4925739220418,
-    "EP": -13.41190528266901
+    "index": 0.96921266980617,
+    "capital": 277.6611260473509,
+    "EP": -8.548444769610455
   },
   {
     "route": [
@@ -1558,9 +1485,9 @@
         "from": "USDT"
       }
     ],
-    "index": 0.9762883419033925,
-    "capital": 592.0957325013841,
-    "EP": -14.039571569533223
+    "index": 0.9851294828159829,
+    "capital": 584.444096315,
+    "EP": -8.690985977349555
   },
   {
     "route": [
@@ -1575,16 +1502,33 @@
         "from": "USDC"
       }
     ],
-    "index": 0.9737553791320787,
-    "capital": 598.3426493616029,
-    "EP": -15.703275981602815
+    "index": 0.9843017692398683,
+    "capital": 590.3005514722503,
+    "EP": -9.266674274844377
+  },
+  {
+    "route": [
+      {
+        "from": "USDC",
+        "to": "USDT",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDC",
+        "via": "auroraswap",
+        "from": "USDT"
+      }
+    ],
+    "index": 0.9840429374138773,
+    "capital": 593.9213362487551,
+    "EP": -9.477239933755072
   },
   {
     "route": [
       {
         "from": "USDT",
         "to": "USDC",
-        "via": "trisolaris"
+        "via": "auroraswap"
       },
       {
         "to": "USDT",
@@ -1592,9 +1536,9 @@
         "from": "USDC"
       }
     ],
-    "index": 0.9816189271410439,
-    "capital": 1000.8445540535478,
-    "EP": -18.39659666854766
+    "index": 0.9832161367617959,
+    "capital": 590.3781794487223,
+    "EP": -9.908826622687343
   },
   {
     "route": [
@@ -1614,9 +1558,87 @@
         "from": "USDC"
       }
     ],
-    "index": 0.968251145357215,
-    "capital": 601.7440580099164,
-    "EP": -19.10468462991639
+    "index": 0.9775298602911631,
+    "capital": 594.3899013216247,
+    "EP": -13.35602412421872
+  },
+  {
+    "route": [
+      {
+        "from": "USDC",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDT",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "USDC",
+        "via": "auroraswap",
+        "from": "USDT"
+      }
+    ],
+    "index": 0.9752567362762984,
+    "capital": 599.272042504941,
+    "EP": -14.82794618994103
+  },
+  {
+    "route": [
+      {
+        "from": "USDC",
+        "to": "USDT",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDC",
+        "via": "wannaswap",
+        "from": "USDT"
+      }
+    ],
+    "index": 0.9849999575721538,
+    "capital": 994.0512196806624,
+    "EP": -14.910810470662227
+  },
+  {
+    "route": [
+      {
+        "from": "USDT",
+        "to": "USDC",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDT",
+        "via": "wannaswap",
+        "from": "USDC"
+      }
+    ],
+    "index": 0.9833454354367525,
+    "capital": 988.9519411175778,
+    "EP": -16.47056395329173
+  },
+  {
+    "route": [
+      {
+        "from": "USDT",
+        "to": "NEAR",
+        "via": "trisolaris"
+      },
+      {
+        "to": "USDC",
+        "via": "trisolaris",
+        "from": "NEAR"
+      },
+      {
+        "to": "USDT",
+        "via": "wannaswap",
+        "from": "USDC"
+      }
+    ],
+    "index": 0.9764779151586251,
+    "capital": 995.9071905956115,
+    "EP": -23.42581343132531
   },
   {
     "route": [
@@ -1636,31 +1658,9 @@
         "from": "USDT"
       }
     ],
-    "index": 0.9766352567929328,
-    "capital": 998.0386499470774,
-    "EP": -23.318916766741495
-  },
-  {
-    "route": [
-      {
-        "from": "USDT",
-        "to": "NEAR",
-        "via": "trisolaris"
-      },
-      {
-        "to": "USDC",
-        "via": "trisolaris",
-        "from": "NEAR"
-      },
-      {
-        "to": "USDT",
-        "via": "wannaswap",
-        "from": "USDC"
-      }
-    ],
-    "index": 0.9760702440029534,
-    "capital": 1006.5340721338775,
-    "EP": -24.086114748877435
+    "index": 0.9762051733504732,
+    "capital": 1003.0067817090671,
+    "EP": -23.866372499066983
   },
   {
     "route": [
@@ -1680,9 +1680,9 @@
         "from": "USDT"
       }
     ],
-    "index": 0.9781522106412678,
-    "capital": 3560.9014865486342,
-    "EP": -77.79782560531112
+    "index": 0.9773221187089411,
+    "capital": 3979.124155924312,
+    "EP": -90.23810525043609
   },
   {
     "route": [
@@ -1702,9 +1702,9 @@
         "from": "USDC"
       }
     ],
-    "index": 0.9786092282727508,
-    "capital": 16162.683841565611,
-    "EP": -345.73228055463005
+    "index": 0.9774013262978059,
+    "capital": 12956.479097476893,
+    "EP": -292.79924345317886
   },
   {
     "route": [
@@ -1724,8 +1724,8 @@
         "from": "USDT"
       }
     ],
-    "index": 0.9741013939570967,
-    "capital": 16159.296176662972,
-    "EP": -418.50324560998706
+    "index": 0.9753849882435193,
+    "capital": 12928.493637304726,
+    "EP": -318.23502287584233
   }
 ]

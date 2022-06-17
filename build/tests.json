@@ -1,0 +1,20 @@
+{
+  "contracts": {},
+  "tests": {
+    "tests/test_Aurora.py": {
+      "coverage": false,
+      "isolated": false,
+      "results": "..ss",
+      "sha1": "7bdadddf4bb73655bc6bf0955e8bdb87d4ad2812",
+      "txhash": []
+    },
+    "tests/test_tes.py": {
+      "coverage": false,
+      "isolated": false,
+      "results": ".",
+      "sha1": "e5724047d1dc20415af870338619350b0c60f78f",
+      "txhash": []
+    }
+  },
+  "tx": {}
+}
