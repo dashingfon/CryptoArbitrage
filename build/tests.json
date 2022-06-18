@@ -4,8 +4,8 @@
     "tests/test_Aurora.py": {
       "coverage": false,
       "isolated": false,
-      "results": "..ss",
-      "sha1": "7bdadddf4bb73655bc6bf0955e8bdb87d4ad2812",
+      "results": "...sss",
+      "sha1": "c0ea8b69803e100560d36c4fe51b3e3dd4809584",
       "txhash": []
     },
     "tests/test_tes.py": {

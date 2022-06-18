@@ -7,7 +7,6 @@ def Aurorasetup():
     Aurora = Blc.Aurora()
     return Aurora
 
-
 def equal(list1,list2):
     list_dif = [i for i in list1 + list2 if i not in list1 or i not in list2]
     return False if list_dif else True
@@ -112,12 +111,19 @@ def test_BuildGraph(Aurorasetup):
     Aurorasetup.buildGraph(exchanges) 
     assert Aurorasetup.graph == graph
 
-
 #@pytest.mark.noData
 def test_getArbRoute(Aurorasetup):
     Aurorasetup.buildGraph(exchanges) 
     route = Aurorasetup.getArbRoute(tokens = tokens, save = False)
     assert equal(route,arbRoute)
+
+
+price = {'WETH': 2.141651224104825, 'WBTC': 0.11160318}
+def test_getRate(Aurorasetup):
+    r1 = Aurorasetup.r1
+    impact = Aurorasetup.impact
+    rate = r1 * price['WETH'] / (1 + (impact * r1)) / price['WBTC']
+    assert rate == Aurorasetup.getRate(price,'WETH','WBTC')
 
 @pytest.mark.skip(reason = 'incomplete')
 def test_getPrice():
@@ -125,4 +131,8 @@ def test_getPrice():
 
 @pytest.mark.skip(reason = 'incomplete')
 def test_pollRoute():
+    assert True
+
+@pytest.mark.skip(reason = 'incomplete')
+def test_execution():
     assert True

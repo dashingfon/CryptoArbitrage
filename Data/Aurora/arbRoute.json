@@ -345,6 +345,145 @@
       "via": "trisolaris"
     },
     {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "trisolaris"
+    },
+    {
       "to": "USDT",
       "via": "auroraswap",
       "from": "USDC"
@@ -369,9 +508,487 @@
       "via": "auroraswap"
     },
     {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    },
+    {
       "to": "USDT",
       "via": "wannaswap",
       "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
     }
   ],
   [
@@ -388,6 +1005,508 @@
   ],
   [
     {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "USDT",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
       "from": "USDC",
       "to": "NEAR",
       "via": "trisolaris"
@@ -723,6 +1842,145 @@
       "to": "USDC",
       "via": "wannaswap",
       "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "USDT"
     }
   ],
   [
@@ -756,9 +2014,487 @@
       "via": "auroraswap"
     },
     {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    },
+    {
       "to": "USDC",
       "via": "wannaswap",
       "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
     }
   ],
   [
@@ -775,6 +2511,508 @@
   ],
   [
     {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WETH"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "USDC",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
       "from": "NEAR",
       "to": "WETH",
       "via": "trisolaris"
@@ -1079,6 +3317,145 @@
       "via": "trisolaris"
     },
     {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "trisolaris"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "trisolaris"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "trisolaris"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "trisolaris"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "trisolaris"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "trisolaris"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "trisolaris"
+    },
+    {
       "to": "NEAR",
       "via": "auroraswap",
       "from": "USDT"
@@ -1101,6 +3478,262 @@
       "from": "NEAR",
       "to": "WBTC",
       "via": "trisolaris"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WBTC",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WBTC",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WBTC",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WBTC",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WBTC",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "WBTC",
+      "via": "wannaswap",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WBTC",
+      "via": "trisolaris"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "WBTC",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "WBTC",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "WBTC",
+      "via": "wannaswap",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "WBTC",
+      "via": "wannaswap",
+      "from": "WETH"
     },
     {
       "to": "NEAR",
@@ -1128,8 +3761,310 @@
     },
     {
       "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
       "via": "wannaswap",
       "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
     }
   ],
   [
@@ -1151,6 +4086,118 @@
       "via": "auroraswap"
     },
     {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "auroraswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
       "to": "NEAR",
       "via": "wannaswap",
       "from": "WETH"
@@ -1158,6 +4205,760 @@
   ],
   [
     {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "WBTC",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "WBTC",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "WBTC",
+      "via": "wannaswap",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "WBTC",
+      "via": "wannaswap",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "AURORA",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WBTC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WBTC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WBTC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WBTC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WBTC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WBTC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WBTC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "WBTC",
+      "via": "wannaswap",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "wannaswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "wannaswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "WETH",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "auroraswap",
+      "from": "WETH"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "WETH"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "auroraswap",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "USDC"
+    },
+    {
+      "to": "USDC",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "USDT"
+    },
+    {
+      "to": "USDT",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
+      "from": "NEAR",
+      "to": "USDT",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    }
+  ],
+  [
+    {
       "from": "WETH",
       "to": "AURORA",
       "via": "trisolaris"
@@ -1287,6 +5088,321 @@
     {
       "to": "NEAR",
       "via": "trisolaris",
+      "from": "AURORA"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "trisolaris"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
       "from": "AURORA"
     },
     {
@@ -1327,6 +5443,450 @@
     },
     {
       "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "auroraswap"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "WBTC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "WBTC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "WBTC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "WBTC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    },
+    {
+      "to": "AURORA",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "WBTC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    },
+    {
+      "to": "WBTC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "WBTC",
+      "via": "auroraswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    },
+    {
+      "to": "WETH",
       "via": "wannaswap",
       "from": "NEAR"
     }
@@ -1340,6 +5900,474 @@
     {
       "to": "WETH",
       "via": "wannaswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDC"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDC"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "auroraswap",
+      "from": "USDT"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "USDT",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "USDT"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "WBTC"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WBTC",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "NEAR",
+      "via": "wannaswap",
+      "from": "AURORA"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "NEAR",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "WBTC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "WBTC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    },
+    {
+      "to": "AURORA",
+      "via": "trisolaris",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "WBTC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "WBTC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    },
+    {
+      "to": "AURORA",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "trisolaris",
+      "from": "AURORA"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "WBTC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    },
+    {
+      "to": "WBTC",
+      "via": "wannaswap",
+      "from": "NEAR"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
+      "from": "WBTC"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "WBTC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "NEAR",
+      "via": "trisolaris",
+      "from": "WBTC"
+    },
+    {
+      "to": "WETH",
+      "via": "wannaswap",
+      "from": "NEAR"
+    }
+  ],
+  [
+    {
+      "from": "WETH",
+      "to": "WBTC",
+      "via": "wannaswap"
+    },
+    {
+      "to": "WETH",
+      "via": "auroraswap",
       "from": "WBTC"
     }
   ]

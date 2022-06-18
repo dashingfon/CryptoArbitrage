@@ -1,6 +1,11 @@
-import scripts.Config as Cfg
+if __name__ == '__main__':
+    import Config as Cfg
+    import Controller as Ctr
+else:
+    import scripts.Config as Cfg
+    import scripts.Controller as Ctr
+
 import requests, json, time, os
-import scripts.Controller as Ctr
 
 from functools import wraps
 
@@ -40,7 +45,6 @@ class Aurora():
         self.depthLimit = 4
         self.graph = {}
         self.arbRoutes = []
-
 
     def buildGraph(self, exchanges = {}):
         graph = {}
@@ -96,7 +100,7 @@ class Aurora():
             # recursive function to search the node to the specified depth
             result += self.dive(depth + 1, i['to'],goal,new_path,followed)
             followed = []
-            
+
         return result
            
     def getArbRoute(self, tokens = Cfg.startTokens,save = True):
@@ -124,8 +128,13 @@ class Aurora():
         if response.status_code == 200:
             for i in response.json()['result']:
                 price[i['symbol']] = int(i['balance']) / 10**int(i['decimals'])
-        
+        else:
+            print('unsuccesful request!')
+
         return price
+
+    def getRate(self, price, to, fro):
+        return self.r1 * price[to] / (1 + (self.impact * self.r1)) / price[fro] 
 
     def pollRoute(self, route):
         rates = []
@@ -135,14 +144,26 @@ class Aurora():
         session = requests.Session()
 
         for index, swap in enumerate(route):
+            retries = 3
+            done = False
 
-            price = self.getPrice(
-                session, 
-                Cfg.AuroraExchanges[swap['via']][frozenset([swap['from'],swap['to']])])
+            while retries and not done:
+                try:
+                    price = self.getPrice(
+                        session, 
+                        self.exchanges[swap['via']][frozenset([swap['from'],swap['to']])])
+                except ConnectionError:
+                    retries -= 1
+                    time.sleep(30)
+                    print(f'Connection error \nRetring {3 - retries}/3 ...')
+                    
+                else:
+                    done = True
 
             print(price)
-            rate = self.r1 * price[swap['to']] / (1 + (self.impact * self.r1)) / price[swap['from']] 
-                
+             
+            rate = self.getRate(price, swap['to'], swap['from'])
+
             if index == 0:
                 least = min(price[swap['from']],price[swap['to']])
                 forward = price[swap['to']]
@@ -167,7 +188,7 @@ class Aurora():
 
         EP = (capital * rates[-1]) - capital
 
-        return [capital,rates[-1],EP]
+        return [capital,rates,EP]
 
     def pollRoutes(self, routes = []):
         print('polling routes ...')
@@ -175,14 +196,19 @@ class Aurora():
             with open(self.routePath) as RO:
                 routes = json.load(RO)
 
+        cycle = 73
+
         result = []
         routeLenght = len(routes)
         for pos, route in enumerate(routes):
+            if pos % cycle == 72:
+                print('pausing for the api..')
+                time.sleep(60)
             print(f'{pos + 1} / {routeLenght}')
-            capital, index, EP = self.pollRoute(route)
+            capital, rates, EP = self.pollRoute(route)
             result.append({
                 'route' : route,
-                'index' : index,
+                'index' : rates[-1],
                 'capital' : capital,
                 'EP' : EP
             })
@@ -218,20 +244,33 @@ class Aurora():
             if EP >= expectedProfit:
                 pass
 
+route = [
+    {
+    'from' : 'AURORA',
+    'to' : 'WETH',
+    'via' : 'trisolaris'},
+    {
+    'from' : 'WETH',
+    'to' : 'NEAR',
+    'via' : 'wannaswap'},
+    {
+    'from' : 'NEAR',
+    'to' : 'AURORA',
+    'via' : 'wannaswap'},
+    ]
 
 if __name__ == '__main__':
     Aurora = Aurora()
-    Aurora.buildGraph()
-    print(Aurora.graph)
-    '''Aurora = Aurora()
+    res = Aurora.pollRoute(route)
+    print(res)
+    '''
     results = Aurora.pollRoutes()
     path = os.path.join(os.path.split(os.path.dirname(__file__))[0], 'Dump.json')
 
     with open(path,'w') as DP:
-        json.dump(results, DP, indent = 2)'''
+        json.dump(results, DP, indent = 2)
+    '''
 
-# test get price
-# then poll route
           
 
  

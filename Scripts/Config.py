@@ -69,3 +69,4 @@ AuroraParams = {
 AuroraHeaders = {'Host' : 'explorer.mainnet.aurora.dev'}
 exampleRequestUrl = 'https://explorer.mainnet.aurora.dev/api?module=account&action=tokenlist&address=0x5eeC60F348cB1D661E4A5122CF4638c7DB7A886e'
 
+# Arbitrum Network
