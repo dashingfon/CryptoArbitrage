@@ -1,10 +1,10 @@
-import scripts.Blockchains as Blc
+import scripts
 import pytest
 
 
 @pytest.fixture(scope = 'module')
 def Aurorasetup():
-    Aurora = Blc.Aurora()
+    Aurora = scripts.Blockchains.Aurora()
     return Aurora
 
 def equal(list1,list2):
@@ -115,6 +115,7 @@ def test_BuildGraph(Aurorasetup):
 def test_getArbRoute(Aurorasetup):
     Aurorasetup.buildGraph(exchanges) 
     route = Aurorasetup.getArbRoute(tokens = tokens, save = False)
+    print(route)
     assert equal(route,arbRoute)
 
 

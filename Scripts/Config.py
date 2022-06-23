@@ -16,14 +16,15 @@ AuroraTokens = {
     
 }
 
-DodoPools = {
+#Loan Provider
+AuroraDodoPools = {
     ('USDT', 'USDC') : '0x6790424249cad1bce244b55afbb240703f5265f6',
     ('NEAR', 'WETH') : '0xedE8950332E6B618C53E7506bca92012702CA697'
 }
 
-startTokens = ['USDT', 'USDC', 'NEAR', 'WETH']
+AuroraStartTokens = ['USDT', 'USDC', 'NEAR', 'WETH']
 
-Routers = {
+AuroraRouters = {
     'trisolaris' : '0x2CB45Edb4517d5947aFdE3BEAbF95A582506858B',
     'auroraswap' : '0xA1B1742e9c32C7cAa9726d8204bD5715e3419861',
     'wannaswap' : '0xa3a1eF5Ae6561572023363862e238aFA84C72ef5'
@@ -70,3 +71,52 @@ AuroraHeaders = {'Host' : 'explorer.mainnet.aurora.dev'}
 exampleRequestUrl = 'https://explorer.mainnet.aurora.dev/api?module=account&action=tokenlist&address=0x5eeC60F348cB1D661E4A5122CF4638c7DB7A886e'
 
 # Arbitrum Network
+
+ArbitrumTokens = {
+
+}
+
+ArbitrumStartTokens = []
+
+ArbitrumRouters = {
+
+}
+
+ArbitrumExchanges = {
+
+}
+
+ArbitrumParams = {
+
+}
+
+ArbitrumHeaders = {
+
+}
+
+
+# Arbitrum Network
+
+ArbitrumTokens = {
+
+}
+
+ArbitrumStartTokens = {
+
+}
+
+ArbitrumRouters = {
+
+}
+
+ArbitrumExchanges = {
+
+}
+
+ArbitrumParams = {
+
+}
+
+ArbitrumHeaders = {
+
+}

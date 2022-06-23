@@ -1,18 +1,11 @@
 {
   "contracts": {},
   "tests": {
-    "tests/test_Aurora.py": {
+    "tests/test_Blockchains.py": {
       "coverage": false,
       "isolated": false,
       "results": "...sss",
-      "sha1": "c0ea8b69803e100560d36c4fe51b3e3dd4809584",
-      "txhash": []
-    },
-    "tests/test_tes.py": {
-      "coverage": false,
-      "isolated": false,
-      "results": ".",
-      "sha1": "e5724047d1dc20415af870338619350b0c60f78f",
+      "sha1": "b78d8204e03cfd4c7006e29a89af08e74c45f2b0",
       "txhash": []
     }
   },
