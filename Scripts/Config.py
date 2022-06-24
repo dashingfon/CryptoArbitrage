@@ -23,6 +23,7 @@ AuroraDodoPools = {
 }
 
 AuroraStartTokens = ['USDT', 'USDC', 'NEAR', 'WETH']
+StartExchanges = []
 
 AuroraRouters = {
     'trisolaris' : '0x2CB45Edb4517d5947aFdE3BEAbF95A582506858B',

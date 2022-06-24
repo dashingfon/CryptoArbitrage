@@ -1,10 +1,10 @@
-import scripts
+from scripts import Blockchains 
 import pytest
 
 
 @pytest.fixture(scope = 'module')
 def Aurorasetup():
-    Aurora = scripts.Blockchains.Aurora()
+    Aurora = Blockchains.Aurora()
     return Aurora
 
 def equal(list1,list2):

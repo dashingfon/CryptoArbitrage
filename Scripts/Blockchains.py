@@ -96,7 +96,7 @@ class Blockchain:
 
         if tokens == 'default':
             tokens = self.startTokens
-        elif not tokens:
+        elif tokens == 'all':
             tokens = self.tokens.keys()
 
         if graph:
@@ -260,6 +260,7 @@ class Aurora(Blockchain):
         self.exchanges = Cfg.AuroraExchanges
         self.tokens = Cfg.AuroraTokens
         self.startTokens = Cfg.AuroraStartTokens
+        self.startExchanges = None
 
         self.pollPath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
             'data', 'Aurora', 'pollResult.json')
@@ -273,6 +274,10 @@ class Arbitrum(Blockchain):
     def __init__(self):
         super().__init__()
         self.source = 'https://arbiscan.io/address/'
+        self.exchanges = None
+        self.tokens = None
+        self.startTokens = None
+        self.startExchanges = None
 
         self.pollPath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
             'data', 'Arbitrum', 'pollResult.json')
@@ -284,7 +289,11 @@ class BSC(Blockchain):
     def __init__(self):
         super().__init__()
         self.source = 'https://bscscan.com/address/'
-
+        self.exchanges = None
+        self.tokens = None
+        self.startTokens = None
+        self.startExchanges = None
+        
         self.pollPath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
             'data', 'BSC', 'pollResult.json')
 
