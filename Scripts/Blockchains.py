@@ -70,17 +70,24 @@ class Blockchain:
         
         return result
 
-    def DLS(self,goal):
+    def DLS(self,goal,exchanges):
         # implementation of depth limited search
+        start = []
         result = []
         path = {'from': goal}
         followed = []
         depth = 1
 
-        if goal in self.graph:
+        if exchanges == 'default':
+            exchanges = self.startExchanges
+
+        if goal in self.graph and exchanges == 'all':
             start = self.graph[goal]
-        else:
-            start = []
+                 
+        elif goal in self.graph:
+            for i in self.graph[goal]:
+                if i['via'] in exchanges:
+                    start.append(i)  
 
         for i in start:
             followed.append(frozenset([goal,i['to'],i['via']]))
@@ -91,19 +98,30 @@ class Blockchain:
 
         return result
            
-    def getArbRoute(self, tokens = 'default', graph = False, save = True):
+    def getArbRoute(self, tokens = 'default', exchanges = 'all',graph = False, save = True):
         route = []
+
+        if graph:
+            self.buildGraph()
+
+        # add functionality to get routes from specific start exchanges
 
         if tokens == 'default':
             tokens = self.startTokens
         elif tokens == 'all':
             tokens = self.tokens.keys()
 
-        if graph:
-            self.buildGraph()
+        if exchanges == 'default':
+            exchanges = self.startExchanges
+        
+        if type(tokens) != list:
+            raise ValueError('invalid token argument')
+        
+        if type(exchanges) != list and exchanges != 'all':
+            raise ValueError('invalid token argument')
 
         for token in tokens:
-            route += self.DLS(token)
+            route += self.DLS(token,exchanges)
     
         if save:
             with open(self.routePath,'w') as AR:
@@ -114,21 +132,22 @@ class Blockchain:
     def extract(self,content):
         price = {}
         soup = BeautifulSoup(content, 'html.parser')
-        tokensList = soup.find_all('li',class_ = 'list-custom')
-        #print(tokensList)
-        for token in tokensList:
-            try:
+
+        try:
+            tokensList = soup.find_all('li',class_ = 'list-custom')
+            #print(tokensList)
+            for token in tokensList:
                 raw = token.find(class_ = 'list-amount').string
                 rawPrice = str(raw).split()
                 price[rawPrice[1]] = float(rawPrice[0].replace(',',''))
-            except:
-                print('Error parsing html')
+        except:
+            print('Error parsing html')
             
         return price
     
     @RateLimited(1)
     def getPrice(self, session, address):
-
+        price = {}
         url = self.source + address
         response = session.get(url)
         
@@ -141,6 +160,9 @@ class Blockchain:
         return price
 
     def getRate(self, price, to, fro):
+        if (to not in price) or (fro not in price):
+            raise ValueError('currency not in price dictionary')
+
         return self.r1 * price[to] / (1 + (self.impact * self.r1)) / price[fro] 
 
     def pollRoute(self, route):
@@ -151,22 +173,23 @@ class Blockchain:
         session = requests.Session()
 
         for index, swap in enumerate(route):
-            retries = 3
+            attemptsAllowed = 4
+            tries = 0
             done = False
 
-            while retries and not done:
+            while tries < attemptsAllowed and not done:
                 try:
                     price = self.getPrice(
                         session, 
                         self.exchanges[swap['via']][frozenset([swap['from'],swap['to']])])
                 except:
-                    retries -= 1
                     time.sleep(10)
-                    print(f'Error \nRetring {3 - retries}/3 ...')
-                    
+                    tries += 1
+                    print(f'Error \nRetring... \n{attemptsAllowed - tries} tries left')
                 else:
                     done = True
 
+            
             print(price)
              
             rate = self.getRate(price, swap['to'], swap['from'])
@@ -194,7 +217,6 @@ class Blockchain:
             capital = liquidity[index] / rates[index] * self.impact 
 
         EP = (capital * rates[-1]) - capital
-
         return [capital,rates,EP]
 
     def pollRoutes(self, routes = [], save = True):
@@ -205,6 +227,7 @@ class Blockchain:
 
         result = []
         routeLenght = len(routes)
+
         try:
             for pos, route in enumerate(routes):
                 print(f'{pos + 1} / {routeLenght}')
@@ -216,7 +239,7 @@ class Blockchain:
                     'EP' : EP
                 })
         finally:
-            export = sorted(result, key = lambda v : v['EP'], reverse = True)
+            export = sorted(result, key = lambda v : v['index'], reverse = True)
         
             if save:
                 with open(self.pollPath,'w') as DP:
@@ -250,8 +273,7 @@ class Blockchain:
 
         for route in routes:
             _, _, EP = self.pollRoute(route)
-            if EP >= expectedProfit:
-                pass
+
 
 class Aurora(Blockchain):
     def __init__(self):

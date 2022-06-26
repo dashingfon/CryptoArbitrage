@@ -50,3 +50,5 @@ def extract(content):
 
 #price = extract(get('0x03B666f3488a7992b2385B12dF7f35156d7b29cD'))
 #print(price)
+r = [1,2,3,4]
+print(r[::2])

@@ -2,15 +2,6 @@ from scripts import Blockchains
 import pytest
 
 
-@pytest.fixture(scope = 'module')
-def Aurorasetup():
-    Aurora = Blockchains.Aurora()
-    return Aurora
-
-def equal(list1,list2):
-    list_dif = [i for i in list1 + list2 if i not in list1 or i not in list2]
-    return False if list_dif else True
-
 exchanges = {
     'trisolaris' : {
         frozenset(('AURORA', 'WETH')) : '0x5eeC60F348cB1D661E4A5122CF4638c7DB7A886e',
@@ -46,7 +37,7 @@ graph = {
 }
 
 tokens = ['AURORA','WETH']
-
+price = {'WETH': 2.141651224104825, 'WBTC': 0.11160318}
 arbRoute = [
     [
         {
@@ -106,34 +97,69 @@ arbRoute = [
     ],
     ]
 
+@pytest.fixture(scope = 'module')
+def Aurorasetup():
+    Aurora = Blockchains.Aurora()
+    Aurora.buildGraph(exchanges) 
+    return Aurora
+
+def equal(list1,list2):
+    list_dif = [i for i in list1 + list2 if i not in list1 or i not in list2]
+    return False if list_dif else True
+
 #@pytest.mark.noData
 def test_BuildGraph(Aurorasetup):
-    Aurorasetup.buildGraph(exchanges) 
     assert Aurorasetup.graph == graph
 
-#@pytest.mark.noData
-def test_getArbRoute(Aurorasetup):
-    Aurorasetup.buildGraph(exchanges) 
-    route = Aurorasetup.getArbRoute(tokens = tokens, save = False)
-    print(route)
-    assert equal(route,arbRoute)
+class TestArbRoute:
+    #refactor the DLS tests to multiple ones
+    def test_DLS(self,Aurorasetup):
+        route = Aurorasetup.DLS('AURORA',exchanges)
+        assert equal(route,arbRoute[:2])
+
+    #testing default as token
+    def test_normalGetRoute(self,Aurorasetup):
+        route = Aurorasetup.getArbRoute(tokens = tokens, save = False,exchanges = 'all')
+        assert equal(route,arbRoute)
+    
+    @pytest.mark.parametrize('toks',[{},''])
+    def test_invalidToken(self,Aurorasetup,toks):
+        with pytest.raises(ValueError):
+            Aurorasetup.getArbRoute(tokens = toks, save = False,exchanges = 'all')
+
+    #need to parametrize inputs to check other edge cases
+    def test_startExchanges(self,Aurorasetup):
+        route = Aurorasetup.getArbRoute(tokens = tokens, save = False,exchanges = ['trisolaris'])
+        assert equal(route,arbRoute[::2])
 
 
-price = {'WETH': 2.141651224104825, 'WBTC': 0.11160318}
-def test_getRate(Aurorasetup):
-    r1 = Aurorasetup.r1
-    impact = Aurorasetup.impact
-    rate = r1 * price['WETH'] / (1 + (impact * r1)) / price['WBTC']
-    assert rate == Aurorasetup.getRate(price,'WETH','WBTC')
+class TestRate:
 
-@pytest.mark.skip(reason = 'incomplete')
-def test_getPrice():
-    assert True
+    def test_getRate(self,Aurorasetup):
+        r1 = Aurorasetup.r1
+        impact = Aurorasetup.impact
+        rate = r1 * price['WETH'] / (1 + (impact * r1)) / price['WBTC']
+        assert rate == Aurorasetup.getRate(price,'WETH','WBTC')
 
-@pytest.mark.skip(reason = 'incomplete')
-def test_pollRoute():
-    assert True
+    @pytest.mark.parametrize('prices',[{'WETH': 2.141651224104825},{'WBTC': 0.11160318}])
+    def test_invalidRate(self, Aurorasetup,prices):
+        with pytest.raises(ValueError):
+            Aurorasetup.getRate(prices,'WETH','WBTC')
 
-@pytest.mark.skip(reason = 'incomplete')
-def test_execution():
-    assert True
+class TestPollRoute:
+
+    @pytest.mark.skip(reason = 'incomplete')
+    def test_pollRoute():
+        assert True
+
+class TestgetPrice:
+
+    @pytest.mark.skip(reason = 'incomplete')
+    def test_getPrice():
+        assert True
+
+class TestExceution:
+
+    @pytest.mark.skip(reason = 'incomplete')
+    def test_execution(self,):
+        assert True
