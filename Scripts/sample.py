@@ -50,5 +50,16 @@ def extract(content):
 
 #price = extract(get('0x03B666f3488a7992b2385B12dF7f35156d7b29cD'))
 #print(price)
-r = [1,2,3,4]
-print(r[::2])
+def r(value):
+    counter = 1
+    for i in range(value):
+        yield f'yielding the value {value} {counter}/{value} times '
+        counter += 1
+
+def reep(values):
+    for i in values:
+        for j in r(i):
+            yield j
+
+r = {'2':3,'4':4}
+print(r.keys())

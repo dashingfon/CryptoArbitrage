@@ -1,11 +1,21 @@
-from . import Config as Cfg
-from . import Controller as Ctr
-import requests, json, time, os
+'''
+This module contains the Blockchain main class that other specific blockchain classes inherit from
+to import the config and controller modules
+'''
+import Config as Cfg
+import Controller as Ctr
 
+'''
+Then to import the other modules needed
+'''
+import requests, json, time, os
 from functools import wraps
 from bs4 import BeautifulSoup
 
-
+'''
+This is the Ratelimited function used to decorate the getPrice function that limits the rate
+at which requests are being sent
+'''
 def RateLimited(maxPerSecond):
     mininterval = 1.0 / float(maxPerSecond)
 
@@ -25,11 +35,13 @@ def RateLimited(maxPerSecond):
         return ratelimitedFunction
     return decorate
 
-
+'''
+the main blockchain class containing all the methods
+'''
 class Blockchain:
     def __init__(self):
-        self.impact = 0.005
-        self.r1 = 0.997
+        self.impact = 0.005 # represents the fraction of the liquidity pool 
+        self.r1 = 0.997 
         self.depthLimit = 4
         self.graph = {}
         self.arbRoutes = []
@@ -149,7 +161,7 @@ class Blockchain:
     def getPrice(self, session, address):
         price = {}
         url = self.source + address
-        response = session.get(url)
+        response = session.get(url,headers = self.headers)
         
         if response.status_code == 200:
             price = self.extract(response.text)
@@ -165,9 +177,38 @@ class Blockchain:
 
         return self.r1 * price[to] / (1 + (self.impact * self.r1)) / price[fro] 
 
+    def getDetails(self,listItems,least,rates):
+        try:
+            index = listItems.index(least)
+        except ValueError:
+            capital = least * self.impact
+        else:
+            capital = listItems[index] / rates[index] * self.impact 
+        
+        EP = (capital * rates[-1]) - capital
+        return [capital,rates,EP]
+
+    def cumSum(self,listItem):
+        result = [listItem[0]]
+        for i in listItem[1:]:
+            result.append(i*result[-1])
+        return result
+
+    def Simplyfy(self,route):
+        result = []
+        _result = []
+        result.append(route[0]['from']+' '+route[0]['to']+' '+route[0]['via'])
+        _result.append(route[0]['to']+' '+route[0]['from']+' '+route[0]['via'])
+        for j in route[1:]:
+            result.append(j['from']+' '+j['to']+' '+j['via'])
+            _result.insert(0,j['to']+' '+j['from']+' '+j['via'])
+            
+        return ['-'.join(result),'-'.join(_result)]
+
+
     def pollRoute(self, route):
-        rates = []
-        liquidity = []
+        rates = [[],[]]
+        liquidity = [[],[]]
         least = 0
         lenght = len(route)
         session = requests.Session()
@@ -192,32 +233,37 @@ class Blockchain:
             
             print(price)
              
-            rate = self.getRate(price, swap['to'], swap['from'])
+            rate = (self.getRate(price, swap['to'], swap['from']),
+            self.getRate(price, swap['from'], swap['to']))
 
             if index == 0:
                 least = min(price[swap['from']],price[swap['to']])
+                liquidity[0].append(price[swap['from']])
                 forward = price[swap['to']]
-                rates.append(rate)
-
+                rates[0].append(rate[0])
+                rates[1].insert(0,rate[1])
+                
             elif index == lenght - 1:
                 least = min(price[swap['from']],price[swap['to']],least)
-                rates.append(rate * rates[-1])
-                liquidity += [min(price[swap['from']],forward), price[swap['to']]]
+                rates[0].append(rate[0] * rates[0][-1])
+                rates[1].insert(0,rate[1])
+                liquidity[0] += [min(price[swap['from']],forward), price[swap['to']]]
+
             else:
                 least = min(price[swap['from']],price[swap['to']],least)
-                rates.append(rate * rates[-1])
-                liquidity.append(min(price[swap['from']],forward))
+                rates[0].append(rate[0] * rates[0][-1])
+                rates[1].insert(0,rate[1])
+                liquidity[0].append(min(price[swap['from']],forward))
                 forward = price[swap['to']]
 
-        try:
-            index = liquidity.index(least)
-        except ValueError:
-            capital = least * self.impact
-        else:
-            capital = liquidity[index] / rates[index] * self.impact 
+        liquidity[1] = liquidity[0][-2::-1]
+        liquidity[0] = liquidity[0][1:]
+        rates[1] = self.cumSum(rates[1])
 
-        EP = (capital * rates[-1]) - capital
-        return [capital,rates,EP]
+        export = (self.getDetails(liquidity[0],least,rates[0]),
+            self.getDetails(liquidity[1],least,rates[1]))
+
+        return export
 
     def pollRoutes(self, routes = [], save = True):
         print('polling routes ...')
@@ -225,19 +271,32 @@ class Blockchain:
             with open(self.routePath) as RO:
                 routes = json.load(RO)
 
+        history = {}
         result = []
         routeLenght = len(routes)
-
+    
         try:
             for pos, route in enumerate(routes):
+                simplifiedroute = self.Simplyfy(route)
+                if simplifiedroute[0] in history or simplifiedroute[1] in history:
+                    print(f'route {simplifiedroute} already polled!')
+                    continue
+
                 print(f'{pos + 1} / {routeLenght}')
-                capital, rates, EP = self.pollRoute(route)
-                result.append({
-                    'route' : route,
-                    'index' : rates[-1],
-                    'capital' : capital,
-                    'EP' : EP
-                })
+                # self.polRoute returns a tuple of [capital,rates,Ep]
+                for P, item in enumerate(self.pollRoute(route)):
+                    capital, rates, EP = item
+                    result.append({
+                        'route' : simplifiedroute[P],
+                        'index' : rates[-1],
+                        'capital' : capital,
+                        'EP' : EP
+                    })
+
+                history[simplifiedroute[0]] = pos
+                history[simplifiedroute[1]] = pos
+
+            print('Done!')
         finally:
             export = sorted(result, key = lambda v : v['index'], reverse = True)
         
@@ -266,7 +325,7 @@ class Blockchain:
         with open(self.routePath,'w') as AR:
             json.dump(newRoute,AR,indent = 2)  
 
-    def executeArb(self, expectedProfit = 50, routes = []):
+    def executeArb(self, expectedProfit = 50, routes = [],save = True):
         if not routes:
             with open(self.routePath) as RO:
                 routes = json.load(RO)
@@ -274,7 +333,11 @@ class Blockchain:
         for route in routes:
             _, _, EP = self.pollRoute(route)
 
-
+'''
+To do list
+convert getarbroute to a generator to conserve memory or read it and iterate using a generator
+integrate screenroutes with pollroutes using a cutoff parameter
+'''
 class Aurora(Blockchain):
     def __init__(self):
         super().__init__()
@@ -283,6 +346,7 @@ class Aurora(Blockchain):
         self.tokens = Cfg.AuroraTokens
         self.startTokens = Cfg.AuroraStartTokens
         self.startExchanges = None
+        self.headers = {}
 
         self.pollPath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
             'data', 'Aurora', 'pollResult.json')
@@ -290,8 +354,6 @@ class Aurora(Blockchain):
         self.routePath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
             'data', 'Aurora', 'arbRoutes.json')
         
-
-
 class Arbitrum(Blockchain):
     def __init__(self):
         super().__init__()
@@ -300,6 +362,7 @@ class Arbitrum(Blockchain):
         self.tokens = None
         self.startTokens = None
         self.startExchanges = None
+        self.headers = {}
 
         self.pollPath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
             'data', 'Arbitrum', 'pollResult.json')
@@ -311,11 +374,13 @@ class BSC(Blockchain):
     def __init__(self):
         super().__init__()
         self.source = 'https://bscscan.com/address/'
-        self.exchanges = None
-        self.tokens = None
-        self.startTokens = None
-        self.startExchanges = None
-        
+        self.exchanges = Cfg.BSCExchanges
+        self.tokens = Cfg.BSCTokens
+        self.startTokens = Cfg.BSCStartTokens
+        self.startExchanges = Cfg.BSCStartExchanges
+        self.headers = {
+        'User-Agent': 'PostmanRuntime/7.29.0',}
+
         self.pollPath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
             'data', 'BSC', 'pollResult.json')
 
@@ -324,9 +389,7 @@ class BSC(Blockchain):
       
 
 
-if __name__ == '__main__':
-    chain = Aurora()
-    chain.pollRoutes()
+
     
 
           

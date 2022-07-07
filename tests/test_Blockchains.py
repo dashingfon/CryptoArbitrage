@@ -1,4 +1,8 @@
-from scripts import Blockchains 
+import sys, os 
+sys.path.insert(1,
+    os.path.join(os.path.split(os.path.dirname(__file__))[0],'scripts'))
+
+import Blockchains
 import pytest
 
 
@@ -127,10 +131,14 @@ class TestArbRoute:
         with pytest.raises(ValueError):
             Aurorasetup.getArbRoute(tokens = toks, save = False,exchanges = 'all')
 
-    #need to parametrize inputs to check other edge cases
-    def test_startExchanges(self,Aurorasetup):
-        route = Aurorasetup.getArbRoute(tokens = tokens, save = False,exchanges = ['trisolaris'])
-        assert equal(route,arbRoute[::2])
+    @pytest.mark.parametrize('Exchanges,results',
+        [(['trisolaris'],arbRoute[::2]),
+        (['wannaswap'],arbRoute[1::2]),
+        (['auroraswap'],[]),
+        (['trisolaris','wannaswap'],arbRoute)])
+    def test_startExchanges(self,Aurorasetup,Exchanges,results):
+        route = Aurorasetup.getArbRoute(tokens = tokens, save = False,exchanges = Exchanges)
+        assert equal(route,results)
 
 
 class TestRate:
