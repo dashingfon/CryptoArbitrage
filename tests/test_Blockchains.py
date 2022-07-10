@@ -154,17 +154,40 @@ class TestRate:
         with pytest.raises(ValueError):
             Aurorasetup.getRate(prices,'WETH','WBTC')
 
-class TestPollRoute:
-
-    @pytest.mark.skip(reason = 'incomplete')
-    def test_pollRoute():
+class TestPollRoutes:
+    # remember to mark that it requires data to test
+    def test_pollRoute(self):
         assert True
+
+    def test_accurateReverse(self):
+        pass
+    
+    def test_pollingOnlyUnique(self):
+        pass
+
+    def test_pollingWarning(self):
+        pass
+
+    def test_getDetails(self):
+        pass
+
+    def test_cumSum(self):
+        pass
+
+    def test_simplyfy(self):
+        pass
 
 class TestgetPrice:
 
-    @pytest.mark.skip(reason = 'incomplete')
-    def test_getPrice():
+    def test_extract(self):
+        pass
+
+    def test_getPrice(self):
         assert True
+
+
+def test_screenRoute():
+    pass
 
 class TestExceution:
 

@@ -72,18 +72,19 @@ AuroraHeaders = {'Host' : 'explorer.mainnet.aurora.dev'}
 exampleRequestUrl = 'https://explorer.mainnet.aurora.dev/api?module=account&action=tokenlist&address=0x5eeC60F348cB1D661E4A5122CF4638c7DB7A886e'
 
 # BSC Network
-
+# USDT is BSC-USD
 BSCTokens = {
-    'BNB' : '',
-    'BUSD' : '',
-    'USDC' : '',
-    'USDT' : '',
-    'ETH' : '',
-    'BTCB' : '',
+    'WBNB' : '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c',
+    'BUSD' : '0xe9e7cea3dedca5984780bafc599bd69add087d56',
+    'BSC-USD' : '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
+    'USDT' : '0xe9e7cea3dedca5984780bafc599bd69add087d56',
+    'ETH' : '0x2170ed0880ac9a755fd29b2688956bd959f933f8',
+    'BTCB' : '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
 }
 # notable mentions, frax, ada, link, sushi
 
-BSCStartTokens = ['BNB','BUSD','USDC','USDT']
+BSCStartTokens = ['USDC']
+
 BSCStartExchanges = ['pancakeswap', 'sushiswap', 'dodo','biswap','apeswap','bakeryswap']
 BSCRouters = {
     'pancakeswap' : '',
@@ -98,11 +99,11 @@ BSCRouters = {
 
 BSCExchanges = {
     'pancakeswap' : {
-        frozenset(('USDT','BUSD')) : '0x7efaef62fddcca950418312c6c91aef321375a00',
+        frozenset(('BSC-USD','BUSD')) : '0x7efaef62fddcca950418312c6c91aef321375a00',
         frozenset(('WBNB','BUSD')) : '0x58f876857a02d6762e0101bb5c46a8c1ed44dc16',
-        frozenset(('USDT','WBNB')) : '0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae',
+        frozenset(('BSC-USD','WBNB')) : '0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae',
         frozenset(('USDC','BUSD')) : '0x2354ef4df11afacb85a5c7f98b624072eccddbb1',
-        frozenset(('USDT','USDC')) : '0xec6557348085aa57c72514d67070dc863c0a5a8c',
+        frozenset(('BSC-USD','USDC')) : '0xec6557348085aa57c72514d67070dc863c0a5a8c',
         frozenset(('BTCB','BUSD')) : '0xf45cd219aef8618a92baa7ad848364a158a24f33',
         frozenset(('BTCB','WBNB')) : '0x61eb789d75a95caa3ff50ed7e47b96c132fec082',
         frozenset(('ETH','WBNB')) : '0x74e4716e431f45807dcf19f284c7aa99f18a4fbc',
@@ -111,25 +112,25 @@ BSCExchanges = {
         
     },
     'biswap' : {
-        frozenset(('USDT','BUSD')) : '0xda8ceb724a06819c0a5cdb4304ea0cb27f8304cf',
+        frozenset(('BSC-USD','BUSD')) : '0xda8ceb724a06819c0a5cdb4304ea0cb27f8304cf',
         frozenset(('WBNB','BUSD')) : '0xacaac9311b0096e04dfe96b6d87dec867d3883dc',
-        frozenset(('USDT','WBNB')) : '0x8840c6252e2e86e545defb6da98b2a0e26d8c1ba',
+        frozenset(('BSC-USD','WBNB')) : '0x8840c6252e2e86e545defb6da98b2a0e26d8c1ba',
         frozenset(('ETH','WBNB')) : '0x5bf6941f029424674bb93a43b79fc46bf4a67c21',
         frozenset(('BTCB','WBNB')) : '0xc7e9d76ba11099af3f330ff829c5f442d571e057',
-        frozenset(('USDT','USDC')) : '0x1483767e665b3591677fd49f724bf7430c18bf83',
-        frozenset(('USDT','BTCB')) : '0x1483767e665b3591677fd49f724bf7430c18bf83',
-        frozenset(('ETH','USDT')) : '0x63b30de1a998e9e64fd58a21f68d323b9bcd8f85',
+        frozenset(('BSC-USD','USDC')) : '0x1483767e665b3591677fd49f724bf7430c18bf83',
+        frozenset(('BSC-USD','BTCB')) : '0x1483767e665b3591677fd49f724bf7430c18bf83',
+        frozenset(('ETH','BSC-USD')) : '0x63b30de1a998e9e64fd58a21f68d323b9bcd8f85',
         frozenset(('ETH','BTCB')) : '0x6216e04cd40db2c6fbed64f1b5830a98d3a91740',
         frozenset(('USDC','WBNB')) : '0x06cd679121ec37b0a2fd673d4976b09d81791856',
         
     },
     'dodo' : {
-        frozenset(('BUSD','USDT')) : '0xbe60d4c4250438344bec816ec2dec99925deb4c7',
+        frozenset(('BUSD','BSC-USD')) : '0xbe60d4c4250438344bec816ec2dec99925deb4c7',
         frozenset(('USDC','BUSD')) : '0x6064dbd0ff10bfed5a797807042e9f63f18cfe10',
         
     },
     'sushiswap' : {
-        frozenset(('USDT','WBNB')) : '0x2905817b020fd35d9d09672946362b62766f0d69',
+        frozenset(('BSC-USD','WBNB')) : '0x2905817b020fd35d9d09672946362b62766f0d69',
         frozenset(('WBNB','BUSD')) : '0xdc558d64c29721d74c4456cfb4363a6e6660a9bb',
         frozenset(('USDC','WBNB')) : '0xc7632b7b2d768bbb30a404e13e1de48d1439ec21',
         frozenset(('ETH','WBNB')) : '0x6da1ffd9d24e1753d2f46ca53146116c7210b3c5',
@@ -137,11 +138,11 @@ BSCExchanges = {
         
     },
     'mdex' : {
-        frozenset(('USDT','BUSD')) : '0x62c1dec1ff328dcdc157ae0068bb21af3967acd9',
-        frozenset(('USDT','WBNB')) : '0x09cb618bf5ef305fadfd2c8fc0c26eecf8c6d5fd',
-        frozenset(('USDT','USDC')) : '0x9f4da89774570e27170873befd139a79cb1a3da2',
-        frozenset(('ETH','USDT')) : '0x0fb881c078434b1c0e4d0b64d8c64d12078b7ce2',
-        frozenset(('USDT','BTCB')) : '0xda28eb7aba389c1ea226a420bce04cb565aafb85',
+        frozenset(('BSC-USD','BUSD')) : '0x62c1dec1ff328dcdc157ae0068bb21af3967acd9',
+        frozenset(('BSC-USD','WBNB')) : '0x09cb618bf5ef305fadfd2c8fc0c26eecf8c6d5fd',
+        frozenset(('BSC-USD','USDC')) : '0x9f4da89774570e27170873befd139a79cb1a3da2',
+        frozenset(('ETH','BSC-USD')) : '0x0fb881c078434b1c0e4d0b64d8c64d12078b7ce2',
+        frozenset(('BSC-USD','BTCB')) : '0xda28eb7aba389c1ea226a420bce04cb565aafb85',
         frozenset(('ETH','BTCB')) : '0x577d005912c49b1679b4c21e334fdb650e92c077',
         frozenset(('ETH','WBNB')) : '0x82e8f9e7624fa038dff4a39960f5197a43fa76aa',
         frozenset(('WBNB','BUSD')) : '0x340192d37d95fb609874b1db6145ed26d1e47744',
@@ -150,25 +151,25 @@ BSCExchanges = {
     },
     'apeswap' : {
         frozenset(('USDC','BUSD')) : '0xc087c78abac4a0e900a327444193dbf9ba69058e',
-        frozenset(('USDT','BUSD')) : '0x2e707261d086687470b515b320478eb1c88d49bb',
+        frozenset(('BSC-USD','BUSD')) : '0x2e707261d086687470b515b320478eb1c88d49bb',
         frozenset(('WBNB','BUSD')) : '0x51e6d27fa57373d8d4c256231241053a70cb1d93',
         frozenset(('ETH','WBNB')) : '0xa0c3ef24414ed9c9b456740128d8e63d016a9e11',
         frozenset(('BTCB','WBNB')) : '0x1e1afe9d9c5f290d8f6996ddb190bd111908a43d',
-        frozenset(('USDT','WBNB')) : '0x83c5b5b309ee8e232fe9db217d394e262a71bcc0',
+        frozenset(('BSC-USD','WBNB')) : '0x83c5b5b309ee8e232fe9db217d394e262a71bcc0',
         
     },
     'bakeryswap' : {
         frozenset(('WBNB','BUSD')) : '0x559e3d9611e9cb8a77c11335bdac49621382188b',
         frozenset(('BTCB','WBNB')) : '0x58521373474810915b02fe968d1bcbe35fc61e09',
-        frozenset(('USDT','WBNB')) : '0x9ec271c041a18aa7bef070a1f196eea1d06ab7cb',
+        frozenset(('BSC-USD','WBNB')) : '0x9ec271c041a18aa7bef070a1f196eea1d06ab7cb',
         frozenset(('USDC','BUSD')) : '0x56cde265aad310e623c8f8994a5143582659abfc',
-        frozenset(('USDT','BUSD')) : '0xbcf3278098417e23d941613ce36a7ce9428724a5',
+        frozenset(('BSC-USD','BUSD')) : '0xbcf3278098417e23d941613ce36a7ce9428724a5',
        
     },
     'babyswap' : {
-        frozenset(('USDT','BUSD')) : '0x249cd054697f41d73f1a81fa0f5279fcce3cf70c',
-        frozenset(('USDT','WBNB')) : '0x04580ce6dee076354e96fed53cb839de9efb5f3f',
-        frozenset(('USDT','USDC')) : '0xcc21b0a9a01fcd2103ff75614480bd6a07869053',
+        frozenset(('BSC-USD','BUSD')) : '0x249cd054697f41d73f1a81fa0f5279fcce3cf70c',
+        frozenset(('BSC-USD','WBNB')) : '0x04580ce6dee076354e96fed53cb839de9efb5f3f',
+        frozenset(('BSC-USD','USDC')) : '0xcc21b0a9a01fcd2103ff75614480bd6a07869053',
         frozenset(('WBNB','BUSD')) : '0xdf84c66e5c1e01dc9cbcbbb09f4ce2a1de6641d6',
         frozenset(('USDC','WBNB')) : '0xbf83ca11abc62447226f6b3566918d3594ba3803',
         

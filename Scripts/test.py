@@ -12,5 +12,5 @@ response = requests.request("GET", url, headers=headers, data=payload)
 
 print(response.status_code)'''
 
-route = ['3','4','2','4jrkjkt']
-print('-'.join(route))
+route = {'t' : 4,'y': 5}
+r = {'y':5, 't':4}

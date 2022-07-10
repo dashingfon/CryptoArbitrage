@@ -1,1 +1,998 @@
-[]
+[
+  {
+    "route": "USDC BUSD bakeryswap-BUSD BSC-USD dodo-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 3.670084939610403,
+    "capital": 91.9521998349,
+    "EP": 245.52018394321266
+  },
+  {
+    "route": "USDC BUSD apeswap-BUSD BSC-USD dodo-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 3.6645345013680695,
+    "capital": 9132.15796589515,
+    "EP": 24332.949972070877
+  },
+  {
+    "route": "USDC BUSD dodo-BUSD BSC-USD dodo-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 3.5428560685007002,
+    "capital": 10568.175211453852,
+    "EP": 26873.348469424098
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD USDC dodo",
+    "index": 1.0164300210213504,
+    "capital": 10232.78097182952,
+    "EP": 168.1248064740339
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD mdex-BUSD USDC dodo",
+    "index": 1.001565050345501,
+    "capital": 508.86697636792843,
+    "EP": 0.7964024371786422
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD sushiswap-BUSD USDC dodo",
+    "index": 1.0015509382808476,
+    "capital": 24.1144086008029,
+    "EP": 0.03739995941898755
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD bakeryswap-BUSD USDC dodo",
+    "index": 1.0015306247898337,
+    "capital": 434.6718012441512,
+    "EP": 0.6653194344259532
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD babyswap-BUSD USDC dodo",
+    "index": 1.0009449337357672,
+    "capital": 6197.727336379787,
+    "EP": 5.8564416452318255
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD apeswap-BUSD USDC dodo",
+    "index": 0.9997737859410304,
+    "capital": 4412.932372828225,
+    "EP": -0.9982673440163126
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD apeswap-BUSD USDC dodo",
+    "index": 0.9995531622969422,
+    "capital": 6352.05509928852,
+    "EP": -2.838337710262749
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD bakeryswap-BUSD USDC dodo",
+    "index": 0.9992765875887866,
+    "capital": 82.92426875206645,
+    "EP": -0.05998844520604507
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD biswap-BUSD USDC dodo",
+    "index": 0.9992576685239923,
+    "capital": 47229.99702511614,
+    "EP": -35.06031340349
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD babyswap-BUSD USDC dodo",
+    "index": 0.9991418956413093,
+    "capital": 10409.838506098902,
+    "EP": -8.93272779535073
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD biswap-BUSD USDC dodo",
+    "index": 0.9988471441591352,
+    "capital": 10412.910362835748,
+    "EP": -12.004584532196532
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD mdex-BUSD USDC dodo",
+    "index": 0.9987313665598158,
+    "capital": 7570.783409091785,
+    "EP": -9.604549001165651
+  },
+  {
+    "route": "USDC BUSD bakeryswap-BUSD USDC pancakeswap",
+    "index": 0.9870740279366075,
+    "capital": 91.9521998349,
+    "EP": -1.1885715662334064
+  },
+  {
+    "route": "USDC BUSD apeswap-BUSD USDC pancakeswap",
+    "index": 0.9855776170422806,
+    "capital": 9132.17472086775,
+    "EP": -131.70772106115874
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD USDC apeswap",
+    "index": 0.9827690762816139,
+    "capital": 9292.289451577037,
+    "EP": -160.11473070928696
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD USDC bakeryswap",
+    "index": 0.9812791917230772,
+    "capital": 93.70646051653918,
+    "EP": -1.7542606816391668
+  },
+  {
+    "route": "USDC BSC-USD mdex-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9801806279375045,
+    "capital": 24879.913754672452,
+    "EP": -493.104267586652
+  },
+  {
+    "route": "USDC BSC-USD babyswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9795294063581161,
+    "capital": 13378.828215224601,
+    "EP": -273.8725557984326
+  },
+  {
+    "route": "USDC BSC-USD biswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9790041971599638,
+    "capital": 42571.517445367754,
+    "EP": -893.823186884103
+  },
+  {
+    "route": "USDC WBNB sushiswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9785107117567315,
+    "capital": 21.73106668048071,
+    "EP": -0.4669851557305371
+  },
+  {
+    "route": "USDC BSC-USD pancakeswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9784365462370557,
+    "capital": 157535.5362292745,
+    "EP": -3397.0102515006147
+  },
+  {
+    "route": "USDC WBNB pancakeswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9778824903311568,
+    "capital": 33560.505954376786,
+    "EP": -742.2748149371982
+  },
+  {
+    "route": "USDC WBNB biswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9773271729223507,
+    "capital": 14816.71244781863,
+    "EP": -335.93675918864574
+  },
+  {
+    "route": "USDC WBNB babyswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9772233942982889,
+    "capital": 3910.861550733501,
+    "EP": -89.07615149503954
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB USDC babyswap",
+    "index": 0.9754828005159172,
+    "capital": 3945.699278970505,
+    "EP": -96.73749632672161
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB USDC biswap",
+    "index": 0.9753792177386875,
+    "capital": 14950.286377918066,
+    "EP": -368.08774565498607
+  },
+  {
+    "route": "USDC WBNB sushiswap-WBNB BSC-USD sushiswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9749806987356706,
+    "capital": 21.730829318849448,
+    "EP": -0.5436901654520163
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB USDC pancakeswap",
+    "index": 0.9748253218819216,
+    "capital": 33882.29777888021,
+    "EP": -852.9759404841898
+  },
+  {
+    "route": "USDC WBNB sushiswap-WBNB BSC-USD pancakeswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9743384700874654,
+    "capital": 21.730829318849448,
+    "EP": -0.5576463265898397
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD USDC pancakeswap",
+    "index": 0.9742733108916478,
+    "capital": 161695.4241362715,
+    "EP": -4159.887906996999
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB USDC sushiswap",
+    "index": 0.9741994665427405,
+    "capital": 21.95352757297551,
+    "EP": -0.5664127226514246
+  },
+  {
+    "route": "USDC WBNB sushiswap-WBNB BSC-USD bakeryswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9739350218538322,
+    "capital": 21.730829318849448,
+    "EP": -0.5664135912939123
+  },
+  {
+    "route": "USDC WBNB biswap-WBNB BSC-USD sushiswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9737713655645904,
+    "capital": 43.54991608393838,
+    "EP": -1.1422548286583805
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD USDC biswap",
+    "index": 0.9737084030539729,
+    "capital": 43721.01268906067,
+    "EP": -1149.4952436929234
+  },
+  {
+    "route": "USDC WBNB sushiswap-WBNB BSC-USD mdex-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.973467259550059,
+    "capital": 21.730829318849448,
+    "EP": -0.5765784540790015
+  },
+  {
+    "route": "USDC WBNB pancakeswap-WBNB BSC-USD bakeryswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.973231619128236,
+    "capital": 107.77036968221311,
+    "EP": -2.884838302344292
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD USDC babyswap",
+    "index": 0.9731863149918049,
+    "capital": 13747.447954338799,
+    "EP": -368.6197391141977
+  },
+  {
+    "route": "USDC WBNB sushiswap-WBNB BSC-USD apeswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9731129118514816,
+    "capital": 21.730829318849448,
+    "EP": -0.5842787234363129
+  },
+  {
+    "route": "USDC BUSD bakeryswap-BUSD BSC-USD mdex-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9730172521218434,
+    "capital": 91.9521998349,
+    "EP": -2.481123024986971
+  },
+  {
+    "route": "USDC BUSD bakeryswap-BUSD BSC-USD biswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9729082379326711,
+    "capital": 91.9521998349,
+    "EP": -2.4911471194945847
+  },
+  {
+    "route": "USDC WBNB babyswap-WBNB BSC-USD sushiswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9728011936698128,
+    "capital": 43.59350689007675,
+    "EP": -1.1856913511568834
+  },
+  {
+    "route": "USDC WBNB biswap-WBNB BSC-USD bakeryswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.972726985705084,
+    "capital": 107.8262790291998,
+    "EP": -2.940747649330973
+  },
+  {
+    "route": "USDC WBNB sushiswap-WBNB BSC-USD babyswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9726077898198707,
+    "capital": 21.730829318849448,
+    "EP": -0.5952554440904407
+  },
+  {
+    "route": "USDC BUSD bakeryswap-BUSD BSC-USD babyswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9725612640013122,
+    "capital": 91.9521998349,
+    "EP": -2.5230521357684097
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD USDC mdex",
+    "index": 0.9725397403595132,
+    "capital": 25582.413470811214,
+    "EP": -702.4997161387619
+  },
+  {
+    "route": "USDC BUSD bakeryswap-BUSD WBNB biswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9725058320913585,
+    "capital": 91.9521998349,
+    "EP": -2.5281492218296933
+  },
+  {
+    "route": "USDC BUSD bakeryswap-BUSD BSC-USD bakeryswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.972472456859497,
+    "capital": 81.28516869641243,
+    "EP": -2.2375809879735584
+  },
+  {
+    "route": "USDC WBNB pancakeswap-WBNB BSC-USD sushiswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9723569097433885,
+    "capital": 43.61326672370916,
+    "EP": -1.2056054684291624
+  },
+  {
+    "route": "USDC WBNB biswap-WBNB BSC-USD pancakeswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9722969628615321,
+    "capital": 14823.020010571303,
+    "EP": -410.6426738571099
+  },
+  {
+    "route": "USDC WBNB biswap-WBNB BSC-USD mdex-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9722598035978939,
+    "capital": 14816.71244781863,
+    "EP": -411.01851333601917
+  },
+  {
+    "route": "USDC BUSD bakeryswap-BUSD BSC-USD apeswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9722179285159819,
+    "capital": 91.9521998349,
+    "EP": -2.554622588925909
+  },
+  {
+    "route": "USDC WBNB sushiswap-WBNB BSC-USD biswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9721823175467271,
+    "capital": 21.730829318849448,
+    "EP": -0.6045013094380245
+  },
+  {
+    "route": "USDC BUSD bakeryswap-BUSD WBNB apeswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9720563916470054,
+    "capital": 4397.459099455887,
+    "EP": -122.88087482350784
+  },
+  {
+    "route": "USDC WBNB pancakeswap-WBNB BSC-USD babyswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9719398338895278,
+    "capital": 19568.628161589113,
+    "EP": -549.0989567682554
+  },
+  {
+    "route": "USDC WBNB biswap-WBNB BSC-USD apeswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9719059478970157,
+    "capital": 1254.4961742382873,
+    "EP": -35.243880882045005
+  },
+  {
+    "route": "USDC WBNB babyswap-WBNB BSC-USD bakeryswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9717543189828046,
+    "capital": 107.93420654889294,
+    "EP": -3.048675169024108
+  },
+  {
+    "route": "USDC BUSD bakeryswap-BUSD WBNB babyswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9716341131203658,
+    "capital": 6183.230592678823,
+    "EP": -175.3928195426206
+  },
+  {
+    "route": "USDC BSC-USD pancakeswap-BSC-USD BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB USDC biswap",
+    "index": 0.9715889195666659,
+    "capital": 15030.634292566572,
+    "EP": -427.03655985013756
+  },
+  {
+    "route": "USDC BUSD apeswap-BUSD BSC-USD mdex-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9715463676848604,
+    "capital": 7428.322681910531,
+    "EP": -211.36276230929434
+  },
+  {
+    "route": "USDC BUSD apeswap-BUSD BSC-USD biswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9714368644719948,
+    "capital": 9132.15796589515,
+    "EP": -260.8430656430155
+  },
+  {
+    "route": "USDC WBNB pancakeswap-WBNB BSC-USD pancakeswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9714133925570492,
+    "capital": 33601.670277607314,
+    "EP": -960.5577576534306
+  },
+  {
+    "route": "USDC WBNB biswap-WBNB BSC-USD babyswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9714013999249675,
+    "capital": 14816.71244781863,
+    "EP": -423.73723372192035
+  },
+  {
+    "route": "USDC WBNB babyswap-WBNB BSC-USD mdex-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9711875700145414,
+    "capital": 3910.861550733501,
+    "EP": -112.68142461333127
+  },
+  {
+    "route": "USDC BUSD apeswap-BUSD BSC-USD babyswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9711466573706751,
+    "capital": 9132.15796589515,
+    "EP": -263.49328273509127
+  },
+  {
+    "route": "USDC WBNB pancakeswap-WBNB BSC-USD apeswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9711413280350472,
+    "capital": 1255.49564582336,
+    "EP": -36.231936996242894
+  },
+  {
+    "route": "USDC BUSD apeswap-BUSD WBNB biswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9710365055920088,
+    "capital": 47111.3446841937,
+    "EP": -1364.5091683135906
+  },
+  {
+    "route": "USDC BUSD apeswap-BUSD BSC-USD bakeryswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9710017415095672,
+    "capital": 81.40828623597275,
+    "EP": -2.3606985275338843
+  },
+  {
+    "route": "USDC WBNB babyswap-WBNB BSC-USD apeswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9709292250271759,
+    "capital": 1255.7518482888904,
+    "EP": -36.50567940331416
+  },
+  {
+    "route": "USDC WBNB pancakeswap-WBNB BSC-USD mdex-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9709199695908912,
+    "capital": 33593.14964366513,
+    "EP": -976.8898131755232
+  },
+  {
+    "route": "USDC BUSD apeswap-BUSD BSC-USD apeswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9707475981011103,
+    "capital": 6237.655761767423,
+    "EP": -182.4664132501457
+  },
+  {
+    "route": "USDC WBNB babyswap-WBNB BSC-USD pancakeswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9706659001510138,
+    "capital": 3913.7714236995266,
+    "EP": -114.80696172891066
+  },
+  {
+    "route": "USDC BUSD apeswap-BUSD WBNB apeswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9705366689737649,
+    "capital": 4404.119654552527,
+    "EP": -129.76003526122895
+  },
+  {
+    "route": "USDC WBNB babyswap-WBNB BSC-USD babyswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9704295711023232,
+    "capital": 3910.861550733501,
+    "EP": -115.64585341462316
+  },
+  {
+    "route": "USDC BUSD bakeryswap-BUSD WBNB mdex-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9703102241980858,
+    "capital": 507.99123676847756,
+    "EP": -15.082145928993214
+  },
+  {
+    "route": "USDC BUSD bakeryswap-BUSD WBNB bakeryswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9703070559014301,
+    "capital": 433.90883383305453,
+    "EP": -12.884030746880569
+  },
+  {
+    "route": "USDC BUSD bakeryswap-BUSD WBNB sushiswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9702766645765565,
+    "capital": 24.07256948589628,
+    "EP": -0.7155170573334466
+  },
+  {
+    "route": "USDC WBNB biswap-WBNB BSC-USD biswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9701521853534819,
+    "capital": 14823.020010571303,
+    "EP": -442.43475377716095
+  },
+  {
+    "route": "USDC BSC-USD pancakeswap-BSC-USD BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB USDC pancakeswap",
+    "index": 0.9700573200999107,
+    "capital": 34082.684595540566,
+    "EP": -1020.5269149799715
+  },
+  {
+    "route": "USDC BSC-USD pancakeswap-BSC-USD BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB USDC babyswap",
+    "index": 0.9697482835629356,
+    "capital": 3969.0318074112784,
+    "EP": -120.07002476749494
+  },
+  {
+    "route": "USDC WBNB sushiswap-WBNB BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD USDC pancakeswap",
+    "index": 0.9695865142008326,
+    "capital": 21.72077284688535,
+    "EP": -0.6606044165256861
+  },
+  {
+    "route": "USDC WBNB pancakeswap-WBNB BSC-USD biswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9694773284075964,
+    "capital": 33601.720576087464,
+    "EP": -1025.6142820836285
+  },
+  {
+    "route": "USDC BUSD apeswap-BUSD WBNB babyswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9693944123768085,
+    "capital": 6192.6186443766555,
+    "EP": -189.5287325374793
+  },
+  {
+    "route": "USDC WBNB pancakeswap-WBNB BUSD biswap-BUSD BSC-USD pancakeswap-BSC-USD USDC pancakeswap",
+    "index": 0.9693455258618424,
+    "capital": 33596.239201551376,
+    "EP": -1029.8750457433125
+  },
+  {
+    "route": "USDC BSC-USD pancakeswap-BSC-USD BUSD pancakeswap-BUSD BSC-USD biswap-BSC-USD USDC biswap",
+    "index": 0.9691982184392273,
+    "capital": 43924.46935563281,
+    "EP": -1352.9519102650593
+  },
+  {
+    "route": "USDC BSC-USD mdex-BSC-USD BUSD biswap-BUSD BSC-USD pancakeswap-BSC-USD USDC pancakeswap",
+    "index": 0.9691653447359566,
+    "capital": 24879.913754672452,
+    "EP": -767.1635636244573
+  },
+  {
+    "route": "USDC BUSD apeswap-BUSD WBNB mdex-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.968842778893228,
+    "capital": 508.7606591882394,
+    "EP": -15.851568348755052
+  },
+  {
+    "route": "USDC BUSD apeswap-BUSD WBNB bakeryswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9688314987043924,
+    "capital": 434.5660482901536,
+    "EP": -13.544772439158692
+  },
+  {
+    "route": "USDC BUSD apeswap-BUSD WBNB sushiswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9688112649963266,
+    "capital": 24.109030694915454,
+    "EP": -0.7519301695391434
+  },
+  {
+    "route": "USDC BSC-USD pancakeswap-BSC-USD BUSD pancakeswap-BUSD BSC-USD biswap-BSC-USD USDC babyswap",
+    "index": 0.9686395164927014,
+    "capital": 13811.978540445401,
+    "EP": -433.15032522080037
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB biswap-WBNB USDC babyswap",
+    "index": 0.9686291718784257,
+    "capital": 3976.5740192133385,
+    "EP": -124.74842006945983
+  },
+  {
+    "route": "USDC WBNB babyswap-WBNB BSC-USD biswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9685612379216911,
+    "capital": 3913.7714236995266,
+    "EP": -123.04412861857372
+  },
+  {
+    "route": "USDC BSC-USD babyswap-BSC-USD BUSD biswap-BUSD BSC-USD pancakeswap-BSC-USD USDC pancakeswap",
+    "index": 0.9685508941433937,
+    "capital": 13378.828215224601,
+    "EP": -420.7521847779499
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD sushiswap-BUSD USDC apeswap",
+    "index": 0.96837919179768,
+    "capital": 24.1144086008029,
+    "EP": -0.762517089278365
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD bakeryswap-BUSD USDC apeswap",
+    "index": 0.9683589675358859,
+    "capital": 434.6720631900295,
+    "EP": -13.753472862639171
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD mdex-BUSD USDC apeswap",
+    "index": 0.9683476929800425,
+    "capital": 508.8906992817807,
+    "EP": -16.107564653267787
+  },
+  {
+    "route": "USDC BSC-USD pancakeswap-BSC-USD BUSD pancakeswap-BUSD BSC-USD biswap-BSC-USD USDC mdex",
+    "index": 0.9680253992751169,
+    "capital": 25701.71585714919,
+    "EP": -821.802102476744
+  },
+  {
+    "route": "USDC BSC-USD biswap-BSC-USD BUSD biswap-BUSD BSC-USD pancakeswap-BSC-USD USDC pancakeswap",
+    "index": 0.9679925653520567,
+    "capital": 42571.517445367754,
+    "EP": -1362.60506249639
+  },
+  {
+    "route": "USDC BSC-USD pancakeswap-BSC-USD BUSD pancakeswap-BUSD WBNB biswap-WBNB USDC pancakeswap",
+    "index": 0.9678454635332436,
+    "capital": 34162.98444107972,
+    "EP": -1098.494929023931
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD babyswap-BUSD USDC apeswap",
+    "index": 0.967796655131695,
+    "capital": 6197.728302970324,
+    "EP": -199.5875819406083
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB biswap-WBNB USDC pancakeswap",
+    "index": 0.9677138828430588,
+    "capital": 34173.20420383902,
+    "EP": -1103.320074553223
+  },
+  {
+    "route": "USDC BSC-USD pancakeswap-BSC-USD BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB USDC sushiswap",
+    "index": 0.9676049079281065,
+    "capital": 22.092678291340054,
+    "EP": -0.7156943473626853
+  },
+  {
+    "route": "USDC WBNB babyswap-WBNB BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD USDC pancakeswap",
+    "index": 0.967443496114983,
+    "capital": 3910.861550733501,
+    "EP": -127.32397927021884
+  },
+  {
+    "route": "USDC WBNB pancakeswap-WBNB BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD USDC pancakeswap",
+    "index": 0.9671352922784023,
+    "capital": 33593.86986907878,
+    "EP": -1104.05271448466
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB biswap-WBNB USDC biswap",
+    "index": 0.9670407220283683,
+    "capital": 15085.617418973085,
+    "EP": -497.2110578856227
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD sushiswap-BUSD USDC bakeryswap",
+    "index": 0.9669166579524668,
+    "capital": 24.11435894454478,
+    "EP": -0.7977835852193671
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD bakeryswap-BUSD USDC bakeryswap",
+    "index": 0.9668863728194266,
+    "capital": 434.6757047888764,
+    "EP": -14.393689232831832
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD mdex-BUSD USDC bakeryswap",
+    "index": 0.9668832157024708,
+    "capital": 508.8906992817807,
+    "EP": -16.852823519133494
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB babyswap-WBNB USDC babyswap",
+    "index": 0.966764304941722,
+    "capital": 3981.282472852372,
+    "EP": -132.32069020858808
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD apeswap-BUSD USDC apeswap",
+    "index": 0.9666576233473472,
+    "capital": 4412.947328559826,
+    "EP": -147.1381519771594
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB pancakeswap-WBNB USDC babyswap",
+    "index": 0.9665289258185245,
+    "capital": 3985.215026939709,
+    "EP": -133.38942779583022
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD apeswap-BUSD USDC apeswap",
+    "index": 0.9664475829111584,
+    "capital": 6352.05509928852,
+    "EP": -213.1268020626312
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB mdex-WBNB USDC pancakeswap",
+    "index": 0.966276005422921,
+    "capital": 34215.326334380065,
+    "EP": -1153.8774797536244
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB apeswap-WBNB USDC babyswap",
+    "index": 0.9662667943437085,
+    "capital": 1279.0217445890526,
+    "EP": -43.145503549091245
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD bakeryswap-BUSD USDC apeswap",
+    "index": 0.9661946314772774,
+    "capital": 82.92302745459105,
+    "EP": -2.8032435021222994
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD biswap-BUSD USDC apeswap",
+    "index": 0.9661600407387928,
+    "capital": 47230.086740652136,
+    "EP": -1598.2642112069516
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB apeswap-WBNB USDC pancakeswap",
+    "index": 0.966055755962816,
+    "capital": 1279.0401444554632,
+    "EP": -43.41605079675128
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD babyswap-BUSD USDC apeswap",
+    "index": 0.9660504545643923,
+    "capital": 9453.085936399655,
+    "EP": -320.92797050450463
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB mdex-WBNB USDC babyswap",
+    "index": 0.9660097583287476,
+    "capital": 3984.392237716841,
+    "EP": -135.4304550730576
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB babyswap-WBNB USDC biswap",
+    "index": 0.9657971152544119,
+    "capital": 15098.614814584336,
+    "EP": -516.4161823212562
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB pancakeswap-WBNB USDC pancakeswap",
+    "index": 0.9657851919583591,
+    "capital": 34241.39746837049,
+    "EP": -1171.562841457824
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD biswap-BUSD USDC apeswap",
+    "index": 0.9657618565994589,
+    "capital": 9455.91079570109,
+    "EP": -323.75282980593875
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD mdex-BUSD USDC apeswap",
+    "index": 0.9656530053601581,
+    "capital": 7570.783409091785,
+    "EP": -260.0336571714797
+  },
+  {
+    "route": "USDC WBNB biswap-WBNB BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD USDC pancakeswap",
+    "index": 0.9656107134487106,
+    "capital": 14838.455692856993,
+    "EP": -510.28390480026974
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD babyswap-BUSD USDC bakeryswap",
+    "index": 0.9655658000610042,
+    "capital": 6202.630104337835,
+    "EP": -213.58260516040355
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB bakeryswap-WBNB USDC babyswap",
+    "index": 0.9654463597174213,
+    "capital": 110.02771938192525,
+    "EP": -3.801858236635553
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB apeswap-WBNB USDC biswap",
+    "index": 0.965295738575973,
+    "capital": 1279.0281693221013,
+    "EP": -44.38772795684895
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB babyswap-WBNB USDC pancakeswap",
+    "index": 0.9652620842251287,
+    "capital": 19951.993326374257,
+    "EP": -693.0906637123844
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD apeswap-BUSD USDC bakeryswap",
+    "index": 0.9651463411623982,
+    "capital": 4413.173021749416,
+    "EP": -153.81522689136273
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB biswap-WBNB USDC sushiswap",
+    "index": 0.9650213266263584,
+    "capital": 22.162081454031483,
+    "EP": -0.7752002084606069
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD apeswap-BUSD USDC bakeryswap",
+    "index": 0.9649859792584644,
+    "capital": 95.28863818887807,
+    "EP": -3.3364383539780533
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB mdex-WBNB USDC biswap",
+    "index": 0.9649444174590607,
+    "capital": 15111.957091437085,
+    "EP": -529.7584591740069
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB pancakeswap-WBNB USDC biswap",
+    "index": 0.9649075391951409,
+    "capital": 15118.968158603155,
+    "EP": -530.5617975156929
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB sushiswap-WBNB USDC pancakeswap",
+    "index": 0.9648480515752407,
+    "capital": 44.48676753460452,
+    "EP": -1.5637965579606785
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD bakeryswap-BUSD USDC bakeryswap",
+    "index": 0.9647334103748078,
+    "capital": 82.92302745459105,
+    "EP": -2.9244123797196124
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD WBNB pancakeswap-WBNB BUSD biswap-BUSD USDC bakeryswap",
+    "index": 0.9647003018831224,
+    "capital": 95.31685607997291,
+    "EP": -3.364656245072908
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD babyswap-BUSD USDC bakeryswap",
+    "index": 0.9646453180150149,
+    "capital": 95.32228905035618,
+    "EP": -3.3700892154561757
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB babyswap-WBNB USDC sushiswap",
+    "index": 0.9645991730905048,
+    "capital": 22.17178061333899,
+    "EP": -0.7848993677681158
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB bakeryswap-WBNB USDC biswap",
+    "index": 0.9644809731700726,
+    "capital": 110.02771938192525,
+    "EP": -3.9080775167623187
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB sushiswap-WBNB USDC babyswap",
+    "index": 0.9644073998947678,
+    "capital": 44.486929382257,
+    "EP": -1.583405487412378
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD biswap-BUSD USDC bakeryswap",
+    "index": 0.9643012909369115,
+    "capital": 95.35629652176405,
+    "EP": -3.404096686864051
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD mdex-BUSD USDC bakeryswap",
+    "index": 0.9641932532601689,
+    "capital": 95.36698117725626,
+    "EP": -3.4147813423562496
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB apeswap-WBNB USDC sushiswap",
+    "index": 0.9640984703579976,
+    "capital": 22.183295486019503,
+    "EP": -0.7964142404486267
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB bakeryswap-WBNB USDC pancakeswap",
+    "index": 0.9639808770721964,
+    "capital": 110.02771938192525,
+    "EP": -3.963101949883452
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB mdex-WBNB USDC sushiswap",
+    "index": 0.9637475329527362,
+    "capital": 22.191373273917083,
+    "EP": -0.8044920283462105
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB sushiswap-WBNB USDC biswap",
+    "index": 0.963446557352483,
+    "capital": 44.48676753460452,
+    "EP": -1.6261445056495916
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB bakeryswap-WBNB USDC sushiswap",
+    "index": 0.9632846635044114,
+    "capital": 22.20203648604329,
+    "EP": -0.8151552404724143
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB pancakeswap-WBNB USDC sushiswap",
+    "index": 0.9628857923647528,
+    "capital": 22.211233580513007,
+    "EP": -0.8243523349421338
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD WBNB sushiswap-WBNB USDC sushiswap",
+    "index": 0.9622515307413094,
+    "capital": 22.225873965713127,
+    "EP": -0.8389927201422545
+  },
+  {
+    "route": "USDC BUSD dodo-BUSD USDC pancakeswap",
+    "index": 0.9529384062576117,
+    "capital": 10568.175211453852,
+    "EP": -497.3551683998194
+  },
+  {
+    "route": "USDC BUSD dodo-BUSD BSC-USD mdex-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9393683839461564,
+    "capital": 7682.779240753014,
+    "EP": -465.8193211517764
+  },
+  {
+    "route": "USDC BUSD dodo-BUSD BSC-USD biswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9392595006029882,
+    "capital": 10568.175211453852,
+    "EP": -641.9162400588266
+  },
+  {
+    "route": "USDC BUSD dodo-BUSD BSC-USD babyswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9389824147044226,
+    "capital": 10568.175211453852,
+    "EP": -644.8445323834931
+  },
+  {
+    "route": "USDC BUSD dodo-BUSD WBNB biswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9388736252456436,
+    "capital": 48725.139771471564,
+    "EP": -2978.391153629367
+  },
+  {
+    "route": "USDC BUSD dodo-BUSD BSC-USD bakeryswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9388558497756988,
+    "capital": 84.19692012600481,
+    "EP": -5.1481491326079265
+  },
+  {
+    "route": "USDC BUSD dodo-BUSD BSC-USD apeswap-BSC-USD BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9385960699136098,
+    "capital": 6451.326126983047,
+    "EP": -396.13677846576957
+  },
+  {
+    "route": "USDC BUSD dodo-BUSD WBNB apeswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9383889465741271,
+    "capital": 4554.982397060605,
+    "EP": -280.6372638192115
+  },
+  {
+    "route": "USDC BUSD dodo-BUSD WBNB babyswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9372909919231314,
+    "capital": 6404.722788690302,
+    "EP": -401.63381308608496
+  },
+  {
+    "route": "USDC BUSD dodo-BUSD WBNB bakeryswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.936742867946252,
+    "capital": 449.45207114790713,
+    "EP": -28.431049016433747
+  },
+  {
+    "route": "USDC BUSD dodo-BUSD WBNB sushiswap-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.936723868894778,
+    "capital": 24.934883481654943,
+    "EP": -1.5777829562786323
+  },
+  {
+    "route": "USDC BUSD dodo-BUSD WBNB mdex-WBNB BUSD pancakeswap-BUSD USDC pancakeswap",
+    "index": 0.9367106704432189,
+    "capital": 526.188212103614,
+    "EP": -33.302099164719095
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD dodo-BUSD USDC dodo",
+    "index": 0.26480801129430503,
+    "capital": 39277.156787919404,
+    "EP": -28876.25100961585
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD dodo-BUSD USDC apeswap",
+    "index": 0.2560152372562966,
+    "capital": 35670.36893492771,
+    "EP": -26538.21096903256
+  },
+  {
+    "route": "USDC BUSD pancakeswap-BUSD BSC-USD pancakeswap-BSC-USD BUSD dodo-BUSD USDC bakeryswap",
+    "index": 0.2556280536387865,
+    "capital": 359.7109101524219,
+    "EP": -267.7587103175219
+  }
+]

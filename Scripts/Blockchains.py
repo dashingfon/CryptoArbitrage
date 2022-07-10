@@ -8,7 +8,7 @@ import Controller as Ctr
 '''
 Then to import the other modules needed
 '''
-import requests, json, time, os
+import requests, json, time, os, warnings
 from functools import wraps
 from bs4 import BeautifulSoup
 
@@ -141,31 +141,54 @@ class Blockchain:
         else:
             return route
 
-    def extract(self,content):
+    def extract(self,content,swap):
         price = {}
         soup = BeautifulSoup(content, 'html.parser')
 
         try:
             tokensList = soup.find_all('li',class_ = 'list-custom')
             #print(tokensList)
-            for token in tokensList:
-                raw = token.find(class_ = 'list-amount').string
+            done1 = False
+            done2 = False
+            slider = 0
+            while (not done1 or not done2) and slider < len(tokensList):  
+                raw = tokensList[slider].find(class_ = 'list-amount').string
                 rawPrice = str(raw).split()
                 price[rawPrice[1]] = float(rawPrice[0].replace(',',''))
+                if rawPrice[1] == swap['from']:
+                    done1 = True
+                elif rawPrice[1] == swap['to']:
+                    done2 = True
+                slider += 1  
+
         except:
             print('Error parsing html')
             
         return price
     
     @RateLimited(1)
-    def getPrice(self, session, address):
-        price = {}
+    def getPrice(self, session, address,swap):
         url = self.source + address
-        response = session.get(url,headers = self.headers)
+        attemptsAllowed = 4
+        tries = 0
+        done = False
+
+        while tries < attemptsAllowed and not done:
+                try:
+                    response = session.get(url,headers = self.headers)
+                except ConnectionError:
+                    print('Error')
+                    time.sleep(8)
+                    tries += 1
+                    print(f'Retring... \n{attemptsAllowed - tries} tries left')
+                else:
+                    done = True
+        
         
         if response.status_code == 200:
-            price = self.extract(response.text)
+            price = self.extract(response.text,swap)
         else:
+            price = {}
             print('unsuccesful request!')
             print(response.status_code)
 
@@ -194,17 +217,15 @@ class Blockchain:
             result.append(i*result[-1])
         return result
 
-    def Simplyfy(self,route):
-        result = []
-        _result = []
-        result.append(route[0]['from']+' '+route[0]['to']+' '+route[0]['via'])
-        _result.append(route[0]['to']+' '+route[0]['from']+' '+route[0]['via'])
+    def simplyfy(self,route):
+        result = [route[0]['from']+' '+route[0]['to']+' '+route[0]['via']]
+        _result = [route[0]['to']+' '+route[0]['from']+' '+route[0]['via']]
+
         for j in route[1:]:
             result.append(j['from']+' '+j['to']+' '+j['via'])
             _result.insert(0,j['to']+' '+j['from']+' '+j['via'])
             
         return ['-'.join(result),'-'.join(_result)]
-
 
     def pollRoute(self, route):
         rates = [[],[]]
@@ -214,23 +235,12 @@ class Blockchain:
         session = requests.Session()
 
         for index, swap in enumerate(route):
-            attemptsAllowed = 4
-            tries = 0
-            done = False
-
-            while tries < attemptsAllowed and not done:
-                try:
-                    price = self.getPrice(
-                        session, 
-                        self.exchanges[swap['via']][frozenset([swap['from'],swap['to']])])
-                except:
-                    time.sleep(10)
-                    tries += 1
-                    print(f'Error \nRetring... \n{attemptsAllowed - tries} tries left')
-                else:
-                    done = True
-
             
+            price = self.getPrice(
+                session, 
+                self.exchanges[swap['via']][frozenset([swap['from'],swap['to']])],
+                swap)
+
             print(price)
              
             rate = (self.getRate(price, swap['to'], swap['from']),
@@ -243,17 +253,14 @@ class Blockchain:
                 rates[0].append(rate[0])
                 rates[1].insert(0,rate[1])
                 
-            elif index == lenght - 1:
-                least = min(price[swap['from']],price[swap['to']],least)
-                rates[0].append(rate[0] * rates[0][-1])
-                rates[1].insert(0,rate[1])
-                liquidity[0] += [min(price[swap['from']],forward), price[swap['to']]]
-
             else:
                 least = min(price[swap['from']],price[swap['to']],least)
                 rates[0].append(rate[0] * rates[0][-1])
                 rates[1].insert(0,rate[1])
                 liquidity[0].append(min(price[swap['from']],forward))
+
+                if index == lenght - 1:
+                    liquidity[0].append(price[swap['to']])
                 forward = price[swap['to']]
 
         liquidity[1] = liquidity[0][-2::-1]
@@ -277,9 +284,9 @@ class Blockchain:
     
         try:
             for pos, route in enumerate(routes):
-                simplifiedroute = self.Simplyfy(route)
+                simplifiedroute = self.simplyfy(route)
                 if simplifiedroute[0] in history or simplifiedroute[1] in history:
-                    print(f'route {simplifiedroute} already polled!')
+                    warnings.warn('route {simplifiedroute} already polled!')
                     continue
 
                 print(f'{pos + 1} / {routeLenght}')
@@ -303,9 +310,8 @@ class Blockchain:
             if save:
                 with open(self.pollPath,'w') as DP:
                     json.dump(export, DP, indent = 2)
-            
             else:
-                return export
+                return (export,history)
               
     def screenRoutes(self, expectedProfit = 50, routes = []):
         print('screening routes...')
