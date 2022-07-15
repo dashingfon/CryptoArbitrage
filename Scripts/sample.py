@@ -25,31 +25,8 @@ parent = os.path.split(curr)[0]
 file = os.path.join(parent, 'Data', 'Aurora', 'arbRoute.json')
 print(file)
 '''
-import requests
-from bs4 import BeautifulSoup
+import time
 
-#SOURCE = 'https://arbiscan.io/address/'
-SOURCE = 'https://aurorascan.dev/address/'
-
-def get(address):
-    url = SOURCE + address
-    response = requests.request('GET',url)
-    print(response.status_code)
-    return response.text
-
-def extract(content):
-    price = {}
-    soup = BeautifulSoup(content, 'html.parser')
-    tokensList = soup.find_all('li',class_ = 'list-custom')
-    for token in tokensList:
-        raw = token.find(class_ = 'list-amount').string
-        rawPrice = str(raw).split()
-        price[rawPrice[1]] = float(rawPrice[0].replace(',',''))
-
-    return price
-
-#price = extract(get('0x03B666f3488a7992b2385B12dF7f35156d7b29cD'))
-#print(price)
 def r(value):
     counter = 1
     for i in range(value):
@@ -61,5 +38,4 @@ def reep(values):
         for j in r(i):
             yield j
 
-r = {'2':3,'4':4}
-print(r.keys())
+print(time.ctime())

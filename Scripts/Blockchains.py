@@ -3,7 +3,6 @@ This module contains the Blockchain main class that other specific blockchain cl
 to import the config and controller modules
 '''
 import Config as Cfg
-import Controller as Ctr
 
 '''
 Then to import the other modules needed
@@ -45,14 +44,16 @@ class Blockchain:
         self.depthLimit = 4
         self.graph = {}
         self.arbRoutes = []
+        self.dataPath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
+            'data')
 
     def buildGraph(self, exchanges = {}):
         graph = {}
         if not exchanges:
             exchanges = self.exchanges
 
-        for dex, tokens in exchanges.items():
-            for pools in tokens.keys():
+        for dex, attributes in exchanges.items():
+            for pools in attributes['pairs'].keys():
                 pool = list(pools)
                 if pool[0] not in graph:
                     graph[pool[0]] = []
@@ -137,7 +138,12 @@ class Blockchain:
     
         if save:
             with open(self.routePath,'w') as AR:
-                json.dump(route,AR,indent = 2)
+                json.dump(
+                    {'MetaData': {
+                        'time': time.ctime(),
+                    },
+                    'Data':route},
+                    AR,indent = 2)
         else:
             return route
 
@@ -220,28 +226,43 @@ class Blockchain:
     def simplyfy(self,route):
         result = [route[0]['from']+' '+route[0]['to']+' '+route[0]['via']]
         _result = [route[0]['to']+' '+route[0]['from']+' '+route[0]['via']]
+        reverseRoute = [{
+            'from' : route[0]['to'],
+            'to' :  route[0]['from'],
+            'via' : route[0]['via']
+        }]
 
         for j in route[1:]:
             result.append(j['from']+' '+j['to']+' '+j['via'])
             _result.insert(0,j['to']+' '+j['from']+' '+j['via'])
+            reverseRoute.insert(0,{
+            'from' : j['to'],
+            'to' :  j['from'],
+            'via' : j['via']
+        })
             
-        return ['-'.join(result),'-'.join(_result)]
+        return ['-'.join(result),'-'.join(_result),route,reverseRoute]
 
-    def pollRoute(self, route):
+    def pollRoute(self, route, prices = []):
         rates = [[],[]]
         liquidity = [[],[]]
         least = 0
         lenght = len(route)
         session = requests.Session()
 
-        for index, swap in enumerate(route):
-            
-            price = self.getPrice(
-                session, 
-                self.exchanges[swap['via']][frozenset([swap['from'],swap['to']])],
-                swap)
+        if prices:
+            assert len(prices) == lenght
 
-            print(price)
+        for index, swap in enumerate(route):
+            if not prices:
+                price = self.getPrice(
+                    session, 
+                    self.exchanges[swap['via']]['pairs'][frozenset([swap['from'],swap['to']])],
+                    swap)
+
+                print(price)
+            else:
+                price = prices[index]
              
             rate = (self.getRate(price, swap['to'], swap['from']),
             self.getRate(price, swap['from'], swap['to']))
@@ -272,78 +293,88 @@ class Blockchain:
 
         return export
 
-    def pollRoutes(self, routes = [], save = True):
+    def pollRoutes(self, routes = [], save = True, screen = False):
         print('polling routes ...')
         if not routes:
             with open(self.routePath) as RO:
-                routes = json.load(RO)
+                routes = json.load(RO)['Data']
+
+        if screen:
+            routes = self.screenRoutes(routes,save = False)
 
         history = {}
         result = []
         routeLenght = len(routes)
-    
+        summary = {
+            'total' : routeLenght,
+            'requested' : 0,
+            'polled' : 0 }
+
         try:
             for pos, route in enumerate(routes):
                 simplifiedroute = self.simplyfy(route)
-                if simplifiedroute[0] in history or simplifiedroute[1] in history:
-                    warnings.warn('route {simplifiedroute} already polled!')
-                    continue
-
                 print(f'{pos + 1} / {routeLenght}')
+                if simplifiedroute[0] in history or simplifiedroute[1] in history:
+                    warnings.warn(f'route {simplifiedroute[:2]} already polled!')
+                    continue
+                
                 # self.polRoute returns a tuple of [capital,rates,Ep]
+                
                 for P, item in enumerate(self.pollRoute(route)):
                     capital, rates, EP = item
                     result.append({
-                        'route' : simplifiedroute[P],
+                        'simplyfiedRoute' : simplifiedroute[P],
+                        'route' : simplifiedroute[P + 2],
                         'index' : rates[-1],
                         'capital' : capital,
-                        'EP' : EP
+                        'EP' : EP,
+                        'USD Value' : ''
                     })
+
+                summary['polled'] += 2
+                summary['requested'] += 1
 
                 history[simplifiedroute[0]] = pos
                 history[simplifiedroute[1]] = pos
 
             print('Done!')
+        except:
+            print('failed to poll, a error occured!')
         finally:
             export = sorted(result, key = lambda v : v['index'], reverse = True)
         
             if save:
                 with open(self.pollPath,'w') as DP:
-                    json.dump(export, DP, indent = 2)
+                    json.dump(
+                        {'MetaData': {
+                            'time': time.ctime(),
+                            },
+                        'Data':export}, 
+                        DP, indent = 2)
             else:
-                return (export,history)
+                return (summary,history)
               
-    def screenRoutes(self, expectedProfit = 50, routes = []):
+    def screenRoutes(self,  routes, save = True):
         print('screening routes...')
-        newRoute = []
-
-        if not routes:
-            with open(self.routePath) as RO:
-                routes = json.load(RO)
-        routeLenght = len(routes)
+        history = {}
+        result = []
 
         for pos, route in enumerate(routes):
-            print(f'{pos + 1} / {routeLenght}')
-            _, _, EP = self.pollRoute(route)
-            if EP >= expectedProfit:
-                newRoute.append(route)
-       
-        with open(self.routePath,'w') as AR:
-            json.dump(newRoute,AR,indent = 2)  
+            simplifiedroute = self.simplyfy(route)
+            if simplifiedroute[0] in history or simplifiedroute[1] in history:
+                continue
+            else:
+                result.append(route)
+                history[simplifiedroute[0]] = pos
+                history[simplifiedroute[1]] = pos
 
-    def executeArb(self, expectedProfit = 50, routes = [],save = True):
-        if not routes:
-            with open(self.routePath) as RO:
-                routes = json.load(RO)
+        if save:
+            with open(self.routePath,'w') as AR:
+                json.dump(result,AR,indent = 2)  
+        else:
+            return result
 
-        for route in routes:
-            _, _, EP = self.pollRoute(route)
 
-'''
-To do list
-convert getarbroute to a generator to conserve memory or read it and iterate using a generator
-integrate screenroutes with pollroutes using a cutoff parameter
-'''
 class Aurora(Blockchain):
     def __init__(self):
         super().__init__()
@@ -351,14 +382,11 @@ class Aurora(Blockchain):
         self.exchanges = Cfg.AuroraExchanges
         self.tokens = Cfg.AuroraTokens
         self.startTokens = Cfg.AuroraStartTokens
-        self.startExchanges = None
+        self.startExchanges = Cfg.AuroraStartExchanges
         self.headers = {}
 
-        self.pollPath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
-            'data', 'Aurora', 'pollResult.json')
-
-        self.routePath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
-            'data', 'Aurora', 'arbRoutes.json')
+        self.pollPath = os.path.join(self.dataPath, 'Aurora', 'pollResult.json')
+        self.routePath = os.path.join(self.dataPath, 'Aurora', 'arbRoutes.json')
         
 class Arbitrum(Blockchain):
     def __init__(self):
@@ -370,11 +398,8 @@ class Arbitrum(Blockchain):
         self.startExchanges = None
         self.headers = {}
 
-        self.pollPath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
-            'data', 'Arbitrum', 'pollResult.json')
-
-        self.routePath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
-            'data', 'Arbitrum', 'arbRoutes.json')
+        self.pollPath = os.path.join(self.dataPath,'Arbitrum','pollResult.json')
+        self.routePath = os.path.join(self.dataPath,'Arbitrum', 'arbRoutes.json')
 
 class BSC(Blockchain):
     def __init__(self):
@@ -385,13 +410,11 @@ class BSC(Blockchain):
         self.startTokens = Cfg.BSCStartTokens
         self.startExchanges = Cfg.BSCStartExchanges
         self.headers = {
-        'User-Agent': 'PostmanRuntime/7.29.0',}
+        'User-Agent': 'PostmanRuntime/7.29.0',
+        }
 
-        self.pollPath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
-            'data', 'BSC', 'pollResult.json')
-
-        self.routePath = os.path.join( os.path.split(os.path.dirname(__file__))[0],
-            'data', 'BSC', 'arbRoute.json')
+        self.pollPath = os.path.join(self.dataPath,'BSC', 'pollResult.json')
+        self.routePath = os.path.join(self.dataPath,'BSC', 'arbRoute.json')
       
 
 
