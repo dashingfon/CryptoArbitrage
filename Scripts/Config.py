@@ -1,4 +1,12 @@
- 
+# Controller Settings
+ControllerBlockchains = {
+    'Binance SmartChain' : 1,
+    'Aurora Blockchain' :1
+}
+
+
+
+
 # Aurora Network
 
 AuroraTokens = {
@@ -68,7 +76,7 @@ AuroraExchanges = {
 
 # BSC Network
 
-# USDT is BSC-USD
+# Note - USDT is BSC-USD
 BSCTokens = {
     'WBNB' : '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c',
     'BUSD' : '0xe9e7cea3dedca5984780bafc599bd69add087d56',

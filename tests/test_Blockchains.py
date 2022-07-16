@@ -5,8 +5,9 @@ sys.path.insert(1,
 import Blockchains
 import pytest
 
+DATA_AVAILABLE = 0
 
-exchanges = {
+EXCHANGES = {
     'trisolaris' : {
         'pairs' : {
         frozenset(('AURORA', 'WETH')) : '0x5eeC60F348cB1D661E4A5122CF4638c7DB7A886e',
@@ -22,7 +23,7 @@ exchanges = {
         frozenset(('USDC', 'NEAR')) : '0xbf560771b6002a58477efbcdd6774a5a1947587b',}
         }}
 
-graph = {
+GRAPH = {
     'AURORA' : [
         {'to' : 'WETH','via' : 'trisolaris',},
         {'to' : 'NEAR','via' : 'wannaswap',},],
@@ -44,9 +45,9 @@ graph = {
         {'to' : 'USDC','via' : 'auroraswap',},],
 }
 
-tokens = ['AURORA','WETH']
-price = {'WETH': 2.141651224104825, 'WBTC': 0.11160318}
-arbRoute = [
+TOKENS = ['AURORA','WETH']
+PRICE = {'WETH': 2.141651224104825, 'WBTC': 0.11160318}
+ARB_ROUTE = [
     [
         {
         'from' : 'AURORA',
@@ -106,9 +107,9 @@ arbRoute = [
     ]
 
 @pytest.fixture(scope = 'module')
-def Aurorasetup():
+def ChainSetup():
     Aurora = Blockchains.Aurora()
-    Aurora.buildGraph(exchanges) 
+    Aurora.buildGraph(EXCHANGES) 
     return Aurora
 
 def equal(list1,list2):
@@ -116,47 +117,47 @@ def equal(list1,list2):
     return False if list_dif else True
 
 #@pytest.mark.noData
-def test_BuildGraph(Aurorasetup):
-    assert Aurorasetup.graph == graph
+def test_BuildGraph(ChainSetup):
+    assert ChainSetup.graph == GRAPH
 
 class TestArbRoute:
     #refactor the DLS tests to multiple ones
-    def test_DLS(self,Aurorasetup):
-        route = Aurorasetup.DLS('AURORA',exchanges)
-        assert equal(route,arbRoute[:2])
+    def test_DLS(self,ChainSetup):
+        route = ChainSetup.DLS('AURORA',EXCHANGES)
+        assert equal(route,ARB_ROUTE[:2])
 
     #testing default as token
-    def test_normalGetRoute(self,Aurorasetup):
-        route = Aurorasetup.getArbRoute(tokens = tokens, save = False,exchanges = 'all')
-        assert equal(route,arbRoute)
+    def test_normalGetRoute(self,ChainSetup):
+        route = ChainSetup.getArbRoute(tokens = TOKENS, save = False,exchanges = 'all',graph = False)
+        assert equal(route,ARB_ROUTE)
     
     @pytest.mark.parametrize('toks',[{},''])
-    def test_invalidToken(self,Aurorasetup,toks):
+    def test_invalidToken(self,ChainSetup,toks):
         with pytest.raises(ValueError):
-            Aurorasetup.getArbRoute(tokens = toks, save = False,exchanges = 'all')
+            ChainSetup.getArbRoute(tokens = toks, save = False,exchanges = 'all',graph = False)
 
     @pytest.mark.parametrize('Exchanges,results',
-        [(['trisolaris'],arbRoute[::2]),
-        (['wannaswap'],arbRoute[1::2]),
+        [(['trisolaris'],ARB_ROUTE[::2]),
+        (['wannaswap'],ARB_ROUTE[1::2]),
         (['auroraswap'],[]),
-        (['trisolaris','wannaswap'],arbRoute)])
-    def test_startExchanges(self,Aurorasetup,Exchanges,results):
-        route = Aurorasetup.getArbRoute(tokens = tokens, save = False,exchanges = Exchanges)
+        (['trisolaris','wannaswap'],ARB_ROUTE)])
+    def test_startExchanges(self,ChainSetup,Exchanges,results):
+        route = ChainSetup.getArbRoute(tokens = TOKENS, save = False,exchanges = Exchanges,graph = False)
         assert equal(route,results)
 
 
 class TestRate:
 
-    def test_getRate(self,Aurorasetup):
-        r1 = Aurorasetup.r1
-        impact = Aurorasetup.impact
-        rate = r1 * price['WETH'] / (1 + (impact * r1)) / price['WBTC']
-        assert rate == Aurorasetup.getRate(price,'WETH','WBTC')
+    def test_getRate(self,ChainSetup):
+        r1 = ChainSetup.r1
+        impact = ChainSetup.impact
+        rate = r1 * PRICE['WETH'] / (1 + (impact * r1)) / PRICE['WBTC']
+        assert rate == ChainSetup.getRate(PRICE,'WETH','WBTC')
 
     @pytest.mark.parametrize('prices',[{'WETH': 2.141651224104825},{'WBTC': 0.11160318}])
-    def test_invalidRate(self, Aurorasetup,prices):
+    def test_invalidRate(self, ChainSetup,prices):
         with pytest.raises(ValueError):
-            Aurorasetup.getRate(prices,'WETH','WBTC')
+            ChainSetup.getRate(prices,'WETH','WBTC')
 
 prices = [
     {'AURORA' : 21,
@@ -168,79 +169,81 @@ prices = [
 ]
 class TestPollRoutes:
     
-    def test_pollRoute(self,Aurorasetup):
+    def test_pollRoute(self,ChainSetup):
         least = 21
 
         liquidity = [[32,41,40],[41,32,21]]
-        rates1 = [Aurorasetup.getRate(prices[0],'WETH','AURORA')]
-        rates2 = [Aurorasetup.getRate(prices[2],'NEAR','AURORA')]
+        rates1 = [ChainSetup.getRate(prices[0],'WETH','AURORA')]
+        rates2 = [ChainSetup.getRate(prices[2],'NEAR','AURORA')]
 
-        rates1.append(Aurorasetup.getRate(prices[1],'NEAR','WETH') * rates1[-1])
-        rates2.append(Aurorasetup.getRate(prices[1],'WETH','NEAR') * rates2[-1])
+        rates1.append(ChainSetup.getRate(prices[1],'NEAR','WETH') * rates1[-1])
+        rates2.append(ChainSetup.getRate(prices[1],'WETH','NEAR') * rates2[-1])
 
-        rates1.append(Aurorasetup.getRate(prices[2],'AURORA','NEAR') * rates1[-1])
-        rates2.append(Aurorasetup.getRate(prices[0],'AURORA','WETH') * rates2[-1])
+        rates1.append(ChainSetup.getRate(prices[2],'AURORA','NEAR') * rates1[-1])
+        rates2.append(ChainSetup.getRate(prices[0],'AURORA','WETH') * rates2[-1])
 
-        ans = (Aurorasetup.getDetails(liquidity[0],least,rates1),
-            Aurorasetup.getDetails(liquidity[1],least,rates2))
-        res = Aurorasetup.pollRoute(arbRoute[0],prices = prices)
+        ans = (ChainSetup.getDetails(liquidity[0],least,rates1),
+            ChainSetup.getDetails(liquidity[1],least,rates2))
+        res = ChainSetup.pollRoute(ARB_ROUTE[0],prices = prices)
         assert ans == res
 
-    def test_accurateReverse(self,Aurorasetup):
-        result = Aurorasetup.pollRoute(arbRoute[0],prices = prices)
-        result2 = Aurorasetup.pollRoute(arbRoute[1],prices = prices[::-1])
+    def test_accurateReverse(self,ChainSetup):
+        result = ChainSetup.pollRoute(ARB_ROUTE[0],prices = prices)
+        result2 = ChainSetup.pollRoute(ARB_ROUTE[1],prices = prices[::-1])
         print(result)
         print(result2)
         assert result[1] == result2[0]
         assert result[0] == result2[1]
-    
-    def test_pollingOnlyUnique(self,Aurorasetup):
-        result = Aurorasetup.pollRoutes(arbRoute[:2], save = False)
+        
+    @pytest.mark.xfail(not DATA_AVAILABLE,reason = 'no data connection')
+    def test_pollingOnlyUnique(self,ChainSetup):
+        result = ChainSetup.pollRoutes(ARB_ROUTE[:2], save = False)
         assert result[0]['requested'] == 1
 
-    def test_pollingWarning(self,Aurorasetup):
+    @pytest.mark.xfail(not DATA_AVAILABLE, reason = 'no data connection')
+    def test_pollingWarning(self,ChainSetup):
         with pytest.warns(UserWarning):
-            Aurorasetup.pollRoutes(arbRoute[:2], save = False)
+            ChainSetup.pollRoutes(ARB_ROUTE[:2], save = False)
     
     @pytest.mark.parametrize('least,result',[
         (21,[0.105,[0.5,0.5,0.5],-0.0525]),
         (40,[0.4,[0.5,0.5,0.5],-0.2]),
         (32,[0.32,[0.5,0.5,0.5],-0.16])])
-    def test_getDetails(self,Aurorasetup,least,result):
+    def test_getDetails(self,ChainSetup,least,result):
         lists = [32,41,40]
         rates = [0.5,0.5,0.5]
         
-        test = Aurorasetup.getDetails(lists,least,rates)
+        test = ChainSetup.getDetails(lists,least,rates)
         assert test == result
 
-    def test_cumSum(self,Aurorasetup):
+    def test_cumSum(self,ChainSetup):
         listItem = [2,3,1,4]
-        assert Aurorasetup.cumSum(listItem) == [2,6,6,24]
+        assert ChainSetup.cumSum(listItem) == [2,6,6,24]
 
         
-    def test_simplyfy(self,Aurorasetup):
+    def test_simplyfy(self,ChainSetup):
         ans = ['AURORA WETH trisolaris-WETH NEAR wannaswap-NEAR AURORA wannaswap',
             'AURORA NEAR wannaswap-NEAR WETH wannaswap-WETH AURORA trisolaris',
-            arbRoute[0],arbRoute[1]]
-        result = Aurorasetup.simplyfy(arbRoute[0])
+            ARB_ROUTE[0],ARB_ROUTE[1]]
+        result = ChainSetup.simplyfy(ARB_ROUTE[0])
         assert result == ans
 
 class TestgetPrice:
 
     @pytest.mark.skip(reason = 'incomplete')
-    def test_extract(self,Aurorasetup):
+    def test_extract(self,ChainSetup):
         pass
 
     @pytest.mark.skip(reason = 'incomplete')
-    def test_getPrice(self,Aurorasetup):
+    def test_getPrice(self,ChainSetup):
         assert True
 
 
-def test_screenRoute(Aurorasetup):
-    routes = arbRoute
-    screenedRoute = arbRoute[::2]
+def test_screenRoute(ChainSetup):
+    routes = ARB_ROUTE
+    screenedRoute = ARB_ROUTE[::2]
 
-    result = Aurorasetup.screenRoutes(routes = routes,save = False)
+    result = ChainSetup.screenRoutes(routes = routes,save = False)
     assert equal(screenedRoute,result)
 
 class TestExceution:

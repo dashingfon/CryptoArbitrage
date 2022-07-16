@@ -38,4 +38,13 @@ def reep(values):
         for j in r(i):
             yield j
 
-print(time.ctime())
+class Test():
+    def __init__(self):
+        self.purpose = 'test'
+
+    def __repr__(self):
+        return 'Aurora Blockchain'
+
+test = 1
+
+print(test == True)

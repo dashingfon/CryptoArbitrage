@@ -1,6 +1,5 @@
 '''
-This module contains the Blockchain main class that other specific blockchain classes inherit from
-to import the config and controller modules
+The config file contains related blockchain specific information
 '''
 import Config as Cfg
 
@@ -12,8 +11,7 @@ from functools import wraps
 from bs4 import BeautifulSoup
 
 '''
-This is the Ratelimited function used to decorate the getPrice function that limits the rate
-at which requests are being sent
+This is the Ratelimited decorator used to limit requests
 '''
 def RateLimited(maxPerSecond):
     mininterval = 1.0 / float(maxPerSecond)
@@ -35,11 +33,12 @@ def RateLimited(maxPerSecond):
     return decorate
 
 '''
-the main blockchain class containing all the methods
+The main blockchain class other specific blockchains inherit
+It contains all the methods
 '''
 class Blockchain:
     def __init__(self):
-        self.impact = 0.005 # represents the fraction of the liquidity pool 
+        self.impact = 0.005  
         self.r1 = 0.997 
         self.depthLimit = 4
         self.graph = {}
@@ -47,7 +46,20 @@ class Blockchain:
         self.dataPath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
             'data')
 
+    '''
+    impact - the amount of price impact allowed
+    r1 - The swap fee on dexs
+    depthLimit - Used to determine the longest cycle of swaps
+    graph - a representation of the connected tokens across dexs
+    arbRoutes - a list of the cycle able routes
+    dataPath - the path to the data directory
+    
+    '''
+
+
     def buildGraph(self, exchanges = {}):
+        # The method to find the connections between the tokens
+
         graph = {}
         if not exchanges:
             exchanges = self.exchanges
@@ -66,6 +78,8 @@ class Blockchain:
         self.graph = graph    
 
     def dive(self, depth, node, goal, path, followed):
+        # Used recurrsively with the Depth limited search function to discover the arb routes
+
         result = []
         if depth <= self.depthLimit and node in self.graph:
             for i in self.graph[node]:
@@ -85,6 +99,7 @@ class Blockchain:
 
     def DLS(self,goal,exchanges):
         # implementation of depth limited search
+
         start = []
         result = []
         path = {'from': goal}
@@ -111,7 +126,9 @@ class Blockchain:
 
         return result
            
-    def getArbRoute(self, tokens = 'default', exchanges = 'all',graph = False, save = True):
+    def getArbRoute(self, tokens = 'default', exchanges = 'all',graph = True, save = True):
+        # The methods the produces and optionally saves the Arb routes
+
         route = []
 
         if graph:
@@ -387,7 +404,10 @@ class Aurora(Blockchain):
 
         self.pollPath = os.path.join(self.dataPath, 'Aurora', 'pollResult.json')
         self.routePath = os.path.join(self.dataPath, 'Aurora', 'arbRoutes.json')
-        
+    
+    def __repr__(self):
+        return 'Aurora Blockchain'
+
 class Arbitrum(Blockchain):
     def __init__(self):
         super().__init__()
@@ -400,6 +420,9 @@ class Arbitrum(Blockchain):
 
         self.pollPath = os.path.join(self.dataPath,'Arbitrum','pollResult.json')
         self.routePath = os.path.join(self.dataPath,'Arbitrum', 'arbRoutes.json')
+
+    def __repr__(self):
+        return 'Arbitrum Blockchain'
 
 class BSC(Blockchain):
     def __init__(self):
@@ -416,7 +439,8 @@ class BSC(Blockchain):
         self.pollPath = os.path.join(self.dataPath,'BSC', 'pollResult.json')
         self.routePath = os.path.join(self.dataPath,'BSC', 'arbRoute.json')
       
-
+    def __repr__(self):
+        return 'Binance SmartChain'
 
 
     

@@ -1,18 +1,45 @@
-import brownie
-import Blockchains as Blc
+import web3
+import Config as Cfg
+
 
 def lookupPrice():
     #returns the updated price as a dict
     pass
 
 class Controller():
-    def __init__(self):
+    def __init__(self,blockchain):
+        self.target = 1000
+        self.blockchainMap = Cfg.ControllerBlockchains
+
+        if str(blockchain) in self.blockchainMap:
+            self.blockchain = blockchain
+        else:
+            raise ValueError('Invalid Blockchain Object')
+
+    def setup(self):
         pass
 
-    def getRoutes(self):
+    def refresh(self):
+        pass
+    
+    def getRoutes(self, via = 'pollResult'):
+        if via == 'pollResult':
+            pass
+
+
+        elif via == 'arbRoute':
+            pass
+        
+        else:
+            raise ValueError('Invalid Route Location')
+
+    def check(self, route):
         pass
 
-    def prepPayload(self):
+    def getProspect(self):
+        pass
+
+    def prepPayload(self, route):
         pass
 
     def execute(self):
