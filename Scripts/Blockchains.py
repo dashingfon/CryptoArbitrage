@@ -1,6 +1,8 @@
 '''
-The config file contains related blockchain specific information
+Blockchain module containing the different blockchain implementation
 '''
+#The config file contains related blockchain specific information
+
 import Config as Cfg
 
 '''
@@ -9,6 +11,7 @@ Then to import the other modules needed
 import requests, json, time, os, warnings
 from functools import wraps
 from bs4 import BeautifulSoup
+from pycoingecko import CoinGeckoAPI
 
 '''
 This is the Ratelimited decorator used to limit requests
@@ -45,6 +48,7 @@ class Blockchain:
         self.arbRoutes = []
         self.dataPath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
             'data')
+        self.priceLookupPath = os.path.join(self.dataPath,'PriceLookup.json')
 
     '''
     impact - the amount of price impact allowed
@@ -55,7 +59,6 @@ class Blockchain:
     dataPath - the path to the data directory
     
     '''
-
 
     def buildGraph(self, exchanges = {}):
         # The method to find the connections between the tokens
@@ -78,7 +81,7 @@ class Blockchain:
         self.graph = graph    
 
     def dive(self, depth, node, goal, path, followed):
-        # Used recurrsively with the Depth limited search function to discover the arb routes
+        # Used recurrsively with the Depth limited search function to discover tradable arb routes
 
         result = []
         if depth <= self.depthLimit and node in self.graph:
@@ -158,6 +161,8 @@ class Blockchain:
                 json.dump(
                     {'MetaData': {
                         'time': time.ctime(),
+                        'startExchanges' : self.startExchanges,
+                        'startTokens' : self.startTokens,
                     },
                     'Data':route},
                     AR,indent = 2)
@@ -189,7 +194,7 @@ class Blockchain:
             
         return price
     
-    @RateLimited(1)
+    @RateLimited(3)
     def getPrice(self, session, address,swap):
         url = self.source + address
         attemptsAllowed = 4
@@ -201,9 +206,10 @@ class Blockchain:
                     response = session.get(url,headers = self.headers)
                 except ConnectionError:
                     print('Error')
-                    time.sleep(8)
+                    time.sleep(10)
                     tries += 1
                     print(f'Retring... \n{attemptsAllowed - tries} tries left')
+                
                 else:
                     done = True
         
@@ -258,7 +264,20 @@ class Blockchain:
             'via' : j['via']
         })
             
-        return ['-'.join(result),'-'.join(_result),route,reverseRoute]
+        return [' - '.join(result),' - '.join(_result),route,reverseRoute]
+
+    def assemble(self,route):
+        result = []
+        routeList = route.split(' - ')
+        for item in routeList:
+            itemList = item.split()
+            load = {
+                'from' : itemList[0],
+                'to' : itemList[1],
+                'via' : itemList[2],
+            }
+            result.append(load)
+        return result
 
     def pollRoute(self, route, prices = []):
         rates = [[],[]]
@@ -309,17 +328,62 @@ class Blockchain:
             self.getDetails(liquidity[1],least,rates[1]))
 
         return export
+    
+    def checkIfTestnet(self):
+            return str(self)[-7:] == 'Testnet'
 
-    def pollRoutes(self, routes = [], save = True, screen = False):
+    def lookupPrice(self, returns = False):
+        def getPriceLookup():
+            try:
+                with open(self.priceLookupPath) as PP:
+                    temp = json.load(PP)
+            except FileNotFoundError:
+                temp = {}
+            
+            return temp
+        
+        temp = getPriceLookup()
+
+        Testnet = self.checkIfTestnet()
+        prices = {}
+        if not Testnet:
+
+            tokenAdresses = []
+            for i in self.tokens.values():
+                tokenAdresses.append(i)
+
+            Cg = CoinGeckoAPI()
+            prices = Cg.get_token_price(
+                id = self.coinGeckoId,
+                contract_addresses = tokenAdresses,
+                vs_currencies = 'usd' )
+        
+        with open(self.priceLookupPath,'w') as PW:
+            json.dump({**temp,**prices},PW,indent = 2)
+
+        if returns:
+            return {**temp,**prices}
+
+    def pollRoutes(self, routes = [], save = True, screen = True,currentPrice = True,start = 0):
         print('polling routes ...')
+        Method = 'Manual'
         if not routes:
+            Method = 'Auto'
             with open(self.routePath) as RO:
                 routes = json.load(RO)['Data']
+
+        if start > 0:
+            assert start < len(routes) - 2
+            routes = routes[start:]
 
         if screen:
             routes = self.screenRoutes(routes,save = False)
 
-        history = {}
+        priceLookup = {}
+        if currentPrice:
+            priceLookup = self.lookupPrice(True)
+
+        history = set()
         result = []
         routeLenght = len(routes)
         summary = {
@@ -339,32 +403,50 @@ class Blockchain:
                 
                 for P, item in enumerate(self.pollRoute(route)):
                     capital, rates, EP = item
+                    startToken = simplifiedroute[P + 2][0]['from']
+                    if priceLookup:
+                        USD_Value = priceLookup[self.tokens[startToken]]['usd']
+                    else:
+                        USD_Value = 0
+
                     result.append({
                         'simplyfiedRoute' : simplifiedroute[P],
                         'route' : simplifiedroute[P + 2],
                         'index' : rates[-1],
                         'capital' : capital,
                         'EP' : EP,
-                        'USD Value' : ''
+                        'USD Value' : USD_Value * EP
                     })
 
                 summary['polled'] += 2
                 summary['requested'] += 1
 
-                history[simplifiedroute[0]] = pos
-                history[simplifiedroute[1]] = pos
+                history.add(simplifiedroute[0])
+                history.add(simplifiedroute[1])
 
             print('Done!')
         except:
-            print('failed to poll, a error occured!')
+            print('failed to poll, an error occured!')
         finally:
-            export = sorted(result, key = lambda v : v['index'], reverse = True)
-        
+            if result[0]['USD Value']:
+                export = sorted(result, key = lambda v : v['USD Value'], reverse = True)
+            else:
+                export = sorted(result, key = lambda v : v['EP'], reverse = True)
+                
             if save:
+                routeInfo = {}
+                if Method == 'Auto':
+                    with open(self.routePath) as routes:
+                        Info = json.load(routes)
+                        routeInfo['startExchanges'] = Info['MetaData']
+
                 with open(self.pollPath,'w') as DP:
                     json.dump(
                         {'MetaData': {
                             'time': time.ctime(),
+                            'indexStopped' : pos + start,
+                            'Total' : routeLenght,
+                            'routeInfo' : routeInfo
                             },
                         'Data':export}, 
                         DP, indent = 2)
@@ -373,17 +455,17 @@ class Blockchain:
               
     def screenRoutes(self,  routes, save = True):
         print('screening routes...')
-        history = {}
+        history = set()
         result = []
 
-        for pos, route in enumerate(routes):
+        for route in routes:
             simplifiedroute = self.simplyfy(route)
             if simplifiedroute[0] in history or simplifiedroute[1] in history:
                 continue
             else:
                 result.append(route)
-                history[simplifiedroute[0]] = pos
-                history[simplifiedroute[1]] = pos
+                history.add(simplifiedroute[0])
+                history.add(simplifiedroute[1])
 
         if save:
             with open(self.routePath,'w') as AR:
@@ -396,12 +478,13 @@ class Aurora(Blockchain):
     def __init__(self):
         super().__init__()
         self.source = 'https://aurorascan.dev/address/'
+        self.testData = Cfg.AuroraTestData
         self.exchanges = Cfg.AuroraExchanges
         self.tokens = Cfg.AuroraTokens
         self.startTokens = Cfg.AuroraStartTokens
         self.startExchanges = Cfg.AuroraStartExchanges
+        self.coinGeckoId = 'aurora'
         self.headers = {}
-
         self.pollPath = os.path.join(self.dataPath, 'Aurora', 'pollResult.json')
         self.routePath = os.path.join(self.dataPath, 'Aurora', 'arbRoutes.json')
     
@@ -412,12 +495,13 @@ class Arbitrum(Blockchain):
     def __init__(self):
         super().__init__()
         self.source = 'https://arbiscan.io/address/'
+        self.testData = ''
         self.exchanges = None
         self.tokens = None
         self.startTokens = None
         self.startExchanges = None
+        self.coinGeckoId = ''
         self.headers = {}
-
         self.pollPath = os.path.join(self.dataPath,'Arbitrum','pollResult.json')
         self.routePath = os.path.join(self.dataPath,'Arbitrum', 'arbRoutes.json')
 
@@ -428,14 +512,15 @@ class BSC(Blockchain):
     def __init__(self):
         super().__init__()
         self.source = 'https://bscscan.com/address/'
+        self.testData = ''
         self.exchanges = Cfg.BSCExchanges
         self.tokens = Cfg.BSCTokens
         self.startTokens = Cfg.BSCStartTokens
         self.startExchanges = Cfg.BSCStartExchanges
+        self.coinGeckoId = 'binance-smart-chain'
         self.headers = {
         'User-Agent': 'PostmanRuntime/7.29.0',
         }
-
         self.pollPath = os.path.join(self.dataPath,'BSC', 'pollResult.json')
         self.routePath = os.path.join(self.dataPath,'BSC', 'arbRoute.json')
       
@@ -443,8 +528,37 @@ class BSC(Blockchain):
         return 'Binance SmartChain'
 
 
-    
+class Kovan(Blockchain):
+    def __init__(self):
+        super().__init__()
+        self.source = ''
+        self.exchanges = None
+        self.tokens = None
+        self.startTokens = None
+        self.startExchanges = None
+        self.coinGeckoId = ''
+        self.headers = {}
+        self.pollPath = os.path.join(self.dataPath,'Kovan','pollResult.json')
+        self.routePath = os.path.join(self.dataPath,'Kovan', 'arbRoute.json')
 
-          
 
+    def __repr__(self):
+        return 'Kovan Testnet' 
+
+class Goerli(Blockchain):
+    def __init__(self):
+        super().__init__()
+        self.source = ''
+        self.exchanges = None
+        self.tokens = None
+        self.startTokens = None
+        self.startExchanges = None
+        self.coinGeckoId = ''
+        self.headers = {}
+        self.pollPath = os.path.join(self.dataPath,'Goerli','pollResult.json')
+        self.routePath = os.path.join(self.dataPath,'Goerli', 'arbRoute.json')
+
+
+    def __repr__(self):
+        return 'Goerli Testnet' 
  

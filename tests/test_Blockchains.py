@@ -5,126 +5,45 @@ sys.path.insert(1,
 import Blockchains
 import pytest
 
-DATA_AVAILABLE = 0
+Data_Available = 0
+Chain = 'Aurora'
+def getChain():
+    if Chain == 'Aurora':
+        return Blockchains.Aurora()
+    elif Chain == 'Kovan' :
+        return Blockchains.Kovan()
+    else:
+        raise ValueError('Invalid Chain Argument')
 
-EXCHANGES = {
-    'trisolaris' : {
-        'pairs' : {
-        frozenset(('AURORA', 'WETH')) : '0x5eeC60F348cB1D661E4A5122CF4638c7DB7A886e',
-        frozenset(('NEAR', 'USDT')) : '0x03B666f3488a7992b2385B12dF7f35156d7b29cD',}},
-    'auroraswap' : {
-        'pairs' : {
-        frozenset(('USDT', 'USDC')) : '0xec538fafafcbb625c394c35b11252cef732368cd',
-        frozenset(('USDC', 'NEAR')) : '0x480a68ba97d70495e80e11e05d59f6c659749f27',}},
-    'wannaswap' : {
-        'pairs' : {
-        frozenset(('AURORA', 'NEAR')) : '0x7e9ea10e5984a09d19d05f31ca3cb65bb7df359d',
-        frozenset(('NEAR', 'WETH')) : '0x256d03607eee0156b8a2ab84da1d5b283219fe97',
-        frozenset(('USDC', 'NEAR')) : '0xbf560771b6002a58477efbcdd6774a5a1947587b',}
-        }}
+CHAIN = getChain()
 
-GRAPH = {
-    'AURORA' : [
-        {'to' : 'WETH','via' : 'trisolaris',},
-        {'to' : 'NEAR','via' : 'wannaswap',},],
-    'WETH' : [
-        {'to' : 'AURORA','via' : 'trisolaris',},
-        {'to' : 'NEAR','via' : 'wannaswap',},],
-    'NEAR' : [
-        {'to' : 'USDT','via' : 'trisolaris',},
-        {'to' : 'USDC','via' : 'auroraswap',},
-        {'to' : 'AURORA','via' : 'wannaswap',},
-        {'to' : 'WETH','via' : 'wannaswap',},
-        {'to' : 'USDC','via' : 'wannaswap',},],
-    'USDC' : [
-        {'to' : 'USDT','via' : 'auroraswap',},
-        {'to' : 'NEAR','via' : 'auroraswap',},
-        {'to' : 'NEAR','via' : 'wannaswap',},],
-    'USDT': [
-        {'to' : 'NEAR','via' : 'trisolaris',},
-        {'to' : 'USDC','via' : 'auroraswap',},],
-}
-
-TOKENS = ['AURORA','WETH']
-PRICE = {'WETH': 2.141651224104825, 'WBTC': 0.11160318}
-ARB_ROUTE = [
-    [
-        {
-        'from' : 'AURORA',
-        'to' : 'WETH',
-        'via' : 'trisolaris'},
-        {
-        'from' : 'WETH',
-        'to' : 'NEAR',
-        'via' : 'wannaswap'},
-        {
-        'from' : 'NEAR',
-        'to' : 'AURORA',
-        'via' : 'wannaswap'},
-    ],
-    [
-        {
-        'from' : 'AURORA',
-        'to' : 'NEAR',
-        'via' : 'wannaswap'},
-        {
-        'from' : 'NEAR',
-        'to' : 'WETH',
-        'via' : 'wannaswap'},
-        {
-        'from' : 'WETH',
-        'to' : 'AURORA',
-        'via' : 'trisolaris'},
-    ],
-    [
-        {
-        'from' : 'WETH',
-        'to' : 'AURORA',
-        'via' : 'trisolaris'},
-        {
-        'from' : 'AURORA',
-        'to' : 'NEAR',
-        'via' : 'wannaswap'},
-        {
-        'from' : 'NEAR',
-        'to' : 'WETH',
-        'via' : 'wannaswap'},
-    ],
-    [
-        {
-        'from' : 'WETH',
-        'to' : 'NEAR',
-        'via' : 'wannaswap'},
-        {
-        'from' : 'NEAR',
-        'to' : 'AURORA',
-        'via' : 'wannaswap'},
-        {
-        'from' : 'AURORA',
-        'to' : 'WETH',
-        'via' : 'trisolaris'},
-    ],
-    ]
+EXCHANGES = CHAIN.testData['EXCHANGES']
+GRAPH = CHAIN.testData['GRAPH']
+TOKENS = CHAIN.testData['TOKENS']
+PRICE = CHAIN.testData['PRICE']
+ARB_ROUTE = CHAIN.testData['ARB_ROUTE']
 
 @pytest.fixture(scope = 'module')
-def ChainSetup():
-    Aurora = Blockchains.Aurora()
-    Aurora.buildGraph(EXCHANGES) 
-    return Aurora
+def ChainSetup(): 
+    CHAIN.buildGraph(EXCHANGES)
+    return CHAIN
+
 
 def equal(list1,list2):
     list_dif = [i for i in list1 + list2 if i not in list1 or i not in list2]
     return False if list_dif else True
 
-#@pytest.mark.noData
+
 def test_BuildGraph(ChainSetup):
     assert ChainSetup.graph == GRAPH
 
 class TestArbRoute:
-    #refactor the DLS tests to multiple ones
+
     def test_DLS(self,ChainSetup):
         route = ChainSetup.DLS('AURORA',EXCHANGES)
+        route2 = ChainSetup.DLS('WETH',EXCHANGES)
         assert equal(route,ARB_ROUTE[:2])
+        assert equal(route2,ARB_ROUTE[2:])
 
     #testing default as token
     def test_normalGetRoute(self,ChainSetup):
@@ -195,15 +114,15 @@ class TestPollRoutes:
         assert result[1] == result2[0]
         assert result[0] == result2[1]
         
-    @pytest.mark.xfail(not DATA_AVAILABLE,reason = 'no data connection')
+    @pytest.mark.xfail(not Data_Available,reason = 'no data connection')
     def test_pollingOnlyUnique(self,ChainSetup):
-        result = ChainSetup.pollRoutes(ARB_ROUTE[:2], save = False)
+        result = ChainSetup.pollRoutes(ARB_ROUTE[:2], save = False, screen = False)
         assert result[0]['requested'] == 1
 
-    @pytest.mark.xfail(not DATA_AVAILABLE, reason = 'no data connection')
+    @pytest.mark.xfail(not Data_Available, reason = 'no data connection')
     def test_pollingWarning(self,ChainSetup):
         with pytest.warns(UserWarning):
-            ChainSetup.pollRoutes(ARB_ROUTE[:2], save = False)
+            ChainSetup.pollRoutes(ARB_ROUTE[:2], save = False, screen = False)
     
     @pytest.mark.parametrize('least,result',[
         (21,[0.105,[0.5,0.5,0.5],-0.0525]),
@@ -222,8 +141,8 @@ class TestPollRoutes:
 
         
     def test_simplyfy(self,ChainSetup):
-        ans = ['AURORA WETH trisolaris-WETH NEAR wannaswap-NEAR AURORA wannaswap',
-            'AURORA NEAR wannaswap-NEAR WETH wannaswap-WETH AURORA trisolaris',
+        ans = ['AURORA WETH trisolaris - WETH NEAR wannaswap - NEAR AURORA wannaswap',
+            'AURORA NEAR wannaswap - NEAR WETH wannaswap - WETH AURORA trisolaris',
             ARB_ROUTE[0],ARB_ROUTE[1]]
         result = ChainSetup.simplyfy(ARB_ROUTE[0])
         assert result == ans
@@ -246,8 +165,8 @@ def test_screenRoute(ChainSetup):
     result = ChainSetup.screenRoutes(routes = routes,save = False)
     assert equal(screenedRoute,result)
 
-class TestExceution:
 
-    @pytest.mark.skip(reason = 'incomplete')
-    def test_execution(self,):
-        assert True
+@pytest.mark.skip(reason = 'incomplete')
+def test_priceLookup():
+    pass
+

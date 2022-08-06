@@ -1,0 +1,18 @@
+{
+  "MetaData" : {
+    "Info" : "Polled route result on test token arb route"
+  },
+  "Data" : [
+  {
+    "route": "TST1 TST2 fonswap - TST2 TST3 fonswap - TST3 TST1 fonswap",
+    "index": 2.5848121884425344,
+    "capital": 0.1919007137570744,
+    "EP": 0.30412659013303345
+  },
+  {
+    "route": "TST1 TST3 fonswap - TST3 TST2 fonswap - TST2 TST1 fonswap",
+    "index": 0.5327032196255774,
+    "capital": 0.6518059210663799,
+    "EP": -0.30458680834330437
+  }
+]}
