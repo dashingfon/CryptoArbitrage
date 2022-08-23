@@ -1,48 +1,51 @@
 # The controller class that prepares and executes arbs
-
+import os
 import Config as Cfg
 import warnings, json
 
 from eth_abi import encode_abi
-#from brownie import config, interface, accounts, BscArb, TestArb
 from web3 import Web3
-from datetime import datetime, timedelta
+
 
 class Controller():
     def __init__(self,blockchain):
-        self.contract = None
-        self.account = None
+        self.contractAbi = Cfg.contractAbi
+        self.contractAddress = None
+        self.routerAbi = Cfg.routerAbi
         self.swapFuncSig = '0x38ed1739' #'swapExactTokensForTokens(uint256,uint256,address[],address,uint256)'
         self.approveFuncSig = '0x095ea7b3' #'approve(address,uint256)'
         self.blockchainMap = Cfg.ControllerBlockchains
-
+        self.optimalAmount = 1.009027027
         if str(blockchain) in self.blockchainMap:
             self.blockchain = blockchain
         else:
             raise ValueError('Invalid Blockchain Object')
-    '''
-    def getContract(self):
-        if str(self.blockchain) == 'Binance SmartChain':
-            if not self.contract:
-                self.contract = BscArb[0]
-            return self.contract
-        elif str(self.blockchain)[-7:] == 'Testnet':
-            if not self.contract:
-                self.contract = TestArb.deploy({'from' : accounts[0]})
-            return self.contract
+        self.web3 = Web3(Web3.HTTPProvider(self.blockchain.url,request_kwargs={'timeout':300}))
+        self.pv = os.environ.get('BEACON')
+
     
+    def isTestnet(self):
+        return str(self.blockchain)[-7:] == 'Testnet'
+
+    def getContract(self,address = '',abi = ''):
+        if not address:
+            address = self.contractAddress
+        if not abi:
+            abi = self.contractAbi
+        return self.web3.eth.contract(address = address, abi = abi)
+
     def getAccount(self):
-        if str(self.blockchain) == 'Binance SmartChain':
-            if not self.account:
-                self.account = accounts.add(config['wallets']['beacon'])
-            return self.account
-        elif str(self.blockchain)[-7:] == 'Testnet':
-            if not self.account:
-                self.account = accounts[0]
-            return self.account
-'''
+        if self.isTestnet():
+            return self.web3.eth.accounts[0]
+        else:
+            return self.web3.eth.account.from_key(self.pv)
+
     def getRoutes(self, pollResult = True, arbRoute = False):
         history = set()
+
+        if arbRoute:
+            self.blockchain.pollRoutes()
+            pollResult = True
 
         if pollResult:
             try:
@@ -58,57 +61,46 @@ class Controller():
                     history.add(routes[1])
                     if item['EP'] > 0:
                         yield {'route' : routes[2],'simplified' : routes[0],'EP' : item['EP'],'capital' : item['capital']}
-
-        if arbRoute:
-            try:
-                with open(self.blockchain.routePath, 'r') as PP:
-                    routePath = json.load(PP)
-            except FileNotFoundError:
-                warnings.warn('Route path file not found')
-            else:
-                for item in routePath['Data']:
-                    simplyfiedRoute = self.blockchain.simplyfy(item)
-                    if simplyfiedRoute[0] not in history and simplyfiedRoute[1] not in history:
-                        history.add(simplyfiedRoute[0])
-                        history.add(simplyfiedRoute[1])
-                        yield {'route' : simplyfiedRoute[2],'simplified' : simplyfiedRoute[0]}
-                
+         
     def check(self, route):
         return self.blockchain.pollRoute(route)
 
     def getProspect(self,Routes):
         for item in Routes:
             simplyfied = self.blockchain.simplyfy(item['route'])
-            if 'EP' in item:
-                if item['EP'] > 0:
-                    item['EP'] *= 1e18
-                    item['capital'] *= 1e18
-                    yield item
-            elif str(self.blockchain)[-7:] != 'Testnet':
+            if 'EP' in item and item['EP']/item['capital'] >= self.optimalAmount:
+                item['EP'] *= 1e18
+                item['capital'] *= 1e18
+                item['simplified'] = simplyfied[0]
+                item['route'] = simplyfied[2]
+                yield item
+            elif 'EP' not in item and str(self.blockchain)[-7:] != 'Testnet':
                 result = self.check(item['route'])
                 
-                if result[0][2] > 0:
+                if result[0][2] / result[0][0] >= self.optimalAmount:
                     item['EP'] = result[0][2] * 1e18
                     item['capital'] = result[0][0] * 1e18
+                    item['simplified'] = simplyfied[0]
                     yield item
-                elif result[1][2] > 0:
+                elif result[1][2] / result[1][0] >= self.optimalAmount:
                     item['EP'] = result[1][2] * 1e18
                     item['capital'] = result[1][0] * 1e18
                     item['simplified'] = simplyfied[1]
                     item['route'] = simplyfied[3]
                     yield item
-                
-    def encodeCall(self,signature,definitions,arguments):
+    
+    @staticmethod
+    def encodeCall(signature,definitions,arguments):
         byteData = encode_abi(definitions,arguments)
         return signature + Web3.toHex(byteData)[2:]
 
-    '''def getAmountsOut(self,router,amount,addresses):
-        Router = interface.IRouter(router)
-        amounts = Router.getAmountsOut(amount,addresses)
-        return amounts[-1]'''
+    def getAmountsOut(self,routerAddress,amount,addresses):
+        Router = self.getContract(routerAddress,self.routerAbi)
+        amounts = Router.functions.getAmountsOut(amount,addresses).call()
+        return amounts[-1]
 
-
-    def sortTokens(self,address1, address2):
+    @staticmethod
+    def sortTokens(address1, address2):
         first = str.encode(address1).hex()
         second = str.encode(address2).hex()
 
@@ -127,34 +119,17 @@ class Controller():
 
         tokens :- dict
         pair :- address
-        fee :- num
         factory :- address
         router :- list
-        timeStamp :- bool
         '''
         values = {}
 
         if 'tokens' in options:
-            values['tokens'] = tokens = options['tokens']
+            values['tokens'] = options['tokens']
         else: 
-            values['tokens'] = tokens = self.blockchain.tokens
+            values['tokens'] = self.blockchain.tokens
 
         values['names'] = names = (item['route'][0]['from'], item['route'][0]['to'])
-        token0, token1 = self.sortTokens(tokens[names[0]],tokens[names[1]])
-        
-        values['amount0'] = int(item['capital']) if tokens[names[0]] == token0 else 0
-        values['amount1'] = 0 if tokens[names[1]] == token1 else int(item['capital'])
-    
-        if 'pair' in options:
-            values['pair'] = options['pair']
-        else:
-            values['pair'] = self.blockchain.exchanges[
-            item['route'][0]['via']]['pairs'][frozenset(names[0],names[1])]
-        
-        if 'factory' in options:
-            values['factory']  = options['factory']
-        else:
-            values['factory'] = self.blockchain.exchanges[item['route'][0]['via']['factory']]
         
         if 'routers' in options:
             assert len(item['route']) == len(options['routers'])
@@ -165,46 +140,39 @@ class Controller():
                 routers.append(self.blockchain.exchanges[i['via']]['router'])
             values['routers'] = routers
 
+        if 'pair' in options:
+            values['pair'] = options['pair']
+        else:
+            values['pair'] = self.blockchain.exchanges[
+            item['route'][0]['via']]['pairs'][frozenset(names[0],names[1])]
+        
+        if 'factory' in options:
+            values['factory']  = options['factory']
+        
         if 'fee' in options:
             values['fee'] = options['fee']
-        else:
-            values['fee'] = self.blockchain.exchanges[item['route'][0]['via']]['fee']
-
-        values['timeStamp'] = options['timeStamp']
-
-        if 'contract' in options:
-            values['contract'] = options['contract']
-
-        if 'Outs' in options:
-            assert len(item['route']) == len(options['Outs'])
-            values['Outs'] = options['Outs']
-
 
         return values   
 
-    def prepPayload(self, item, initiator = '0x0000000000000000000000000000000000000000', options = {}):
+    def prepPayload(self, item, options = {}):
 
         val = self.getValues(item = item,options = options)
 
-        tokens = val['tokens']
-        AMOUNT0 = val['amount0']
-        AMOUNT1 = val['amount1']
-        PAIR = val['pair']
-        factory = val['factory']
-        names = val['names']
-        routers = val['routers']
+        tokens, amount = val['tokens'], int(item['capital'])
+        addresses, data = [], []
 
+        if 'fee' in val:
+            fee = val['fee']
+        else: fee = self.blockchain.exchanges[item['route'][0]['via']]['fee']
 
-        addresses = []
-        data = []
-
-        addr = [tokens[names[0]],tokens[names[1]]]
-        amount = int(item['capital'])
-
-        if 'Outs' in val:
-            In = int(val['Outs'][0] * amount)
+        isOut = True
+        if 'out' not in options:
+            isOut = False
+            start = self.getAmountsOut(
+                    val['routers'][0], amount, [val['names'][0],val['names'][1]])
         else:
-            In = self.getAmountsOut(routers[0],amount,addr)
+            start = int(options['out'] * amount)
+        prev = start
 
         rem = item['route'][1:]
         end = len(rem) - 1
@@ -213,112 +181,100 @@ class Controller():
             router = val['routers'][index + 1]
         
             # to populate the addresses list
-
             if index == 0 or rem[index - 1]['via'] != i['via']:
-                addresses.append(tokens[i['from']])
                 addr = [tokens[i['from']],tokens[i['to']]]
                 addresses.append(router) 
                 print(f'addresses snapshot, index {index} :- {addresses}')
             else:
                 addr.append(tokens[i['to']])
-                
 
             # to populate the data list
-
             if index == end or rem[index + 1]['via'] != i['via']:
-                # to encode the approve call
-                defs = ['address','uint256']
-                args = [addresses[-1],In]
-                print(f'approve data args, index {index} :- {args}')
-                data.append((self.encodeCall(self.approveFuncSig,defs,args)).encode())
-
-                #to encode the swap call
-                defs = ['uint256','uint256','address[]','address','uint256']
-
-
-                if val['timeStamp']:
-                    timeStamp = int(datetime.now() + timedelta(minutes = 1).timestamp())
-                else:
-                    timeStamp = int(9e9)
-
-                if 'Outs' in val:
-                    Out = int(val['Outs'][index + 1] * amount)
-                else:
-                    Out = self.getAmountsOut(router,In,addr)
-
-                if 'contract' in val:
-                    contract = val['contract']
-                else:
-                    contract = self.getContract().address
-
-                args = [In,Out,addr,contract,timeStamp]
-                In = Out
-                print(f'swap data args, index {index} :- {args}')
-                data.append((self.encodeCall(self.swapFuncSig,defs,args)).encode())
-
-
-        if Out > amount:
-            print('payload profitable!')
-            print(f'Starting :- {amount}')
-            print(f'Ending :- {Out}')
+                defs, args = ['address[]'], [addr]
+                print(f'addr snapshot, index {index} :- {addr}')
+                data.append(encode_abi(defs,args))
             
-            defs = ['address[]','bytes[]','address','address','address','uint256','uint256']
-            args = [addresses,data,PAIR,factory,initiator,amount,val['fee']]
-            DATA = Web3.toHex(encode_abi(defs,args))
+            '''if not isOut:
+                step = self.getAmountsOut(
+                    val['routers'][index], prev, [tokens[i['from']],tokens[i['to']]])
+            else:
+                step = int(options['out'][index] * prev)
+                prev = step'''
 
-            return [AMOUNT0,AMOUNT1,tokens[val['names'][0]],DATA]
-        else:
-            print('payload not profitable!')
-            return [] 
+        
+        defs = ['address[]','bytes[]','address','uint256','uint256']
+        args = [addresses,data,val['pair'],amount,fee]
+
+        #print(args)
+        DATA = Web3.toHex(encode_abi(defs,args))
+
+        names = val['names']
+        token0 = self.sortTokens(tokens[names[0]],tokens[names[1]])[0]
+
+        AMOUNT0 = start if tokens[names[0]] == token0 else 0
+        AMOUNT1 = 0 if tokens[names[0]] == token0 else start
+
+        #print(f'final payload :- {AMOUNT0,AMOUNT1,tokens[names[0]],DATA}')
+        return [AMOUNT0,AMOUNT1,tokens[names[0]],DATA]
 
     def execute(self, payload):
         contract = self.getContract()
-        contract.start(*payload,{'from' : self.getAccount()})
+        account = self.getAccount()
 
-    def arb(self, routes = [], amount = 10, keyargs = []):
+        if self.isTestnet():
+            tranx = contract.functions.start(*payload).transact({'from' : account})
+        else:
+            rawTx = contract.functions.start(*payload).buildTransaction(
+                {'from': account, 
+                'nonce': self.web3.eth.get_transaction_count(account.address)}
+            )
+            txCreate = self.web3.eth.account.sign_transaction(rawTx,self.pv)
+            tranx = self.web3.eth.send_raw_transaction(txCreate.rawTransaction)
+
+        txReceipt = self.web3.eth.wait_for_transaction_receipt(tranx)
+        print(f'tx succesful with hash: {txReceipt.transactionHash.hex()}')
+        
+    def arb(self, routes = [], amount = 10,  keyargs = []):
         
         #keyargs is a list of dictionaries
         if not routes:
             routes = self.getRoutes()
-        
+        lenght = len(routes)
+
         if keyargs:
-            assert len(keyargs) == len(routes)
+            assert len(keyargs) == lenght
+
+        Prospects = self.getProspect(routes)
 
         try:
             for i in range(amount):
-                print(f'arbing {i + 1} of {amount} routes')
-                prospect = next(self.getProspect(routes))
+                print(f'arbing {i + 1} of {lenght} routes')
+                prospect = next(Prospects)
 
                 if not keyargs:
                     payload = self.prepPayload(prospect) 
                 else:
                     payload = self.prepPayload(prospect,keyargs[i])
                 
-                if payload:    
-                    self.execute(payload)
+                if payload: self.execute(payload)
 
         except StopIteration:
-            print('routes exhausted!')
-
+            print('route items exhausted!')
 
     def scanPair(self):
         #get reserves and compare against balances
         pass
         
-
     def getSkimProspect(self):
         #scan and yields profitable pairs
         pass
-
 
     def storeSkimProspect(self):
         #save the profitable pairs in a json file
         pass
 
-
     def skim(self, skims = [], source = ''):
         #Execute the profitable pairs
-        
         pass
 
 

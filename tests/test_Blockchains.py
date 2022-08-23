@@ -62,8 +62,8 @@ class TestArbRoute:
         (['trisolaris','wannaswap'],ARB_ROUTE)])
     def test_startExchanges(self,ChainSetup,Exchanges,results):
         route = ChainSetup.getArbRoute(tokens = TOKENS, save = False,exchanges = Exchanges,graph = False)
+        print(route)
         assert equal(route,results)
-
 
 class TestRate:
 
@@ -86,23 +86,29 @@ prices = [
     {'NEAR' : 70,
     'AURORA' : 40}
 ]
+rates1 = [1,ChainSetup.getRate(prices[0],'WETH','AURORA')]
+rates2 = [1,ChainSetup.getRate(prices[2],'NEAR','AURORA')]
+
+rates1.append(ChainSetup.getRate(prices[1],'NEAR','WETH') * rates1[-1])
+rates2.append(ChainSetup.getRate(prices[1],'WETH','NEAR') * rates2[-1])
+
+rates1.append(ChainSetup.getRate(prices[2],'AURORA','NEAR') * rates1[-1])
+rates2.append(ChainSetup.getRate(prices[0],'AURORA','WETH') * rates2[-1])
+
 class TestPollRoutes:
     
-    def test_pollRoute(self,ChainSetup):
-        least = 21
+    @pytest.parametrize('least,liquidity,result',[
+        (21,[21,32,41,40]),
+        (32,[41,32,41,40]),
+        ])
+    def test_pollRoute(self,ChainSetup,least,liquidity,result):
 
-        liquidity = [[32,41,40],[41,32,21]]
-        rates1 = [ChainSetup.getRate(prices[0],'WETH','AURORA')]
-        rates2 = [ChainSetup.getRate(prices[2],'NEAR','AURORA')]
-
-        rates1.append(ChainSetup.getRate(prices[1],'NEAR','WETH') * rates1[-1])
-        rates2.append(ChainSetup.getRate(prices[1],'WETH','NEAR') * rates2[-1])
-
-        rates1.append(ChainSetup.getRate(prices[2],'AURORA','NEAR') * rates1[-1])
-        rates2.append(ChainSetup.getRate(prices[0],'AURORA','WETH') * rates2[-1])
-
-        ans = (ChainSetup.getDetails(liquidity[0],least,rates1),
-            ChainSetup.getDetails(liquidity[1],least,rates2))
+        reverse = liquidity[::-1]
+    
+        ans = (
+            [],
+            []
+        )
         res = ChainSetup.pollRoute(ARB_ROUTE[0],prices = prices)
         assert ans == res
 
@@ -124,16 +130,6 @@ class TestPollRoutes:
         with pytest.warns(UserWarning):
             ChainSetup.pollRoutes(ARB_ROUTE[:2], save = False, screen = False)
     
-    @pytest.mark.parametrize('least,result',[
-        (21,[0.105,[0.5,0.5,0.5],-0.0525]),
-        (40,[0.4,[0.5,0.5,0.5],-0.2]),
-        (32,[0.32,[0.5,0.5,0.5],-0.16])])
-    def test_getDetails(self,ChainSetup,least,result):
-        lists = [32,41,40]
-        rates = [0.5,0.5,0.5]
-        
-        test = ChainSetup.getDetails(lists,least,rates)
-        assert test == result
 
     def test_cumSum(self,ChainSetup):
         listItem = [2,3,1,4]
@@ -162,7 +158,7 @@ def test_screenRoute(ChainSetup):
     routes = ARB_ROUTE
     screenedRoute = ARB_ROUTE[::2]
 
-    result = ChainSetup.screenRoutes(routes = routes,save = False)
+    result = ChainSetup.screenRoutes(routes = routes)
     assert equal(screenedRoute,result)
 
 
