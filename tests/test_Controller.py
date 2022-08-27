@@ -1,16 +1,22 @@
+import pytest
 import sys, os
 sys.path.insert(1,
     os.path.join(os.path.split(os.path.dirname(__file__))[0],'scripts'))
 
-import pytest
-import Blockchains as Blc
-import Controller as Ctr
-import Config as Cfg
-from eth_abi import encode_abi
-from brownie import accounts, Token, Factory, Router, TestArb, interface
-from web3 import Web3
+import Blockchains as Blc, Controller as Ctr, Config as Cfg
+from utills import sortTokens, getPayloadBytes
+from brownie import accounts, Token, Factory, Router, TestArb
 from datetime import datetime, timedelta
 
+
+DEX_DATA = {
+    'pairs' : {},
+    'router' : '',
+    'factory' : '',
+    'fee' : 100301
+}
+TOKENS = {}
+revTOKENS = {}
 
 CtrSetup = Ctr.Controller(Blc.Kovan())
 
@@ -20,20 +26,22 @@ def Contract():
     CtrSetup.contractAddress = Cont.address
     return Cont
 
-
 def deployTokens(details):
     print(f'Test Tokens addresses')
     for index, i in enumerate(details):
         T = Token.deploy(*i,{'from':accounts[0]})
+        TOKENS[i[1]] = T.address
+        revTOKENS[T.address] = i[1]
         print(f'Token {index} address :- {T.address}')
 
 def deployFactory():
     F = Factory.deploy('0x0000000000000000000000000000000000000000',{'from':accounts[0]})
+    DEX_DATA['factory'] = F.address
     #print(f'Factory address :- {F.address}')
-
 
 def deployRouter(factory):
     R = Router.deploy(factory,{'from':accounts[0]})
+    DEX_DATA['router'] = R.address
     print(f'Router address :- {R.address}')
 
 def approve(token, amount, address):
@@ -51,10 +59,13 @@ def createPairsAndAddLiquidity(R,details):
 
         print(f'Pair {index} address :-')
         pair = Factory[0].getPair(i[0].address,i[1].address)
+        DEX_DATA['pairs'][frozenset(
+            (revTOKENS[i[0].address],revTOKENS[i[1].address])
+            )] = pair
         print(pair)
-        print(f'Pair {index} reserves :-')
-        reserve0, reserve1, _ = interface.IPair(pair).getReserves()
-        print(f'reserve0 :- {reserve0}, reserve1 :- {reserve1}')
+        #print(f'Pair {index} reserves :-')
+        #reserve0, reserve1, _ = interface.IPair(pair).getReserves()
+        #print(f'reserve0 :- {reserve0}, reserve1 :- {reserve1}')
 
 
 TOKEN_DETAILS = [
@@ -63,7 +74,6 @@ TOKEN_DETAILS = [
         ['Test Token 3','TST3',],
         ['Test Token 4','TST4',],
     ]
-
 
 def equal(list1,list2):
     list_dif = [i for i in list1 + list2 if i not in list1 or i not in list2]
@@ -96,13 +106,6 @@ def test_getProspect():
     }]
     assert prospects == ans
 
-def test_encodeCall():
-    signature = 'testing'
-    defs = ['string','uint256']
-    args = ['testing',234545]
-
-    data = signature + Web3.toHex(encode_abi(defs,args))[2:]
-    assert data == CtrSetup.encodeCall(signature,defs,args)
 
 class TestSortingAddresses():
 
@@ -113,7 +116,7 @@ class TestSortingAddresses():
         '0xc9bdeed33cd01541e1eed10f90519d2c06fe3feb')])
     def test_sortAddresses(self,address1,address2):
         
-        sortedAdds = CtrSetup.sortTokens(address1,address2)
+        sortedAdds = sortTokens(address1,address2)
         if str.encode(address1).hex() > str.encode(address2).hex():
             assert sortedAdds == (address2,address1)
 
@@ -122,7 +125,7 @@ class TestSortingAddresses():
 
     def test_invalidSort(self):
         with pytest.raises(ValueError):
-            CtrSetup.sortTokens(
+            sortTokens(
                 '0xc42c30ac6cc15fac9bd938618bcaa1a1fae8501d',
                 '0xc42c30ac6cc15fac9bd938618bcaa1a1fae8501d')
 
@@ -146,12 +149,11 @@ class TestSignatures():
 def test_getAmountsOut(Contract):
     deployTokens(TOKEN_DETAILS)
     PAIR_DETAILS = [
-    [Token[3],Token[1],60e18,80e18,60e18,80e18,Contract.address,int((datetime.now() + timedelta(seconds= 600)).timestamp())],
-    [Token[1],Token[2],70e18,65e18,70e18,65e18,Contract.address,int((datetime.now() + timedelta(seconds= 600)).timestamp())],
-    [Token[2],Token[0],50e18,67e18,50e18,67e18,Contract.address,int((datetime.now() + timedelta(seconds= 600)).timestamp())],
-    [Token[0],Token[3],47e18,67e18,47e18,67e18,Contract.address,int((datetime.now() + timedelta(seconds= 600)).timestamp())],
+    [Token[3],Token[1],60e18,80e18,60e18,80e18,Contract.address,int((datetime.now() + timedelta(seconds= 60)).timestamp())],
+    [Token[1],Token[2],70e18,65e18,70e18,65e18,Contract.address,int((datetime.now() + timedelta(seconds= 60)).timestamp())],
+    [Token[2],Token[0],50e18,67e18,50e18,67e18,Contract.address,int((datetime.now() + timedelta(seconds= 60)).timestamp())],
+    [Token[0],Token[3],47e18,67e18,47e18,67e18,Contract.address,int((datetime.now() + timedelta(seconds= 60)).timestamp())],
     ]
-
     deployFactory()
     deployRouter(Factory[0].address)
     createPairsAndAddLiquidity(Router[0],PAIR_DETAILS)
@@ -169,9 +171,7 @@ ITEMS = Cfg.ITEMS
 OPTIONS = Cfg.OPTIONS
 PACKAGES = Cfg.PACKAGES
 
-
 class TestPayload():
-
     def test_getValues(self):
         result = {
             'tokens' : {
@@ -192,10 +192,51 @@ class TestPayload():
 
         assert result == values
 
+    def test_simulateSwap(self):
+        cap = int(0.028586009348285348e18)
+        ep = 0.0380321
+        routers = [DEX_DATA['router']] * 4
+        tokens = {
+            'TST4' : Token[3].address, 'TST3' : Token[2].address,
+            'TST2' : Token[1].address, 'TST1' : Token[0].address
+        }
+        route = [
+        {"from" : 'TST4',"to" : 'TST2',"via" : "fonswap"},
+        {"from" : 'TST2',"to" : 'TST3',"via" : "fonswap"},
+        {"from" : 'TST3',"to" : 'TST1',"via" : "fonswap"},
+        {"from" : 'TST1',"to" : 'TST4',"via" : "fonswap"}
+    ]
+        result = CtrSetup.simulateSwap(route,routers,cap,tokens)
+        assert result >= ep
+
     @pytest.mark.parametrize('options,item,prepared',PACKAGES)
     def test_payloadResult(self,options,item,prepared):
         payload = CtrSetup.prepPayload(item = item, options = options)
-        assert payload == prepared
+        assert payload['data'] == prepared
+
+    
+    def test_payloadResultFromSource(self):
+        CtrSetup.blockchain.tokens = TOKENS
+        CtrSetup.blockchain.exchanges = {'fonswap' : DEX_DATA}
+        print(CtrSetup.blockchain.exchanges)
+        payload = CtrSetup.prepPayload(item = ITEMS[0])
+        to, fro = ITEMS[0]['route'][0]['to'], ITEMS[0]['route'][0]['from']
+        Map = [[Router[0].address],[[Token[1].address,Token[2].address,
+                Token[0].address,Token[3].address]]]
+        pair = DEX_DATA['pairs'][frozenset((to, fro))]
+        data = getPayloadBytes(Map,pair)
+        out = Router[0].getAmountsOut(Cfg.cap,[Token[3].address,Token[1].address])[-1]
+
+        tokens = sortTokens(Token[3].address,Token[1].address)
+        AMT0 = out if Token[3].address == tokens[0] else 0
+        AMT1 = 0 if Token[3].address == tokens[0] else out
+
+        print(f'payload data {payload["data"]}' )
+        print(f'calculated data {[AMT0,AMT1,Token[3].address,data]}' )
+
+        assert payload['data'][0] >= AMT0
+        assert payload['data'][1] >= AMT1
+        assert payload['data'][2:] == [Token[3].address,data]
  
 
 def MAIN_OPTION(): 
@@ -220,15 +261,14 @@ class TestExecution():
     def correctBalance(self,account,balance, token):
         if token.balanceOf(account) >= balance:
             return True
-        else:
-            return False
+        return False
 
     
     def test_arb(self):
-
         option = MAIN_OPTION()
         item = MAIN_ITEM()
-        
+        print(item)
+        print(option)
         CtrSetup.arb(routes = item,keyargs = [option])
         
         assert self.correctBalance(accounts[0].address,0.038060e18,Token[3])

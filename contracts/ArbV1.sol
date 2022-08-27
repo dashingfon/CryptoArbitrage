@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.0;
 
-import '../interfaces/IFactory.sol';
 import '../interfaces/IPair.sol';
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -19,8 +18,10 @@ contract ArbV1 {
     address internal token;
     bool internal instantCashout;
 
-    event arbSuccesful (uint Gain, address Token, address initiator);
-    event transferSent (address Token, address to);
+    event arbSuccesful (uint gain, address token, address initiator);
+    event ownerChanged (address oldOwner, address newOwner);
+    event cashoutChanged (address owner, bool cashOut);
+    event transferSent (address token, address to);
     event CaleeResponse (uint amount, address exchange);
 
     modifier OnlyOwner() {
@@ -80,15 +81,14 @@ contract ArbV1 {
         uint amountExpected = amount.mul(fee).div(100000);
         require (amountGot > amountExpected,"Unsuccesful Arb!");
         uint gain = amountGot.sub(amountExpected);
-        emit arbSuccesful(gain,token,tx.origin);
         
         _sendToken(token, msg.sender, amountExpected);
-
         if (instantCashout) {
             _sendToken(token, tx.origin, gain);
         } else {
             _sendToken(token, owner, gain);
         }
+        emit arbSuccesful(gain,token,tx.origin);
     }
 
     function _respond(bytes calldata data) internal {

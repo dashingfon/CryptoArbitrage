@@ -22,15 +22,15 @@
   },
   "Binance SmartChain": {
     "Tokens": {},
+    "Exchanges": {},
     "TokensRemappings": {
       "USDT": "BSC-USD"
-    },
-    "Exchanges": {}
+    }
   },
   "Aurora Blockchain": {
     "Tokens": {},
-    "TokensRemappings": {},
-    "Exchanges": {}
+    "Exchanges": {},
+    "TokensRemappings": {}
   },
   "ABIs" : {
     "Router_abi" : [

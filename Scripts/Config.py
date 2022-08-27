@@ -99,8 +99,16 @@ PACKAGES = []
 for i in range(len(OPTIONS)):
     PACKAGES.append((OPTIONS[i],ITEMS[i],PREPARED[i]))
 
-def parseEchanges():
-    pass
+def parseEchanges(item):
+    new, temp = {}, {}
+    for key, value in item.items():
+        new[key] = {}
+        for i, j in value['pairs'].items():
+            temp[frozenset(i)] = j
+        new[key]['pairs'] = temp
+        temp = {}
+    return new
+
 
 
 # Aurora Network
@@ -131,9 +139,7 @@ AuroraExchanges = {
         },
         'router' : '0x2CB45Edb4517d5947aFdE3BEAbF95A582506858B',
         'factory' : '',
-        'shortName' : 'TRI',
-        'r2' : 1,
-        'r1' : 0.997,
+        'fee': 0
     },
 
     'auroraswap' : {
@@ -146,9 +152,7 @@ AuroraExchanges = {
         },
         'router' : '0xA1B1742e9c32C7cAa9726d8204bD5715e3419861',
         'factory' : '',
-        'shortName' : 'ARS',
-        'r2' : 1,
-        'r1' : 0.997,
+        'fee': 0
     },
 
     'wannaswap' : {
@@ -163,9 +167,7 @@ AuroraExchanges = {
         },
         'router' : '0xa3a1eF5Ae6561572023363862e238aFA84C72ef5',
         'factory' : '',
-        'shortName' : 'WAN',
-        'r2' : 1,
-        'r1' : 0.997,
+        'fee': 0
     },
     'dodo' : {
         'pairs' : {
@@ -174,9 +176,7 @@ AuroraExchanges = {
         },
         'router' : '',
         'factory' : '',
-        'shortName' : 'DODO',
-        'r2' : 1,
-        'r1' : 0.997,
+        'fee': 0
     }
 
 }

@@ -4,36 +4,14 @@ Blockchain module containing the different blockchain implementation
 #The config file contains related blockchain specific information
 
 import Config as Cfg
+from utills import RateLimited, isTestnet
 '''
 Then to import the other modules needed
 '''
 import requests, json, time, os, warnings
-from functools import wraps
 from bs4 import BeautifulSoup
 from pycoingecko import CoinGeckoAPI
 
-from typing import Optional
-'''
-This is the Ratelimited decorator used to limit requests
-'''
-def RateLimited(maxPerSecond):
-    mininterval = 1.0 / float(maxPerSecond)
-
-    def decorate(func):
-        lastTimeCalled = [0.0]
-
-        @wraps(func)
-        def ratelimitedFunction(*args,**kwargs):
-            elapsed = time.process_time_ns() - lastTimeCalled[0]
-            lefttowait = mininterval - elapsed
-            if lefttowait > 0:
-                print(f'waiting {lefttowait} ...')
-                time.sleep(lefttowait)
-            ret = func(*args, **kwargs)
-            lastTimeCalled[0] = time.process_time_ns()
-            return ret
-        return ratelimitedFunction
-    return decorate
 
 '''
 The main blockchain class other specific blockchains inherit
@@ -116,8 +94,7 @@ class Blockchain:
             exchanges = self.startExchanges
 
         if goal in self.graph and exchanges == 'all':
-            start = self.graph[goal]
-                 
+            start = self.graph[goal]     
         elif goal in self.graph:
             for i in self.graph[goal]:
                 if i['via'] in exchanges:
@@ -179,7 +156,8 @@ class Blockchain:
         else:
             return route
 
-    def extract(self,content,swap):
+    @staticmethod
+    def extract(content,swap):
         price = {}
         soup = BeautifulSoup(content, 'html.parser')
         
@@ -232,21 +210,23 @@ class Blockchain:
             print(f'status code :- {response.status_code}')
 
         return price
-
-    def getRate(self, price, to, fro):
+ 
+    def getRate(self,price, to, fro):
         if (to not in price) or (fro not in price):
             raise ValueError('currency not in price dictionary')
 
         #return self.r1 * price[to] / (1 + (self.impact * self.r1)) / price[fro] 
         return self.r1 * price[to] / price[fro] 
 
-    def cumSum(self,listItem):
+    @staticmethod
+    def cumSum(listItem):
         result = [listItem[0]]
         for i in listItem[1:]:
             result.append(i*result[-1])
         return result
 
-    def simplyfy(self,route):
+    @staticmethod
+    def simplyfy(route):
         result = [route[0]['from']+' '+route[0]['to']+' '+route[0]['via']]
         _result = [route[0]['to']+' '+route[0]['from']+' '+route[0]['via']]
         reverseRoute = [{
@@ -266,7 +246,8 @@ class Blockchain:
             
         return [' - '.join(result),' - '.join(_result),route,reverseRoute]
 
-    def assemble(self,route):
+    @staticmethod
+    def assemble(route):
         result = []
         routeList = route.split(' - ')
         for item in routeList:
@@ -330,15 +311,12 @@ class Blockchain:
             [cap0,rates[0],self.simulateSwap(simplified[2],cap0,prices)],
             [cap1,rates[1],self.simulateSwap(simplified[3],cap1,prices[::-1])]
         )
-    
-    def checkIfTestnet(self):
-            return str(self)[-7:] == 'Testnet'
 
-    def lookupPrice(self, returns = False):        
+    def lookupPrice(self, returns = False):
         temp = self.readPrice()
         prices = {}
 
-        if not self.checkIfTestnet():
+        if not isTestnet(self):
             tokenAdresses = []
             for i in self.tokens.values():
                 tokenAdresses.append(i)
@@ -381,7 +359,7 @@ class Blockchain:
                     content['from'], content['to'] = list(pairs)
                     cache[exchange][pairs] = self.getPrice(session,address,content)
         
-        return cache
+        self.cache = cache
 
     def simulateSwap(self,route,cap,prices = []):
         In = cap
@@ -439,8 +417,7 @@ total of :- {routeLenght}
         history, result = set(), []
         summary = {'total' : routeLenght, 'requested' : 0, 'polled' : 0 }
 
-        cache = self.buildCache()
-
+        self.buildCache()
         
         print('')
         for pos, route in enumerate(routes):
@@ -454,7 +431,7 @@ total of :- {routeLenght}
             try:
                 prices = []
                 for swap in route:
-                    prices.append(cache[swap['via']][frozenset((swap['from'],swap['to']))])
+                    prices.append(self.cache[swap['via']][frozenset((swap['from'],swap['to']))])
                 
                 # self.polRoute returns a tuple of [capital,rates,Ep]
                 
@@ -506,7 +483,6 @@ total of :- {routeLenght}
         else:
             return (summary,history)
             
-
     def screenRoutes(self, routes):
         
         history = set()
@@ -532,9 +508,8 @@ class Aurora(Blockchain):
         self.startTokens = Cfg.AuroraStartTokens
         self.startExchanges = Cfg.AuroraStartExchanges
         self.coinGeckoId = 'aurora'
-        self.geckoTerminalName = 'bsc'
+        self.geckoTerminalName = 'aurora'
         self.arbAddress = ''
-        self.headers = {}
         self.pollPath = os.path.join(self.dataPath, 'Aurora', 'pollResult.json')
         self.routePath = os.path.join(self.dataPath, 'Aurora', 'arbRoutes.json')
     
@@ -551,7 +526,7 @@ class Arbitrum(Blockchain):
         self.startTokens = None
         self.startExchanges = None
         self.coinGeckoId = ''
-        self.geckoTerminalName = 'bsc'
+        self.geckoTerminalName = 'arbitrum'
         self.arbAddress = ''
         self.pollPath = os.path.join(self.dataPath,'Arbitrum','pollResult.json')
         self.routePath = os.path.join(self.dataPath,'Arbitrum', 'arbRoutes.json')
@@ -596,6 +571,23 @@ class Kovan(Blockchain):
         return 'Kovan Testnet' 
 
 class Goerli(Blockchain):
+    def __init__(self, url:str = 'http://127.0.0.1:8545'):
+        super().__init__(url)
+        self.source = ''
+        self.exchanges = None
+        self.tokens = None
+        self.startTokens = None
+        self.startExchanges = None
+        self.coinGeckoId = ''
+        self.arbAddress = ''
+        self.pollPath = os.path.join(self.dataPath,'Goerli','pollResult.json')
+        self.routePath = os.path.join(self.dataPath,'Goerli', 'arbRoute.json')
+
+
+    def __repr__(self):
+        return 'Goerli Testnet' 
+
+class Fantom(Blockchain):
     def __init__(self, url:str = 'http://127.0.0.1:8545'):
         super().__init__(url)
         self.source = ''
