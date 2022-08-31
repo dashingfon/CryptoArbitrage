@@ -29,4 +29,23 @@ contract BscArb is ArbV1 {
         _respond(data);
     }
 
+    function fstswapCall (address /*sender*/, uint /*amount0*/, uint /*amount1*/, bytes calldata data) external {
+        _respond(data);
+    }
+
+    function SwapCall (address /*sender*/, uint /*amount0*/, uint /*amount1*/, bytes calldata data) external {
+        _respond(data);
+    }
+
+    function safeswapCall (address /*sender*/, uint /*amount0*/, uint /*amount1*/, bytes calldata data) external {
+        _respond(data);
+    }
+
+    function nomiswapCall (address /*sender*/, uint /*amount0*/, uint /*amount1*/, bytes calldata data) external {
+        _respond(data);
+    }
+
+    function jetswapCall (address /*sender*/, uint /*amount0*/, uint /*amount1*/, bytes calldata data) external {
+        _respond(data);
+    }
 }

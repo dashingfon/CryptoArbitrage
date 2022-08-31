@@ -1,6 +1,6 @@
 # The controller class that prepares and executes arbs
-import Config as Cfg
-from utills import sortTokens, isTestnet
+import scripts.Config as Cfg
+from scripts.utills import sortTokens, isTestnet
 
 import warnings, json, os
 from eth_abi import encode_abi
@@ -153,11 +153,6 @@ class Controller():
 
         fee = val['fee']
 
-        if 'out' not in options:
-            start = self.getAmountsOut(
-                    val['routers'][0], amount, [tokens[val['names'][0]], tokens[val['names'][1]]])
-        else: start = int(options['out'] * amount)
-
         rem = item['route'][1:]
         end = len(rem) - 1
 
@@ -187,6 +182,11 @@ class Controller():
 
         names = val['names']
         token0 = sortTokens(tokens[names[0]],tokens[names[1]])[0]
+
+        if 'out' not in options:
+            start = self.getAmountsOut(
+                    val['routers'][0], amount, [tokens[val['names'][0]], tokens[val['names'][1]]])
+        else: start = int(options['out'] * amount)
 
         AMOUNT0 = start if tokens[names[0]] == token0 else 0
         AMOUNT1 = 0 if tokens[names[0]] == token0 else start

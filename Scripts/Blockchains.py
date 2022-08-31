@@ -3,8 +3,8 @@ Blockchain module containing the different blockchain implementation
 '''
 #The config file contains related blockchain specific information
 
-import Config as Cfg
-from utills import RateLimited, isTestnet
+import scripts.Config as Cfg
+from scripts.utills import RateLimited, isTestnet, readJson, writeJson
 '''
 Then to import the other modules needed
 '''
@@ -140,8 +140,7 @@ class Blockchain:
             route = self.screenRoutes(route)
 
         if save:
-            with open(self.routePath,'w') as AR:
-                json.dump(
+            writeJson(self.routePath,
                     {'MetaData': {
                         'time': time.ctime(),
                         'total' : len(route),
@@ -152,7 +151,7 @@ class Blockchain:
                         'Exchanges' : exchanges,
                         'Tokens' : tokens,
                     },
-                    'Data': route}, AR, indent = 2)
+                    'Data': route})
         else:
             return route
 
@@ -313,7 +312,7 @@ class Blockchain:
         )
 
     def lookupPrice(self, returns = False):
-        temp = self.readPrice()
+        temp = readJson(self.priceLookupPath)
         prices = {}
 
         if not isTestnet(self):
@@ -332,15 +331,6 @@ class Blockchain:
 
         if returns:
             return {**temp,**prices}
-
-    def readPrice(self):
-        try:
-            with open(self.priceLookupPath) as PP:
-                temp = json.load(PP)
-        except FileNotFoundError:
-            temp = {}
-        
-        return temp
 
     def buildCache(self,exchanges = []):
         print('building cache ... \n')
@@ -389,10 +379,9 @@ class Blockchain:
     def pollRoutes(self, routes = [], save = True, screen = True,currentPrice = True, value = 1):
         routeInfo = {}
         if not routes:
-            with open(self.routePath) as RO:
-                routes = json.load(RO)
-                routeInfo = routes['MetaData']
-                routes = routes['Data']
+            routes = readJson(self.routePath)
+            routeInfo = routes['MetaData']
+            routes = routes['Data']
 
         if screen:
             routes = self.screenRoutes(routes)
@@ -412,7 +401,7 @@ total of :- {routeLenght}
         if currentPrice: 
             priceLookup = self.lookupPrice(True)
         else: 
-            priceLookup = self.readPrice()
+            priceLookup = readJson(self.priceLookupPath)
 
         history, result = set(), []
         summary = {'total' : routeLenght, 'requested' : 0, 'polled' : 0 }
@@ -471,15 +460,13 @@ total of :- {routeLenght}
             export = sorted(result, key = lambda v : v['EP'], reverse = True)
             
         if save:
-            with open(self.pollPath,'w') as DP:
-                json.dump(
+            writeJson(self.pollPath,
                     {'MetaData': {
                         'time': time.ctime(),
                         'total' : routeLenght,
                         'routeInfo' : routeInfo
                         },
-                    'Data':export}, 
-                    DP, indent = 2)
+                    'Data':export})
         else:
             return (summary,history)
             

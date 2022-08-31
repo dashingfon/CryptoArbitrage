@@ -57,7 +57,7 @@ contract ArbV1 {
     }
 
 
-    function _execute (address[] memory routers, bytes[] memory data, uint amount, uint fee) private {
+    function _execute (address[] memory routers, bytes[] memory data, uint amount, uint /*fee*/) private {
         
         uint256 swapAmount;
         address[] memory path;
@@ -78,11 +78,10 @@ contract ArbV1 {
         }
 
         uint amountGot = IERC20(token).balanceOf(address(this));
-        uint amountExpected = amount.mul(fee).div(100000);
-        require (amountGot > amountExpected,"Unsuccesful Arb!");
-        uint gain = amountGot.sub(amountExpected);
+        require (amountGot > amount,"Unsuccesful Arb!");
+        uint gain = amountGot.sub(amount);
         
-        _sendToken(token, msg.sender, amountExpected);
+        _sendToken(token, msg.sender, amount);
         if (instantCashout) {
             _sendToken(token, tx.origin, gain);
         } else {

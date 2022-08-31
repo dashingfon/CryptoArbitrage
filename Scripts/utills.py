@@ -1,12 +1,11 @@
-from copy import copy
 from functools import wraps
-import time, requests, json
+import time, requests, json, os
 from web3 import Web3
 from eth_abi import encode_abi
 from bs4 import BeautifulSoup
 
-
-with open(r'scripts\Config.json') as CJ:
+ConfigPath = r'scripts\Config.json'
+with open(ConfigPath) as CJ:
     config = json.load(CJ)
 
 T1, T2 = config['Test']['T1'], config['Test']['T2']
@@ -94,6 +93,31 @@ def sortTokens(address1, address2):
     else:
         raise ValueError('addresses are the same')
 
+def parseEchanges(item):
+    new = {}
+    try:
+        for key, value in item.items():
+            temp = {}
+            new[key] = value
+            for i, j in value['pairs'].items():
+                temp[frozenset(i.split(' - '))] = j
+            new[key]['pairs'] = temp
+    except KeyError as e:
+        print(f'incorrect exchange data, KeyError :- {e}')
+    return new
+
+def readJson(path):
+    try:
+        with open(path) as PP:
+            temp = json.load(PP)
+    except FileNotFoundError as e:
+        print(e)
+        temp = {}
+    return temp
+
+def writeJson(path,content):
+    with open(path,'w') as PP:
+        json.dump(content, PP, indent = 2)
 
 
 
@@ -103,16 +127,16 @@ def extractSymbol(content):
         soup = BeautifulSoup(content, 'html.parser')
         placeHolder = soup.find('div',id = "ContentPlaceHolder1_tr_tokeninfo")
         #print(placeHolder)
-        raw = placeHolder.find('a').string.split()[-1]
+        raw = placeHolder.find('a').contents[-1].split('(')[-1].split(')')[0]
     except Exception as e:
         print('an error occured')
+        print(placeHolder)
         print(e)
-        return ''
-    print('extracted')
-    return raw[1:-1]
+        return None
+    return raw
 
 @RateLimited(2)
-def fetch(url,session,headers,params):
+def fetch(url,session,Headers,Params):
     print('fetching data ...')
     attemptsAllowed = 4
     tries = 0
@@ -120,7 +144,7 @@ def fetch(url,session,headers,params):
 
     while tries < attemptsAllowed and not done:
         try:
-            response = session.get(url,headers = headers,params = params)
+            response = session.get(url = url,headers = Headers,params = Params)
         except ConnectionError:
             print('Error')
             time.sleep(10)
@@ -146,117 +170,110 @@ def cache(content,name):
             exchanges[i['id']] = i['attributes']['identifier']
         elif i['type'] == 'token' :
             tokens[i['id']] = {'symbol': i['attributes']['symbol'],
-                            'address' : i['attributes']['address']}
+                            'address' : i['attributes']['address'],
+                            'name' : i['attributes']['name']}
         elif i['type'] == 'network':
             assert i['attributes']['identifier'] == name
 
     return (tokens,exchanges)
 
-def trim_and_map(blockchain, tokens, exchanges):
+def trim_and_map(blockchain, tokens, exchanges, minSwaps = 3):
     print('trimming and mapping ...')
-    tokensResult = {}
-    exchangesResult = {}
-    remappingsResult = {}
-    checked = set()
+    exchanges = parseEchanges(exchanges)
+    assert exchanges
+    tokensResult, exchangesResult, remappingsResult = {}, {}, {}
+    swapsCount, distribution = 0, {}
+    checked, ignore = set(), set()
 
-    blockchain.tokens = tokens
-    blockchain.exchanges = exchanges
-
+    initialTokens = len(tokens)
     initialExchangeCount = 0
     for val in exchanges.values():
-        for v in val['pairs'].values():
-            initialExchangeCount += len(v)
+        initialExchangeCount += len(val['pairs'])
 
-    routes = blockchain.getArbRoute(tokens = 'all',save = False)
+    print(f'Total initial tokens :- {initialTokens}')
+    print(f'Total initial exchanges :- {initialExchangeCount}')
 
-    print(f'total routes / {len(routes) - 1}')
     session = requests.Session()
+    blockchain.buildGraph(exchanges)
 
-    for item in routes:
-        for swap in item:
-            to, fro, via = swap['to'], swap['from'], swap['via']
-            if to not in checked:
-                checked.add(to)
-                toAddress = tokens[to]
-                toResponse = fetch(
-                    blockchain.source + toAddress,session,blockchain.headers,{})
-                assert toResponse, "Got an empty response..."
-                toSymbol = extractSymbol(toResponse.text)
-                assert toSymbol, 'Empty to Symbol'
-                if to != toSymbol:
-                    remappingsResult[to] = toSymbol
-                tokensResult[toSymbol] = toAddress
-            elif to in remappingsResult:
-                    toSymbol = remappingsResult[to]
-            else:
-                toSymbol = to
+    for token, swaps in blockchain.graph.items():
+        swapLenght = len(swaps)
+        if swapLenght not in distribution:
+            distribution[swapLenght] = 0
+        distribution[swapLenght] += 1
+        swapsCount += swapLenght
 
-            if fro not in checked:
-                checked.add(fro)
-                fromAddress = tokens[fro]
-                fromResponse = fetch(
-                    blockchain.source + fromAddress,session,blockchain.headers,{})
-                assert fromResponse, "Got an empty response..."
-                fromSymbol = extractSymbol(fromResponse.text)
-                assert fromSymbol, 'Empty from symbol'
-                if fro != fromSymbol:
-                    remappingsResult[fro] = fromSymbol
-                tokensResult[fromSymbol] = fromAddress
-            elif fro in remappingsResult:
-                    toSymbol = remappingsResult[fro]
-            else:
-                toSymbol = fro 
+        if swapLenght < minSwaps:
+            ignore.add(token)
+            continue
+        elif token not in checked and token not in ignore:
+            froResponse = fetch(
+                    blockchain.source + tokens[token],session,blockchain.headers,{})
+            assert froResponse, "Empty response returned"
+            froSymbol = extractSymbol(froResponse.text)
+            if not froSymbol: 
+                ignore.add(token)
+                continue
+            tokensResult[froSymbol] = tokens[token]
+            if token != froSymbol:
+                remappingsResult[token] = froSymbol
+            checked.add(token)
+
+    for via, val in exchanges.items():
+        for key, value in val['pairs'].items():
+            tokens = list(key)
+            if tokens[0] in ignore or tokens[1] in ignore:
+                continue
+            token0 = tokens[0] if tokens[0] not in remappingsResult else remappingsResult[tokens[0]]
+            token1 = tokens[1] if tokens[1] not in remappingsResult else remappingsResult[tokens[1]]
 
             if via not in exchangesResult:
-                exchangesResult[via] = copy(exchanges[via])
-                exchangesResult[via]['pairs'] = {}
+                exchangesResult[via] = {'pairs' : {},'router' : '','factory' : ''}
+            exchangesResult[via]['pairs'][f'{token0} - {token1}'] = value
 
-            exchangesResult[via]['pairs'][frozenset(
-                (toSymbol,fromSymbol))] = exchanges[via]['pairs'][frozenset((fro,to))]
-    
     finalExchangeCount = 0
     for val in exchangesResult.values():
-        for v in val['pairs'].values():
-            finalExchangeCount += len(v)
+        finalExchangeCount += len(val['pairs'])
 
     return {
         'MetaData' : {
-            'initialTokenCount' : len(tokens),
-            'initialPairsCount' : initialExchangeCount,
-            'finalTokenCount' : len(tokensResult),
-            'finalTokenCount' : finalExchangeCount
+            'TokenCount' : {
+                'initial' : initialTokens,
+                'final' : len(tokensResult)
+            },
+            'PairsCount' : {
+                'initial' : initialExchangeCount,
+                'final' : finalExchangeCount
+            },
+            'SwapsPerToken' : swapsCount/initialTokens,
+            'Distribution' : distribution
         },
         'Data': {
             "TokensRemappings": remappingsResult, 
             "Tokens": tokensResult, 
-            "Exchanges": exchangesResult  }
+            "Exchanges": exchangesResult }
         }
 
-def buildData(blockchain,minLiquidity = 150000):
-    print('building Data ...')
+def buildData(blockchain, minLiquidity = 300000, saveArtifact = False):
+    print(f'building {str(blockchain)} Data ...\n')
     tokens, exchanges = {}, {}
-    filePath = 'dataDump.json'
-    url = f'https://app.geckoterminal.com/api/p1/{blockchain.geckoTerminalName}/pools'
-    headers = copy(blockchain.headers)
-    headers['Host'] = 'app.geckoterminal.com'
-    params = {
-        'include' : 'dex%2Cdex.network%2Cdex.network.network_metric%2Ctokens',
-        'page' : 1,
-        'items' : 100
-    }
-    session = requests.Session()
+    filePath = os.path.join(blockchain.dataPath,'dataDump.json')
+    artifactPath = os.path.join(blockchain.dataPath,'artifactDump.json')
+    url = f'https://app.geckoterminal.com/api/p1/{blockchain.geckoTerminalName}/pools?include=dex%2Cdex.network%2Cdex.network.network_metric%2Ctokens&page=1&items=100'
+    page = 1
+    session= requests.Session()
 
     Done = False
     while not Done:
-        print(f"Page {params['page']} ...")
-        raw = fetch(url,session,headers,params)
+        print(f"Page {page} ...")
+        raw = fetch(url,session,{},{})
         assert raw,"Fetched Data is empty..."
         data = raw.json()
         tokenCache, exchangeCache = cache(data,blockchain.geckoTerminalName)
 
         for item in data['data']:
             assert item['type'] == 'pool'
-            if item['attributes']['reserve_in_usd'] >= minLiquidity:
+            if float(item['attributes']['reserve_in_usd']) >= minLiquidity:
                 Ts = []
                 rel = item['relationships']
                 for i in rel['tokens']['data']:
@@ -271,31 +288,47 @@ def buildData(blockchain,minLiquidity = 150000):
                         'router' : '',
                         'factory' : ''
                     }
-                exchanges[exchangeCache[dex]]['pairs'][frozenset(Ts)] = item['attributes']['address']
+                exchanges[exchangeCache[dex]]['pairs'][' - '.join(Ts)] = item['attributes']['address']
                 
         if data['links']['next']:
-            params['page'] += 1
+            url = data['links']['next']
+            page += 1
         else: 
             Done = True
             print('Done')
 
+    if saveArtifact:
+        writeJson(artifactPath,{
+            'tokens' : tokens,
+            'exchanges' : exchanges
+        })
+
     result = trim_and_map(blockchain,tokens,exchanges)
-    dump = {
+
+    writeJson(filePath,{
         "MetaData" : {
-            'datetime' : time.ctime(),**result['MetaData']
+            'datetime' : time.ctime(),
+            'minimunLiquidity' : minLiquidity,
+            **result['MetaData']
         },
         "Data" : result['Data'],
-        'Raw' : {
-            'Tokens' : tokens,
-            'Exchanges' : exchanges
-        }
-    }
-    with open(filePath,'w') as FP:
-        json.dump(dump,FP,indent = 2)
+        })
 
-if __name__ == '__main__':
-    pass
+def setExchangesData(chain,dumpPath,existingExchange,temp = True):
+    dump = readJson(dumpPath)['Data']
+    result = {}
+    for key in dump['Exchanges'].keys():
+        if key in existingExchange:
+            result[key] = existingExchange[key]
+            result[key]['pairs'] = dump['Exchanges'][key]['pairs']
+        else:
+            result[key] = dump['Exchanges'][key]
+    
+    dump['Exchanges'] = result
+    config[str(chain)] = dump
 
+    Path = ConfigPath if not temp else r'temp.json'
+    writeJson(Path,config)
 
 
 
