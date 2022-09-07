@@ -1,9 +1,5 @@
-import sys, os
+import scripts.Blockchains as Blc
 
-sys.path.insert(1,
-    os.path.join(os.path.split(os.path.dirname(__file__))[0],'scripts'))
-
-import Blockchains as Blc
 import pytest
 from brownie import interface
 
@@ -63,6 +59,72 @@ def prepChain():
 
 RESULT = prepChain()
 
+def Contract(idd,address):
+    if idd == 'Factory':
+        return interface.IFactory(address)
+    elif idd == 'Router':
+        return interface.IRouter(address)
+    elif idd == 'Pair':
+        return interface.IPair(address)
+    else:
+        raise ValueError
+        
+def test_router_factories(Chain):
+    routerLen = len(Chain.exchanges)
+    page = 1
+    for exchange, item in Chain.exchanges.items():
+        print(f'\rPage {page} of {routerLen}')
+        router = item['router']
+        factory = item['factory']
+        contract = Contract('Router',router)
+        got = contract.factory().lower()
+        if got != factory.lower():
+            print(f'Exchange {exchange} router factory incorrect')
+            print(f'Got :- {got}')
+            print(f'Expected :- {factory.lower()}')
+            print('')
+        page += 1
+
+
+def test_pairs_factories(Chain):
+    excLen = len(Chain.exchanges)
+    page = 1
+    for exchange, item in Chain.exchanges.items():
+        factory = Chain.exchanges[exchange]['factory']
+        pair = 1
+        for tokens, address in item['pairs'].items():
+            print(f'\rExchange {page} of {excLen}, Pair {pair}')
+            contract = Contract('Pair',address)
+            got = contract.factory().lower()
+            if got != factory.lower():
+                print(f'Exchange {exchange}, Pair {tokens} factory incorrect')
+                print(f'Got :- {got}')
+                print(f'Expected :- {factory.lower()}')
+                print('')
+            pair += 1
+        page += 1
+
+def test_factories_pairs(Chain):
+    toks = Chain.tokens
+    excLen = len(Chain.exchanges)
+    page = 1
+    for exchange, item in Chain.exchanges.items():
+        factory = Chain.exchanges[exchange]['factory']
+        pair = 1
+        for tokens, address in item['pairs'].items():
+            print(f'\rExchange {page} of {excLen}, Pair {pair}')
+            tokens = list(tokens)
+            contract = Contract('Factory',factory)
+            got = contract.getPair(toks[tokens[0]],toks[tokens[1]]).lower()
+            if got != address.lower():
+                print(f'Exchange {exchange}, Pair {tokens} incorrect')
+                print(f'Got :- {got}')
+                print(f'Expected :- {address.lower()}')
+                print(f'Token addresses :- {(toks[tokens[0]],toks[tokens[1]])}')
+                print('')
+            pair += 1
+        page += 1
+        
 class TestExchanges():
     
     @pytest.mark.parametrize('tokens,pairAddress,exchanges',

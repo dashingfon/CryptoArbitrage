@@ -98,8 +98,7 @@ contract ArbV1 {
     }
 
     function _sendCoin(address payable recipient, uint amount) private {
-        (bool sent, ) = recipient.call{value: amount}("");
-        require(sent, "Failed to send Ether");
+        recipient.transfer(amount);
         emit transferSent(address(0),recipient);
     }
     

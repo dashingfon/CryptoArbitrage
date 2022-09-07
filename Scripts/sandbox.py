@@ -1,8 +1,9 @@
-import Blockchains as Blc
-import utills 
-import time
+import scripts.Blockchains as Blc
+import scripts.utills as utills
+import time, requests, asyncio
 from bs4 import BeautifulSoup
-import Config as Cfg
+import scripts.Config as Cfg
+#from brownie import interface
 
 
 route = [
@@ -20,11 +21,9 @@ prices = [
 
 config = utills.config
 
-def pullDataFromDump():
-    chain = Blc.BSC()
+def pullDataFromDump(chain,exchanges,temp = False):
     path = r'data\dataDump.json'
-    exchanges = Cfg.BSCExchanges
-    utills.setExchangesData(chain,path,exchanges,temp=False)
+    utills.setExchangesData(chain,path,exchanges,temp)
 
 def findSymbol(symbol):
     tokens = utills.readJson(r'data\artifactDump.json')['tokens']
@@ -57,12 +56,24 @@ def pull():
     utills.writeJson(r'data\dataDump.json',trimmed)
 
 def main():
-    chain = Blc.BSC()
-    utills.buildData(chain, saveArtifact = True)
+    chain = Blc.Aurora()
+    utills.buildData(chain, minLiquidity = 75000, saveArtifact = True)
+    #pullDataFromDump(chain,Cfg.AuroraExchanges,True)
+
+
 
 
 if __name__ == '__main__': 
-    pullDataFromDump()
-    
-    
+    #main()
+
+    from functools import lru_cache
+
+    def hello():
+        print('yeah')
+
+    print(lru_cache(maxsize=10))
+    print(time.perf_counter())
+
+
+
     

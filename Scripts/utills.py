@@ -1,12 +1,26 @@
-from functools import wraps
+from functools import wraps, lru_cache
+from datetime import timedelta, datetime
 import time, requests, json, os
 from web3 import Web3
 from eth_abi import encode_abi
 from bs4 import BeautifulSoup
 
+
+def readJson(path):
+    try:
+        with open(path) as PP:
+            temp = json.load(PP)
+    except FileNotFoundError as e:
+        print(e)
+        temp = {}
+    return temp
+
+def writeJson(path,content):
+    with open(path,'w') as PP:
+        json.dump(content, PP, indent = 2)
+
 ConfigPath = r'scripts\Config.json'
-with open(ConfigPath) as CJ:
-    config = json.load(CJ)
+config = readJson(ConfigPath)
 
 T1, T2 = config['Test']['T1'], config['Test']['T2']
 T3, T4 = config['Test']['T3'], config['Test']['T4']
@@ -36,6 +50,25 @@ def RateLimited(maxPerSecond):
             return ret
         return ratelimitedFunction
     return decorate
+
+def cache(seconds: int, maxsize: int = 250):
+    def wrapper_cache(func):
+        func = lru_cache(maxsize=maxsize)(func)
+        func.lifetime = timedelta(seconds=seconds)
+        func.expiration = datetime.utcnow() + func.lifetime
+
+        @wraps(func)
+        def wrapped_func(*args, **kwargs):
+            if datetime.utcnow() >= func.expiration:
+                func.cache_clear()
+                func.expiration = datetime.utcnow() + func.lifetime
+
+            return func(*args, **kwargs)
+
+        return wrapped_func
+
+    return wrapper_cache
+
 
 def isTestnet(blockchain):
     return str(blockchain)[-7:] == 'Testnet'
@@ -93,6 +126,13 @@ def sortTokens(address1, address2):
     else:
         raise ValueError('addresses are the same')
 
+def lookupPrice(Chain):
+    lookup = Chain.lookupPrice(returns = True)
+    tokens = Chain.tokens
+    for key, value in tokens.items():
+        if value not in lookup:
+            print(f'Token {key}, Address {value} not included')
+
 def parseEchanges(item):
     new = {}
     try:
@@ -105,21 +145,6 @@ def parseEchanges(item):
     except KeyError as e:
         print(f'incorrect exchange data, KeyError :- {e}')
     return new
-
-def readJson(path):
-    try:
-        with open(path) as PP:
-            temp = json.load(PP)
-    except FileNotFoundError as e:
-        print(e)
-        temp = {}
-    return temp
-
-def writeJson(path,content):
-    with open(path,'w') as PP:
-        json.dump(content, PP, indent = 2)
-
-
 
 def extractSymbol(content):
     print('extracting symbol ...')
@@ -170,8 +195,7 @@ def cache(content,name):
             exchanges[i['id']] = i['attributes']['identifier']
         elif i['type'] == 'token' :
             tokens[i['id']] = {'symbol': i['attributes']['symbol'],
-                            'address' : i['attributes']['address'],
-                            'name' : i['attributes']['name']}
+                            'address' : i['attributes']['address']}
         elif i['type'] == 'network':
             assert i['attributes']['identifier'] == name
 
@@ -207,14 +231,16 @@ def trim_and_map(blockchain, tokens, exchanges, minSwaps = 3):
             ignore.add(token)
             continue
         elif token not in checked and token not in ignore:
+            address = tokens[token]
             froResponse = fetch(
-                    blockchain.source + tokens[token],session,blockchain.headers,{})
+                    blockchain.source + address,session,blockchain.headers,{})
             assert froResponse, "Empty response returned"
             froSymbol = extractSymbol(froResponse.text)
             if not froSymbol: 
                 ignore.add(token)
                 continue
-            tokensResult[froSymbol] = tokens[token]
+            froSymbol = f'{froSymbol}_{address[-7:]}'
+            tokensResult[froSymbol] = address
             if token != froSymbol:
                 remappingsResult[token] = froSymbol
             checked.add(token)
@@ -278,8 +304,9 @@ def buildData(blockchain, minLiquidity = 300000, saveArtifact = False):
                 rel = item['relationships']
                 for i in rel['tokens']['data']:
                     assert i['type'] == 'token'
-                    tokens[tokenCache[i['id']]['symbol']] = tokenCache[i['id']]['address']
-                    Ts.append(tokenCache[i['id']]['symbol'])
+                    symbol = f"{tokenCache[i['id']]['symbol']}_{tokenCache[i['id']]['address'][-7:]}"
+                    tokens[symbol] = tokenCache[i['id']]['address']
+                    Ts.append(symbol)
 
                 dex = rel['dex']['data']['id']
                 if exchangeCache[dex] not in exchanges:
@@ -299,8 +326,13 @@ def buildData(blockchain, minLiquidity = 300000, saveArtifact = False):
 
     if saveArtifact:
         writeJson(artifactPath,{
-            'tokens' : tokens,
-            'exchanges' : exchanges
+            "MetaData" : {
+            'datetime' : time.ctime(),
+            'blockchain' : str(blockchain),
+        },
+        "Data" : {'tokens' : tokens,
+            'exchanges' : exchanges},
+            
         })
 
     result = trim_and_map(blockchain,tokens,exchanges)
@@ -308,6 +340,7 @@ def buildData(blockchain, minLiquidity = 300000, saveArtifact = False):
     writeJson(filePath,{
         "MetaData" : {
             'datetime' : time.ctime(),
+            'blockchain' : str(blockchain),
             'minimunLiquidity' : minLiquidity,
             **result['MetaData']
         },

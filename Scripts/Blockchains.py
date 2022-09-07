@@ -4,13 +4,13 @@ Blockchain module containing the different blockchain implementation
 #The config file contains related blockchain specific information
 
 import scripts.Config as Cfg
-from scripts.utills import RateLimited, isTestnet, readJson, writeJson
+from scripts.utills import RateLimited, isTestnet, readJson, writeJson, cache
 '''
 Then to import the other modules needed
 '''
-import requests, json, time, os, warnings
+import requests, json, time, os, warnings, asyncio
 from bs4 import BeautifulSoup
-from pycoingecko import CoinGeckoAPI
+from pycoingecko import CoinGeckoAPI 
 
 
 '''
@@ -19,7 +19,7 @@ It contains all the methods
 '''
 class Blockchain:
     def __init__(self, url: str):
-        self.impact = 0.001
+        self.impact = 0.00075
         self.r1 = 0.997 
         self.depthLimit = 4
         self.graph = {}
@@ -109,7 +109,7 @@ class Blockchain:
         return result
            
     def getArbRoute(self, tokens = 'default', exchanges = 'all',graph = True, save = True, screen = True):
-        # The methods the produces and optionally saves the Arb routes
+        # The method the produces and optionally saves the Arb routes
 
         route = []
 
@@ -169,21 +169,32 @@ class Blockchain:
             try:
                 raw = tokensList[slider].find(class_ = 'list-amount').string
                 rawPrice = str(raw).split()
-                price[rawPrice[1]] = float(rawPrice[0].replace(',',''))
-                if rawPrice[1] == swap['from']:
-                    done1 = True
-                elif rawPrice[1] == swap['to']:
-                    done2 = True
+                symbol, amount = rawPrice[1], float(rawPrice[0].replace(',',''))
                 
-            except ValueError:
+                if symbol == swap['from'][:-8]:
+                    done1 = True
+                    price[swap['from']] = amount
+                elif symbol == swap['to'][:-8]:
+                    done2 = True
+                    price[swap['to']] = amount
+                else:
+                    price[symbol] = amount
+                
+            except (ValueError, IndexError):
                 print(f'Error parsing item {rawPrice}')
             finally:
                 slider += 1  
         
         return price
     
+    async def fetch(self):
+        pass
+
+    async def getPrices(self):
+        pass
+
     @RateLimited(3)
-    def getPrice(self, session, address,swap):
+    def getPrice(self, session, address, swap):
         url = self.source + address
         attemptsAllowed = 4
         tries = 0
@@ -199,7 +210,6 @@ class Blockchain:
                 print(f'Retring... \n{attemptsAllowed - tries} tries left')
             else:
                 done = True
-        
         
         if response.status_code == 200:
             price = self.extract(response.text,swap)
@@ -263,7 +273,7 @@ class Blockchain:
         rates = [[],[]]
         liquidity = []
         session = requests.Session()
-
+        
         isPrice = False
         if prices:
             assert len(prices) == len(route)
@@ -316,18 +326,15 @@ class Blockchain:
         prices = {}
 
         if not isTestnet(self):
-            tokenAdresses = []
-            for i in self.tokens.values():
-                tokenAdresses.append(i)
+            tokenAdresses = list(self.tokens.values())
 
             Cg = CoinGeckoAPI()
             prices = Cg.get_token_price(
                 id = self.coinGeckoId,
                 contract_addresses = tokenAdresses,
                 vs_currencies = 'usd' )
-        
-        with open(self.priceLookupPath,'w') as PW:
-            json.dump({**temp,**prices},PW,indent = 2)
+
+        writeJson(self.priceLookupPath,{**temp,**prices})
 
         if returns:
             return {**temp,**prices}
@@ -342,13 +349,16 @@ class Blockchain:
         if not exchanges:
             exchanges = self.exchanges.keys()
 
+        count = 1
         for exchange, info in self.exchanges.items():
             if exchange in exchanges:
                 cache[exchange] = {}
                 for pairs, address in info['pairs'].items():
+                    print(f'Exchange {exchange}, pair {count}')
                     content['from'], content['to'] = list(pairs)
                     cache[exchange][pairs] = self.getPrice(session,address,content)
-        
+                    count += 1
+
         self.cache = cache
 
     def simulateSwap(self,route,cap,prices = []):
@@ -373,7 +383,7 @@ class Blockchain:
                 swap['to'],
                 swap['from']) / (1 + ((In/price[swap['from']]) * self.r1))
             In = Out
-        
+            
         return Out - cap
 
     def pollRoutes(self, routes = [], save = True, screen = True,currentPrice = True, value = 1):
@@ -411,7 +421,7 @@ total of :- {routeLenght}
         print('')
         for pos, route in enumerate(routes):
             simplifiedroute = self.simplyfy(route)
-            print(f' {pos + 1} / {routeLenght}',end = '\r')
+            print(f'  {pos + 1} / {routeLenght}',end = '\r')
             if simplifiedroute[0] in history or simplifiedroute[1] in history:
                 warnings.warn(f'route {simplifiedroute[:2]} already polled!')
                 print('')
@@ -451,7 +461,7 @@ total of :- {routeLenght}
                 print('failed to poll, an error occured!')
                 print(e)
 
-            print('\nDone!')
+        print('\nDone!')
             
         
         if priceLookup:
@@ -591,3 +601,16 @@ class Fantom(Blockchain):
     def __repr__(self):
         return 'Goerli Testnet' 
  
+class Polygon(Blockchain):
+    def __init__(self, url:str = 'http://127.0.0.1:8545'):
+        super().__init__(url)
+        self.source = ''
+        self.exchanges = None
+        self.tokens = None
+        self.startTokens = None
+        self.startExchanges = None
+        self.coinGeckoId = ''
+        self.arbAddress = ''
+        self.pollPath = os.path.join(self.dataPath,'Polygon','pollResult.json')
+        self.routePath = os.path.join(self.dataPath,'Polygon', 'arbRoute.json')
+

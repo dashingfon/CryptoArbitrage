@@ -1,7 +1,3 @@
-import sys, os
-sys.path.insert(1,
-    os.path.join(os.path.split(os.path.dirname(__file__))[0],'scripts'))
-
 import brownie, pytest
 from brownie import accounts, Token, TestArb
 from eth_abi import encode_abi

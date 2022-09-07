@@ -1,17 +1,13 @@
-import sys, os
-sys.path.insert(1,
-    os.path.join(os.path.split(os.path.dirname(__file__))[0],'scripts'))
-
-import Blockchains
+import scripts.Blockchains as Blc
 import pytest
 
 Data_Available = 0
 Chain = 'Aurora'
 def getChain():
     if Chain == 'Aurora':
-        return Blockchains.Aurora()
+        return Blc.Aurora()
     elif Chain == 'Kovan' :
-        return Blockchains.Kovan()
+        return Blc.Kovan()
     else:
         raise ValueError('Invalid Chain Argument')
 

@@ -1,10 +1,7 @@
-import pytest
-import sys, os
-sys.path.insert(1,
-    os.path.join(os.path.split(os.path.dirname(__file__))[0],'scripts'))
+import scripts.Blockchains as Blc, scripts.Controller as Ctr, scripts.Config as Cfg
+from scripts.utills import sortTokens, getPayloadBytes
 
-import Blockchains as Blc, Controller as Ctr, Config as Cfg
-from utills import sortTokens, getPayloadBytes
+import pytest
 from brownie import accounts, Token, Factory, Router, TestArb
 from datetime import datetime, timedelta
 
@@ -259,7 +256,9 @@ def MAIN_ITEM():
 
 class TestExecution():
     def correctBalance(self,account,balance, token):
-        if token.balanceOf(account) >= balance:
+        accBal = token.balanceOf(account)
+        print(accBal)
+        if accBal >= balance:
             return True
         return False
 
