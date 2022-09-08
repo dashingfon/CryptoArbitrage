@@ -1,8 +1,6 @@
 #from dotenv import load_dotenv
 #from brownie import interface
-from copy import deepcopy
-import requests
-
+import asyncio
 import scripts.Blockchains as Blc
 import scripts.Config as Cfg
 #import scripts.Controller as Ctr
@@ -15,14 +13,15 @@ Chain = Blc.BSC()
 
 
 def main():
-    Chain.pollRoutes()
+    asyncio.run(Chain.pollRoutes())
     
 
 
-main()
+if __name__ == '__main__':
+
+    main()
 
 
-#if __name__ == '__main__':
     #load_dotenv()
 
     #chain = Blc.BSC()

@@ -1,8 +1,9 @@
 import scripts.Blockchains as Blc
 import scripts.utills as utills
-import time, requests, asyncio
+import time, requests, asyncio, aiohttp
 from bs4 import BeautifulSoup
 import scripts.Config as Cfg
+import datetime
 #from brownie import interface
 
 
@@ -65,15 +66,15 @@ def main():
 
 if __name__ == '__main__': 
     #main()
+    chain = Blc.Aurora()
 
-    from functools import lru_cache
-
-    def hello():
-        print('yeah')
-
-    print(lru_cache(maxsize=10))
-    print(time.perf_counter())
-
-
+    async def test():
+        async with aiohttp.ClientSession() as sess:
+            addr = "0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae"
+            resp = await chain.fetch(sess,addr)
+            print(await resp.text())
+    
+    asyncio.run(test())
 
     
+

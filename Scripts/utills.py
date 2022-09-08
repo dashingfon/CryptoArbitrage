@@ -51,22 +51,20 @@ def RateLimited(maxPerSecond):
         return ratelimitedFunction
     return decorate
 
-def cache(seconds: int, maxsize: int = 250):
+def funcCache(seconds: int, maxsize: int = 250):
     def wrapper_cache(func):
         func = lru_cache(maxsize=maxsize)(func)
-        func.lifetime = timedelta(seconds=seconds)
-        func.expiration = datetime.utcnow() + func.lifetime
+        func.lifetime = seconds
+        func.expiration = time.perf_counter() + func.lifetime
 
         @wraps(func)
         def wrapped_func(*args, **kwargs):
-            if datetime.utcnow() >= func.expiration:
+            if time.perf_counter() >= func.expiration:
                 func.cache_clear()
-                func.expiration = datetime.utcnow() + func.lifetime
+                func.expiration = time.perf_counter() + func.lifetime
 
             return func(*args, **kwargs)
-
         return wrapped_func
-
     return wrapper_cache
 
 

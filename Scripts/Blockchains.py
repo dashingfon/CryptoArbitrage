@@ -3,12 +3,14 @@ Blockchain module containing the different blockchain implementation
 '''
 #The config file contains related blockchain specific information
 
+from typing import Callable
 import scripts.Config as Cfg
-from scripts.utills import RateLimited, isTestnet, readJson, writeJson, cache
+from scripts.utills import isTestnet, readJson, writeJson
 '''
 Then to import the other modules needed
 '''
-import requests, json, time, os, warnings, asyncio
+import time, os, warnings
+import asyncio, aiohttp, aiolimiter
 from bs4 import BeautifulSoup
 from pycoingecko import CoinGeckoAPI 
 
@@ -18,18 +20,19 @@ The main blockchain class other specific blockchains inherit
 It contains all the methods
 '''
 class Blockchain:
+    limiter = aiolimiter.AsyncLimiter(75,1)
+    priceCache = {'__meta__' : {'limit' : 200, 'current' : 0}}
+
     def __init__(self, url: str):
         self.impact = 0.00075
         self.r1 = 0.997 
         self.depthLimit = 4
         self.graph = {}
         self.arbRoutes = []
-        self.headers = {
-        'User-Agent': 'PostmanRuntime/7.29.0',
-        }
+        self.headers = {'User-Agent': 'PostmanRuntime/7.29.0'}
         self.url = url
-        self.dataPath = os.path.join(os.path.split(os.path.dirname(__file__))[0],
-            'data')
+        self.dataPath = os.path.join(
+            os.path.split(os.path.dirname(__file__))[0],'data')
         self.priceLookupPath = os.path.join(self.dataPath,'PriceLookup.json')
 
     '''
@@ -165,7 +168,6 @@ class Blockchain:
         done1, done2, slider = False, False, 0
 
         while (not done1 or not done2) and slider < len(tokensList):  
-            
             try:
                 raw = tokensList[slider].find(class_ = 'list-amount').string
                 rawPrice = str(raw).split()
@@ -187,14 +189,8 @@ class Blockchain:
         
         return price
     
-    async def fetch(self):
-        pass
 
-    async def getPrices(self):
-        pass
-
-    @RateLimited(3)
-    def getPrice(self, session, address, swap):
+    async def fetch(self, session, address):
         url = self.source + address
         attemptsAllowed = 4
         tries = 0
@@ -202,21 +198,46 @@ class Blockchain:
 
         while tries < attemptsAllowed and not done:
             try:
-                response = session.get(url,headers = self.headers)
-            except ConnectionError:
-                print('Error')
-                time.sleep(10)
+                async with self.limiter:
+                    response = await session.get(url, headers = self.headers, ssl = False)
+            except Exception as e:
+                print(f'Error :- {e}')
+                time.sleep(2)
                 tries += 1
                 print(f'Retring... \n{attemptsAllowed - tries} tries left')
             else:
                 done = True
-        
-        if response.status_code == 200:
-            price = self.extract(response.text,swap)
+
+        return response
+
+    async def getPrices(self, route, session):
+        addr: Callable = lambda i: (self.exchanges[i['via']]['pairs'][frozenset([i['from'],i['to']])], i)
+        tasks = []
+    
+    async def getPrice(self, session, address, swap):
+
+        if address in self.priceCache and \
+            self.priceCache[address]['expirationTime'] < time.perf_counter() and \
+            self.priceCache['__meta__']['current'] < self.priceCache['__meta__']['limit']:
+
+            price = self.priceCache[address]['content']
         else:
-            price = {}
-            print('unsuccesful request!')
-            print(f'status code :- {response.status_code}')
+            response = await self.fetch(session,address)
+            
+            async with response:
+                if response.status == 200:
+                    price = self.extract(await response.text(),swap)
+            assert price
+
+            if address not in self.priceCache and \
+                self.priceCache['__meta__']['current'] < self.priceCache['__meta__']['limit']:
+                self.priceCache['__meta__']['current'] += 1
+
+            self.priceCache[address] = {
+                'expirationTime' : time.perf_counter() + 3, 'content' : price}
+
+            
+
 
         return price
  
@@ -269,28 +290,19 @@ class Blockchain:
             result.append(load)
         return result
 
-    def pollRoute(self, route, prices = []):
+    async def pollRoute(self, route, prices = []):
         rates = [[],[]]
         liquidity = []
-        session = requests.Session()
         
-        isPrice = False
         if prices:
             assert len(prices) == len(route)
-            isPrice = True
+        else: 
+            async with aiohttp.ClientSession() as session:
+                prices = [await self.getPrices(route,session)]
         
         simplified = self.simplyfy(route)
         for index, swap in enumerate(route):
-            if not isPrice:
-                price = self.getPrice(
-                    session, 
-                    self.exchanges[swap['via']]['pairs'][frozenset([swap['from'],swap['to']])],
-                    swap)
-                prices.append(price)
-                print(price)
-            else:
-                price = prices[index]
-             
+            price = prices[index]
             rate = (self.getRate(price, swap['to'], swap['from']),
             self.getRate(price, swap['from'], swap['to']))
 
@@ -339,44 +351,36 @@ class Blockchain:
         if returns:
             return {**temp,**prices}
 
-    def buildCache(self,exchanges = []):
+    async def getNsetCache(self,exchange,pairs,session,address,content):
+        response = await self.fetch(session,address)
+        load = await response.text()
+        result = self.extract(load,content)
+        assert result, f'Empty price returned, pairs - {pairs}, exchange - {exchange}'
+        if exchange not in self.cache:
+            self.cache[exchange] = {}
+        self.cache[exchange][pairs] = result
+
+    async def buildCache(self, session, exchanges = []):
         print('building cache ... \n')
 
-        session = requests.Session()
-        cache = {}
-        content = {}
-
+        content, tasks = {}, []
         if not exchanges:
             exchanges = self.exchanges.keys()
 
-        count = 1
         for exchange, info in self.exchanges.items():
             if exchange in exchanges:
-                cache[exchange] = {}
                 for pairs, address in info['pairs'].items():
-                    print(f'Exchange {exchange}, pair {count}')
                     content['from'], content['to'] = list(pairs)
-                    cache[exchange][pairs] = self.getPrice(session,address,content)
-                    count += 1
+                    tasks.append(self.getNsetCache(exchange,pairs,session,address,content))
 
-        self.cache = cache
+        await asyncio.gather(*tasks)
 
-    def simulateSwap(self,route,cap,prices = []):
+    def simulateSwap(self,route,cap,prices):
         In = cap
-        session = requests.Session()
-        
-        if prices: assert len(prices) == len(route)
+        assert len(prices) == len(route)
         
         for index, swap in enumerate(route):
-            if not prices:
-                price = self.getPrice(
-                    session, 
-                    self.exchanges[swap['via']]['pairs'][frozenset([swap['from'],swap['to']])],
-                    swap)
-
-                print(price)
-            else:
-                price = prices[index]
+            price = prices[index]
 
             Out = In * self.getRate(
                 price,
@@ -386,7 +390,7 @@ class Blockchain:
             
         return Out - cap
 
-    def pollRoutes(self, routes = [], save = True, screen = True,currentPrice = True, value = 1):
+    async def pollRoutes(self, routes = [], save = True, screen = True,currentPrice = True, value = 1):
         routeInfo = {}
         if not routes:
             routes = readJson(self.routePath)
@@ -416,12 +420,13 @@ total of :- {routeLenght}
         history, result = set(), []
         summary = {'total' : routeLenght, 'requested' : 0, 'polled' : 0 }
 
-        self.buildCache()
+        async with aiohttp.ClientSession() as sess:
+            await self.buildCache(sess)
         
         print('')
-        for pos, route in enumerate(routes):
+        for index, route in enumerate(routes):
+            print(f'route {index + 1} of {routeLenght}')
             simplifiedroute = self.simplyfy(route)
-            print(f'  {pos + 1} / {routeLenght}',end = '\r')
             if simplifiedroute[0] in history or simplifiedroute[1] in history:
                 warnings.warn(f'route {simplifiedroute[:2]} already polled!')
                 print('')
@@ -434,7 +439,7 @@ total of :- {routeLenght}
                 
                 # self.polRoute returns a tuple of [capital,rates,Ep]
                 
-                for P, item in enumerate(self.pollRoute(route, prices)):
+                for P, item in enumerate(await self.pollRoute(route, prices)):
                     capital, rates, EP = item
                     startToken = simplifiedroute[P + 2][0]['from']
 
@@ -479,7 +484,14 @@ total of :- {routeLenght}
                     'Data':export})
         else:
             return (summary,history)
-            
+
+    async def genRoutes(self, routes = [], value = 1):
+
+
+        async with aiohttp.ClientSession() as sess:
+            pass
+
+
     def screenRoutes(self, routes):
         
         history = set()
