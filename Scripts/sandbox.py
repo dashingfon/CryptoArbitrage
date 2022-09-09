@@ -71,10 +71,11 @@ if __name__ == '__main__':
     async def test():
         async with aiohttp.ClientSession() as sess:
             addr = "0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae"
-            resp = await chain.fetch(sess,addr)
-            print(await resp.text())
+            async with await chain.fetch(sess,addr) as resp:
+                print(resp.status)
+                print(await resp.text())
     
-    asyncio.run(test())
+    asyncio.get_event_loop().run_until_complete(test())
 
     
 

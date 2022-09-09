@@ -13,7 +13,7 @@ Chain = Blc.BSC()
 
 
 def main():
-    asyncio.run(Chain.pollRoutes())
+    asyncio.get_event_loop().run_until_complete(Chain.pollRoutes())
     
 
 

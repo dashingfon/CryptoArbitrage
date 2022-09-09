@@ -28,6 +28,7 @@ class Blockchain:
         self.r1 = 0.997 
         self.depthLimit = 4
         self.graph = {}
+        self.cache = {}
         self.arbRoutes = []
         self.headers = {'User-Agent': 'PostmanRuntime/7.29.0'}
         self.url = url
@@ -199,7 +200,8 @@ class Blockchain:
         while tries < attemptsAllowed and not done:
             try:
                 async with self.limiter:
-                    response = await session.get(url, headers = self.headers, ssl = False)
+                    response = session.get(url, headers = self.headers, ssl = False)
+
             except Exception as e:
                 print(f'Error :- {e}')
                 time.sleep(2)
@@ -222,12 +224,10 @@ class Blockchain:
 
             price = self.priceCache[address]['content']
         else:
-            response = await self.fetch(session,address)
-            
-            async with response:
+            async with await self.fetch(session,address) as response:
                 if response.status == 200:
                     price = self.extract(await response.text(),swap)
-            assert price
+                assert price
 
             if address not in self.priceCache and \
                 self.priceCache['__meta__']['current'] < self.priceCache['__meta__']['limit']:
@@ -352,9 +352,8 @@ class Blockchain:
             return {**temp,**prices}
 
     async def getNsetCache(self,exchange,pairs,session,address,content):
-        response = await self.fetch(session,address)
-        load = await response.text()
-        result = self.extract(load,content)
+        async with await self.fetch(session,address) as response:
+            result = self.extract(await response.text(), content)
         assert result, f'Empty price returned, pairs - {pairs}, exchange - {exchange}'
         if exchange not in self.cache:
             self.cache[exchange] = {}
