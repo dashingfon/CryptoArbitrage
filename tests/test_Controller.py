@@ -1,4 +1,6 @@
-import scripts.Blockchains as Blc, scripts.Controller as Ctr, scripts.Config as Cfg
+import scripts.Blockchains as Blc
+import scripts.Controller as Ctr
+import scripts.Config as Cfg
 from scripts.utills import sortTokens, getPayloadBytes
 
 import pytest

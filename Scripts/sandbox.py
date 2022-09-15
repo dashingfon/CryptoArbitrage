@@ -1,9 +1,11 @@
 import scripts.Blockchains as Blc
 import scripts.utills as utills
-import time, requests, asyncio, aiohttp
+import time, asyncio, aiohttp
 from bs4 import BeautifulSoup
 import scripts.Config as Cfg
-import datetime
+import datetime, os
+from cache import AsyncTTL
+from asyncio.proactor_events import _ProactorBasePipeTransport
 #from brownie import interface
 
 
@@ -66,16 +68,52 @@ def main():
 
 if __name__ == '__main__': 
     #main()
-    chain = Blc.Aurora()
+    _ProactorBasePipeTransport.__del__ = utills.silence_event_loop_closed(_ProactorBasePipeTransport.__del__)
 
-    async def test():
+    chain = Blc.BSC()
+
+    async def test(addr,content,sess):
+        '''async with await chain.fetch(sess,addr) as resp:
+            print(resp.status)
+            print(chain.extract(await resp.text(),content))
+'''     
+        return await chain.getPrice(sess,addr,content,'testing')
+        
+
+    async def main(addrs,conts):
+        assert len(addrs) == len(conts)
         async with aiohttp.ClientSession() as sess:
-            addr = "0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae"
-            async with await chain.fetch(sess,addr) as resp:
-                print(resp.status)
-                print(await resp.text())
+            tasks = [test(addr,swap,sess) for addr, swap in zip(addrs,conts)]
+            await asyncio.gather(*tasks)
+
+
+    addr1 = "0xd171b26e4484402de70e3ea256be5a2630d7e88d"
+    cont1 = {'from' : 'BTCB_e3ead9c', 'to' : 'ETH_9f933f8'}
     
-    asyncio.get_event_loop().run_until_complete(test())
+    
+    addr2 = "0x5292600758a090490d34367d4864ed6291d254fe"
+    cont2 = {'from': "BUSD_d087d56", 'to': "FRAX_3e89f40"}
+    
+    #asyncio.new_event_loop().run_until_complete(test(addr1,cont1),test(addr2,cont2))
+    #asyncio.new_event_loop().run_until_complete(test(addr1,cont1))
 
     
+    #asyncio.run(main([addr1,addr2],[cont1,cont2]),debug=True)
+    
+    @AsyncTTL(time_to_live = 5, maxsize = 200)
+    async def test():
+        print('fetching')
+        return 3
+
+    async def postTest():
+        tasks = [asyncio.create_task(test())] * 3
+        return await asyncio.gather(*tasks)
+
+
+    async def tester():
+        tasks = [asyncio.create_task(postTest())] * 3
+        res = await asyncio.gather(*tasks)
+        print(res)
+
+    asyncio.run(tester())
 

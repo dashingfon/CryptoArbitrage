@@ -1,25 +1,49 @@
 #from dotenv import load_dotenv
 #from brownie import interface
-import asyncio
+import asyncio, aiohttp
+from asyncio.proactor_events import _ProactorBasePipeTransport
 import scripts.Blockchains as Blc
 import scripts.Config as Cfg
 #import scripts.Controller as Ctr
-#from scripts.utills import sortTokens, readJson, writeJson
+from scripts.utills import silence_event_loop_closed
 
 
 exchanges = Cfg.BSCExchanges
 Chain = Blc.BSC()
+Route = [
+      {
+        "from": "WBNB_3bc095c",
+        "to": "BSC-USD_3197955",
+        "via": "pancakeswap_v2"
+      },
+      {
+        "to": "BUSD_d087d56",
+        "via": "pancakeswap_v2",
+        "from": "BSC-USD_3197955"
+      },
+      {
+        "to": "USDC_2cd580d",
+        "via": "pancakeswap_v2",
+        "from": "BUSD_d087d56"
+      },
+      {
+        "to": "WBNB_3bc095c",
+        "via": "pancakeswap_v2",
+        "from": "USDC_2cd580d"
+      }
+    ]
 #config = readJson('Config.json')
 
 
-def main():
-    asyncio.get_event_loop().run_until_complete(Chain.pollRoutes())
+async def main():
+    await Chain.pollRoutes()
     
 
 
 if __name__ == '__main__':
 
-    main()
+    _ProactorBasePipeTransport.__del__ = silence_event_loop_closed(_ProactorBasePipeTransport.__del__)
+    asyncio.run(main())
 
 
     #load_dotenv()

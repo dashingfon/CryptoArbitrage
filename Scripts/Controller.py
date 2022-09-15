@@ -99,6 +99,7 @@ class Controller():
             current = nexxt
         return current
 
+
     def getValues(self,item,options):
         '''
         options contents
@@ -193,13 +194,8 @@ class Controller():
 
         #print(f'final payload :- {AMOUNT0,AMOUNT1,tokens[names[0]],DATA}')
 
-        verdict = None
-        if simulate:
-            result = self.simulateSwap(rem,val['routers'][1:],start,tokens)
-            verdict = True if result > amount else True
-
         return {
-            'profitable' : verdict,
+            'profitable' : None,
             'data' : [AMOUNT0,AMOUNT1,tokens[names[0]],DATA]}
 
     def execute(self, payload):
@@ -262,9 +258,6 @@ class Controller():
     def skim(self, skims = [], source = ''):
         #Execute the profitable pairs
         pass
-
-
-
 
 
 

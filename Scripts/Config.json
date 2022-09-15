@@ -237,7 +237,7 @@
         "fee": 99800
       },
       "pandora_digital_swap": {
-        "pairs": {
+        "pairs": { 
           "WBNB_3bc095c - BUSD_d087d56": "0xac84ff369f5615bd70152b2b286e2b4591e889e9",
           "BSC-USD_3197955 - BUSD_d087d56": "0x63b0547b6fb25cb4b2998a176cca5e573b97b360",
           "USDC_2cd580d - BUSD_d087d56": "0x486585c9873295fd899a3be1de438cf9e68c3e14",

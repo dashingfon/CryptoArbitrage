@@ -6,6 +6,7 @@ from eth_abi import encode_abi
 from bs4 import BeautifulSoup
 
 
+
 def readJson(path):
     try:
         with open(path) as PP:
@@ -32,6 +33,22 @@ fee = config['Test']['fee']
 '''
 This is the Ratelimited decorator used to limit requests
 '''
+def split_list(listA: list[dict[str, str]], n: int):
+    for x in range(0, len(listA), n):
+        chunk = listA[x: n + x]
+        yield chunk
+
+def silence_event_loop_closed(func):
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        try:
+            return func(self, *args, **kwargs)
+        except RuntimeError as e:
+            if str(e) != 'Event loop is closed':
+                raise
+    return wrapper
+
+
 def RateLimited(maxPerSecond):
     mininterval = 1.0 / float(maxPerSecond)
 
@@ -50,22 +67,6 @@ def RateLimited(maxPerSecond):
             return ret
         return ratelimitedFunction
     return decorate
-
-def funcCache(seconds: int, maxsize: int = 250):
-    def wrapper_cache(func):
-        func = lru_cache(maxsize=maxsize)(func)
-        func.lifetime = seconds
-        func.expiration = time.perf_counter() + func.lifetime
-
-        @wraps(func)
-        def wrapped_func(*args, **kwargs):
-            if time.perf_counter() >= func.expiration:
-                func.cache_clear()
-                func.expiration = time.perf_counter() + func.lifetime
-
-            return func(*args, **kwargs)
-        return wrapped_func
-    return wrapper_cache
 
 
 def isTestnet(blockchain):
