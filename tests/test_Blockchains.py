@@ -144,17 +144,6 @@ class TestPollRoutes:
         assert result[1] == result2[0]
         assert result[0] == result2[1]
         
-        
-    '''@pytest.mark.xfail(not Data_Available,reason = 'no data connection')
-    def test_pollingOnlyUnique(self,ChainSetup):
-        result = ChainSetup.pollRoutes(ARB_ROUTE[:2], save = False, screen = False)
-        assert result[0]['requested'] == 1
-
-    @pytest.mark.xfail(not Data_Available, reason = 'no data connection')
-    def test_pollingWarning(self,ChainSetup):
-        with pytest.warns(UserWarning):
-            ChainSetup.pollRoutes(ARB_ROUTE[:2], save = False, screen = False)
-    '''
 
     def test_cumSum(self,ChainSetup):
         listItem = [2,3,1,4]

@@ -36,7 +36,7 @@ class Controller():
         else:
             return self.web3.eth.account.from_key(self.pv)
 
-    def getRoutes(self, pollResult = True, arbRoute = False):
+    '''def getRoutes(self, pollResult = True, arbRoute = False):
         history = set()
 
         if arbRoute:
@@ -57,10 +57,11 @@ class Controller():
                     history.add(routes[1])
                     if item['EP'] > 0:
                         yield {'route' : routes[2],'simplified' : routes[0],'EP' : item['EP'],'capital' : item['capital']}
-         
-    def check(self, route):
-        return self.blockchain.pollRoute(route)
 
+    '''     
+    '''def check(self, route):
+        return self.blockchain.pollRoute(route)
+'''
     def getProspect(self,Routes):
         for item in Routes:
             simplyfied = self.blockchain.simplyfy(item['route'])

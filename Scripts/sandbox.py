@@ -113,7 +113,31 @@ if __name__ == '__main__':
     async def tester():
         tasks = [asyncio.create_task(postTest())] * 3
         res = await asyncio.gather(*tasks)
-        print(res)
+        print(*res)
 
     asyncio.run(tester())
+
+    def evalExchanges(batch):
+        routes = utills.readJson(chain.routePath)['Data']
+        distribution = {}
+        exchanges = chain.exchanges
+        batches = utills.split_list(routes, batch)
+        print(f'lenght of routes :- {len(routes)}')
+        lenght = 0
+
+        for item in batches:
+            store = set()
+            for route in item:
+                for swap in route:
+                    store.add(exchanges[swap['via']]['pairs']
+                        [frozenset([swap['from'],swap['to']])])
+            if len(store) not in distribution:
+                distribution[len(store)] = 0
+            distribution[len(store)] += 1
+            lenght += 1
+
+        print(f'lenght of batches :- {lenght}')
+        print(distribution)
+
+    evalExchanges(30)
 

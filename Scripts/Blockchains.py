@@ -12,7 +12,7 @@ Then to import the other modules needed
 '''
 import time, os, warnings
 import asyncio
-import aiohttp 
+import aiohttp
 from aiolimiter import AsyncLimiter
 from bs4 import BeautifulSoup
 from pycoingecko import CoinGeckoAPI 
@@ -355,41 +355,10 @@ class Blockchain:
             else:
                 Done = True
 
-        if not Done: raise RuntimeError('failed to get the price')
+        if not Done: 
+            raise RuntimeError('failed to get the price')
         
         return price
-
-
-    async def getNsetCache(self, exchange, pairs: frozenset, 
-        session: aiohttp.ClientSession, addr):
-
-        temp: list[str] = list(pairs)
-        result = await self.getPrice(session, addr,
-            {'from' : temp[0],'to' : temp[1]}, exchange)
-
-        if exchange not in self.cache:
-            self.cache[exchange] = {}
-        self.cache[exchange][pairs] = result
-
-
-    async def buildCache(self, session, exchanges = []):
-        print('building cache ... \n')
-        start = time.perf_counter()
-        
-        self.cache = {}
-        tasks = []
-        if not exchanges:
-            exchanges = self.exchanges.keys()
-
-        for exchange, info in self.exchanges.items():
-            if exchange in exchanges:
-                for pairs, address in info['pairs'].items():
-                    #print(f'address :- {address}, pairs :- {pairs}, exchange :- {exchange}')
-                    tasks.append(asyncio.create_task(
-                    self.getNsetCache(exchange,pairs,session,address)))
-
-        await asyncio.gather(*tasks)
-        print(f'finished building cache in {time.perf_counter() - start} seconds')
 
 
     def simulateSwap(self, route, cap, prices):
@@ -408,7 +377,9 @@ class Blockchain:
         return Out - cap
 
 
-    async def pollRoutes(self, routes = [], save = True, currentPrice = False, value = 1.009027027):
+    async def pollRoutes(self, routes = [], save = True, currentPrice = False, 
+        value = 1.009027027):
+
         routeInfo = {}
         if not routes:
             routes = readJson(self.routePath)
@@ -425,7 +396,7 @@ total of :- {routeLenght}
         """
         print(message)
         result = []
-        routesGen = self.genRoutes(routes, currentPrice = currentPrice, value = value)
+        routesGen = self.genRoutes(value, routes, currentPrice = currentPrice)
 
         try:
             async for item in routesGen:
@@ -445,8 +416,8 @@ total of :- {routeLenght}
             else: return export
  
 
-    async def genRoutes(self, routes: list[dict[str,str]] = [], value: int = 1.009027027,
-    converted: bool = False, wait: int = 10, currentPrice: bool = False, batch: int = 15):
+    async def genRoutes(self, value, routes: list[dict[str,str]] = [], converted: bool = False, 
+        wait: int = 10, currentPrice: bool = False, batch: int = 50):
  
         if not routes:
             routes = readJson(self.routePath)['Data']
@@ -462,27 +433,24 @@ total of :- {routeLenght}
 
         found = 0
         async with aiohttp.ClientSession() as sess:
-            
+            marker = 1
             for item in subRoutes:
-                retries = 2
-                while retries:
+                try:
                     SimpRoutes = []
                     tasks = []
-                    try:
-                        for i in item:
-                            SimpRoutes.append(self.simplyfy(i))
-                            tasks.append(asyncio.create_task(self.pollRoute(i, sess)))
-                        results = await asyncio.gather(*tasks)
+                    for i in item:
+                        SimpRoutes.append(self.simplyfy(i))
+                        tasks.append(asyncio.create_task(self.pollRoute(i, sess)))
+                    results = await asyncio.gather(*tasks)
 
-                    except AssertionError:
-                        print('Oops it seems we have sent too many requests')
-                        print(f'pausing for {wait} seconds')
-                        time.sleep(wait)
-                        retries -= 1
-                    else:
-                        retries = 0
+                except AssertionError as e:
+                    print(f'AssertionError \n{e}')
+                    print('Host rate limit reached, batch size probably too big')
+                    print("skipping routes")
+                    continue
+                
 
-                for Pos, result in enumerate(results)
+                for Pos, result in enumerate(results):
                     for pos, item in enumerate(result):
                         capital, rates, EP = item
                         startToken = SimpRoutes[Pos][pos + 2][0]['from']
@@ -503,7 +471,8 @@ total of :- {routeLenght}
                             }
 
                 print(f'                           found {found}', end = '\r')
-                print(f'route {index + 1} of {routeLenght}', end = '\r')
+                step = marker * batch if marker * batch < routeLenght else routeLenght 
+                print(f'route {step} of {routeLenght}', end = '\r')
         
 
     def screenRoutes(self, routes):

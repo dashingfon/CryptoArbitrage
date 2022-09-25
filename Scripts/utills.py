@@ -97,11 +97,8 @@ def getPayloadBytes(Map,pair):
 def setPreparedData():
     Map = {
         1 : [[fonswapRouter], [[T2,T3,T1,T4]]],
-
         2 : [[dodoRouter,fonswapRouter], [[T2,T3,T1],[T1,T4]]],
-
         3 : [[fonswapRouter,dodoRouter], [[T2,T3],[T3,T1,T4]]],
-
         4 : [[dodoRouter,fonswapRouter,dodoRouter], [[T2,T3],[T3,T1],[T1,T4]]]
     }
     result = []
