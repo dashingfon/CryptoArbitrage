@@ -17,6 +17,7 @@ def parseEchanges(item):
         print(f'incorrect exchange data, KeyError :- {e}')
     return new
 
+
 with open(r'scripts\Config.json') as CJ:
     config = json.load(CJ)
 
@@ -37,7 +38,6 @@ contract = config['Test']['contract']
 
 cap = config['Test']['cap']
 f = config['Test']['f']
-
 l = config['Test']['l']
 
 PAIR = config['Test']['PAIR']

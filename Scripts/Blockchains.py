@@ -1,35 +1,45 @@
 '''
 Blockchain module containing the different blockchain implementation
 '''
-#The config file contains related blockchain specific information
-
 from typing import Callable
 import scripts.Config as Cfg
+import scripts.Errors as errors
+from scripts.Logger import preplogger
+import scripts.Database as db
 from scripts.utills import isTestnet, readJson, writeJson, split_list
+from scripts.Models import BaseBlockchain
 
-'''
-Then to import the other modules needed
-'''
-import time, os, warnings
+import time
+import os
 import asyncio
 import aiohttp
 from aiolimiter import AsyncLimiter
 from bs4 import BeautifulSoup
-from pycoingecko import CoinGeckoAPI 
+from pycoingecko import CoinGeckoAPI
 from cache import AsyncTTL
 
 
 '''
-The main blockchain class other specific blockchains inherit
+The main blockchain class inherits from the BaseBlockchain
+other Blockchains then inherit from it
 It contains all the methods
 '''
 
-class Blockchain:
-    limiter: AsyncLimiter = AsyncLimiter(25,1)
+
+class Blockchain(BaseBlockchain):
+    limiter: AsyncLimiter = AsyncLimiter(25, 1)
 
     def __init__(self, url: str):
+        '''
+        impact - the amount of price impact allowed
+        r1 - The swap fee on dexs
+        depthLimit - Used to determine the longest cycle of swaps
+        graph - a representation of the connected tokens across dexs
+        arbRoutes - a list of the cycle able routes
+        dataPath - the path to the data directory
+        '''
         self.impact = 0.00075
-        self.r1 = 0.997 
+        self.r1 = 0.997
         self.depthLimit = 4
         self.graph = {}
         self.arbRoutes = []
@@ -39,21 +49,17 @@ class Blockchain:
             }
         self.url = url
         self.dataPath = os.path.join(
-            os.path.split(os.path.dirname(__file__))[0],'data')
-        self.priceLookupPath = os.path.join(self.dataPath,'PriceLookup.json')
+            os.path.split(os.path.dirname(__file__))[0], 'data')
+        self.logFileName = 'Blockchains.log'
+        self.priceLookupPath = os.path.join(self.dataPath, 'PriceLookup.json')
 
-    '''
-    impact - the amount of price impact allowed
-    r1 - The swap fee on dexs
-    depthLimit - Used to determine the longest cycle of swaps
-    graph - a representation of the connected tokens across dexs
-    arbRoutes - a list of the cycle able routes
-    dataPath - the path to the data directory
-    
-    '''
+    def buildPairs(self,):
+        pass
 
-    def buildGraph(self, exchanges = {}):
-        # The method to find the connections between the tokens
+    def buildGraph(self, exchanges={}):
+        '''
+        The method to find the connections between the tokens
+        '''
 
         graph = {}
         if not exchanges:
@@ -66,35 +72,38 @@ class Blockchain:
                     graph[pool[0]] = []
                 if pool[1] not in graph:
                     graph[pool[1]] = []
-                
-                graph[pool[0]].append({'to' : pool[1], 'via' : dex})
-                graph[pool[1]].append({'to' : pool[0], 'via' : dex})
 
-        self.graph = graph    
+                graph[pool[0]].append({'to': pool[1], 'via': dex})
+                graph[pool[1]].append({'to': pool[0], 'via': dex})
 
+        self.graph = graph
 
     def dive(self, depth, node, goal, path, followed):
-        # Used recurrsively with the Depth limited search function to discover tradable arb routes
+        '''
+        recursive function to discover tradable arb routes
+        called from DLS
+        '''
 
         result = []
         if depth <= self.depthLimit and node in self.graph:
             for i in self.graph[node]:
-                if frozenset([i['to'],i['via'],path[-1]['to']]) in followed:
+                if frozenset([i['to'], i['via'], path[-1]['to']]) in followed:
                     pass
                 elif i['to'] == goal:
                     new_path = path + [i]
                     new_path[-1]['from'] = new_path[-2]['to']
                     result.append(new_path)
                 elif depth < self.depthLimit:
-                    drop = followed + [frozenset([i['to'],i['via'],path[-1]['to']])]
+                    drop = followed + [frozenset(
+                                        [i['to'], i['via'], path[-1]['to']])]
                     new_path = path + [i]
                     new_path[-1]['from'] = new_path[-2]['to']
-                    result += self.dive(depth + 1, i['to'], goal,new_path, drop)
-        
+                    result += self.dive(
+                                depth + 1, i['to'], goal, new_path, drop)
+
         return result
 
-
-    def DLS(self,goal,exchanges):
+    def DLS(self, goal, exchanges):
         # implementation of depth limited search
 
         start = []
@@ -106,25 +115,28 @@ class Blockchain:
             exchanges = self.startExchanges
 
         if goal in self.graph and exchanges == 'all':
-            start = self.graph[goal]     
+            start = self.graph[goal]
         elif goal in self.graph:
             for i in self.graph[goal]:
                 if i['via'] in exchanges:
-                    start.append(i)  
+                    start.append(i)
 
         for i in start:
-            followed = [frozenset([goal,i['to'],i['via']])]
+            followed = [frozenset([goal, i['to'], i['via']])]
             new_path = [{**path, **i}]
             # recursive function to search the node to the specified depth
-            result += self.dive(depth + 1, i['to'],goal,new_path,followed)
+            result += self.dive(depth + 1, i['to'], goal, new_path, followed)
 
         return result
-           
 
-    def getArbRoute(self, tokens = 'default', exchanges = 'all',graph = True, save = True, screen = True):
-        # The method the produces and optionally saves the Arb routes
+    def getArbRoute(self, tokens='default', exchanges='all',
+                    graph=True, save=True, screen=True):
 
-        route = []
+        '''
+        The method the produces and optionally saves the Arb routes
+        '''
+
+        routes = []
 
         if graph:
             self.buildGraph()
@@ -135,43 +147,43 @@ class Blockchain:
             tokens = self.startTokens
         elif tokens == 'all':
             tokens = list(self.tokens.keys())
+        else:
+            raise errors.InvalidTokensArgument(
+                f'invalid token argument {tokens}')
 
         if exchanges == 'default':
             exchanges = self.startExchanges
         elif exchanges == 'all':
             exchanges = list(self.exchanges.keys())
-        
-        if type(tokens) != list:
-            raise ValueError('invalid token argument')
-        elif type(exchanges) != list:
-            raise ValueError('invalid token argument')
+        else:
+            raise errors.InvalidExchangesArgument(
+                f'invalid exchange argument {exchanges}')
 
         for token in tokens:
-            route += self.DLS(token,exchanges)
+            routes += self.DLS(token, exchanges)
 
         if screen:
-            route = self.screenRoutes(route)
+            routes = self.screenRoutes(routes)
 
         if save:
-            writeJson(self.routePath,
-                    {'MetaData': {
-                        'time': time.ctime(),
-                        'total' : len(route),
-                        'Exchanges' : exchanges,
-                        'Tokens' : tokens,
+            writeJson(self.routePath, {
+                'MetaData': {
+                    'time': time.ctime(),
+                    'total': len(routes),
+                    'Exchanges': exchanges,
+                    'Tokens': tokens,
                     },
-                    'Data': route})
+                'Data': routes})
         else:
-            return route
+            return routes
 
-
-    def getRate(self,price, to, fro):
+    def getRate(self, price, to, fro):
         if (to not in price) or (fro not in price):
-            raise ValueError('currency not in price dictionary')
+            raise errors.IncompletePrice(
+                f'token {to} and {fro} not in {price}')
 
-        #return self.r1 * price[to] / (1 + (self.impact * self.r1)) / price[fro] 
-        return self.r1 * price[to] / price[fro] 
-
+        # return self.r1 * price[to]/(1 + (self.impact * self.r1)) / price[fro]
+        return self.r1 * price[to] / price[fro]
 
     @staticmethod
     def cumSum(listItem):
@@ -180,24 +192,24 @@ class Blockchain:
             result.append(i*result[-1])
         return result
 
-
     @staticmethod
     def simplyfy(route):
         result = [f"{route[0]['from']} {route[0]['to']} {route[0]['via']}"]
         _result = [f"{route[0]['to']} {route[0]['from']} {route[0]['via']}"]
         reverseRoute = [{
-            'from' : route[0]['to'], 'to' :  route[0]['from'], 'via' : route[0]['via']
+            'from': route[0]['to'],
+            'to':  route[0]['from'],
+            'via': route[0]['via']
         }]
 
         for j in route[1:]:
             result.append(f"{j['from']} {j['to']} {j['via']}")
-            _result.insert(0,f"{j['to']} {j['from']} {j['via']}")
-            reverseRoute.insert(0,{
-            'from' : j['to'], 'to' :  j['from'], 'via' : j['via']
-        })
-            
-        return [' - '.join(result),' - '.join(_result),route,reverseRoute]
+            _result.insert(0, f"{j['to']} {j['from']} {j['via']}")
+            reverseRoute.insert(0, {
+                'from': j['to'], 'to':  j['from'], 'via': j['via']
+                })
 
+        return [' - '.join(result), ' - '.join(_result), route, reverseRoute]
 
     @staticmethod
     def assemble(route):
@@ -206,28 +218,27 @@ class Blockchain:
         for item in routeList:
             itemList = item.split()
             load = {
-                'from' : itemList[0],
-                'to' : itemList[1],
-                'via' : itemList[2],
-            }
+                'from': itemList[0],
+                'to': itemList[1],
+                'via': itemList[2],
+                }
             result.append(load)
         return result
 
-
-    async def pollRoute(self, route, session, prices = []):
-        rates = [[],[]]
+    async def pollRoute(self, route, session, prices=[]):
+        rates = [[], []]
         liquidity = []
-        
+
         if prices:
             assert len(prices) == len(route)
-        else: 
-            prices = await self.getPrices(route,session)
-        
+        else:
+            prices = await self.getPrices(route, session)
+
         simplified = self.simplyfy(route)
         for index, swap in enumerate(route):
             price = prices[index]
             rate = (self.getRate(price, swap['to'], swap['from']),
-            self.getRate(price, swap['from'], swap['to']))
+                    self.getRate(price, swap['from'], swap['to']))
 
             if index == 0:
                 liquidity.append(price[swap['from']])
@@ -235,13 +246,14 @@ class Blockchain:
                 rates[0].append(rate[0])
             elif index == len(route) - 1:
                 rates[0].append(rate[0] * rates[0][-1])
-                liquidity += [min(price[swap['from']],forward),price[swap['to']]]
+                liquidity += [
+                    min(price[swap['from']], forward), price[swap['to']]]
             else:
                 rates[0].append(rate[0] * rates[0][-1])
-                liquidity.append(min(price[swap['from']],forward))
+                liquidity.append(min(price[swap['from']], forward))
                 forward = price[swap['to']]
 
-            rates[1].insert(0,rate[1])
+            rates[1].insert(0, rate[1])
 
         least = min(liquidity)
         reverse = liquidity[::-1]
@@ -252,12 +264,11 @@ class Blockchain:
         cap1 = least / rates[1][reverse.index(least)] * self.impact
 
         return (
-            [cap0,rates[0],self.simulateSwap(simplified[2],cap0,prices)],
-            [cap1,rates[1],self.simulateSwap(simplified[3],cap1,prices[::-1])]
+            [cap0, rates[0], self.simulateSwap(simplified[2], cap0, prices)],
+            [cap1, rates[1], self.simulateSwap(simplified[3], cap1, prices[::-1])]
         )
 
-
-    def lookupPrice(self, returns = False):
+    def lookupPrice(self, returns=False):
         temp = readJson(self.priceLookupPath)
         prices = {}
 
@@ -266,41 +277,41 @@ class Blockchain:
 
             coinGecko = CoinGeckoAPI()
             prices = coinGecko.get_token_price(
-                id = self.coinGeckoId,
-                contract_addresses = tokenAdresses,
-                vs_currencies = 'usd' )
+                id=self.coinGeckoId,
+                contract_addresses=tokenAdresses,
+                vs_currencies='usd')
 
-        writeJson(self.priceLookupPath,{**temp,**prices})
+        writeJson(self.priceLookupPath, {**temp, **prices})
 
         if returns:
-            return {**temp,**prices}
-
+            return {**temp, **prices}
 
     @staticmethod
-    def extract(content,tokens):
+    def extract(content, tokens):
         assert content, 'Empty content returned'
         assert tokens, 'Empty tokens returned'
-        
+
         price = {}
         soup = BeautifulSoup(content, 'html.parser')
-        
-        tokensList = soup.find_all('li', class_ = 'list-custom')
-        #print(tokensList)
+
+        tokensList = soup.find_all('li', class_='list-custom')
+        # print(tokensList)
         done1, done2, slider = False, False, 0
 
-        while (not done1 or not done2) and slider < len(tokensList):  
+        while (not done1 or not done2) and slider < len(tokensList):
             try:
-                raw = tokensList[slider].find(class_ = 'list-amount').string
+                raw = tokensList[slider].find(class_='list-amount').string
                 rawPrice = str(raw).split()
-                symbol, amount = rawPrice[1], float(rawPrice[0].replace(',',''))
-                
+                symbol = rawPrice[1]
+                amount = float(rawPrice[0].replace(',', ''))
+
                 if symbol == tokens['from'][:-8]:
                     done1 = True
                     price[tokens['from']] = amount
                 elif symbol == tokens['to'][:-8]:
                     done2 = True
                     price[tokens['to']] = amount
-                
+
             except (IndexError, ValueError) as e:
                 print(f'Error parsing item {raw}, error :- {e}')
 
@@ -308,25 +319,22 @@ class Blockchain:
                 print(f"Error parsing item {tokensList[slider].find(class_ = 'list-amount')}, error :- {e}")
 
             finally:
-                slider += 1  
-        
+                slider += 1
+
         assert len(price) == 2, f'price :- {price}\n content :- {content}\n'
         return price
-    
 
     async def fetch(self, session, addr):
         url = self.source + addr
         async with self.limiter:
-            return session.get(url, headers = self.headers, ssl = False)
-
+            return session.get(url, headers=self.headers, ssl=False)
 
     async def getPrices(self, route, session):
-        form: Callable = lambda i: [self.exchanges[i['via']]['pairs'][frozenset([i['from'],i['to']])], i, i['via']]
-        tasks = [asyncio.create_task(self.getPrice(session,*form(i))) for i in route]
+        form: Callable = lambda i: [self.exchanges[i['via']]['pairs'][frozenset([i['from'], i['to']])], i, i['via']]
+        tasks = [asyncio.create_task(self.getPrice(session, *form(i))) for i in route]
         return await asyncio.gather(*tasks)
 
-
-    @AsyncTTL(time_to_live = 5, maxsize = 200)
+    @AsyncTTL(time_to_live=5, maxsize=200)
     async def getPrice(self, session, addr, swap, exchange):
         retries: int = 3
         price: dict[str, str] = {}
@@ -334,9 +342,9 @@ class Blockchain:
 
         while retries > 0 and not Done:
             try:
-                async with await self.fetch(session,addr) as response:
+                async with await self.fetch(session, addr) as response:
                     if response.status == 200:
-                        price = self.extract(await response.text(),swap)
+                        price = self.extract(await response.text(), swap)
                     else:
                         print(f'failed request, exchange :- {exchange}, pairs :- {swap}')
                         break
@@ -347,7 +355,7 @@ class Blockchain:
             except aiohttp.ClientConnectionError as e:
                 print(f"Oops, the connection was dropped before we finished :- {e}")
                 await asyncio.sleep(1)
-                retries -= 1 
+                retries -= 1
             except aiohttp.ClientError as e:
                 print(f"Oops, something else went wrong with the request :- {e}")
                 await asyncio.sleep(1)
@@ -355,16 +363,16 @@ class Blockchain:
             else:
                 Done = True
 
-        if not Done: 
-            raise RuntimeError('failed to get the price')
-        
-        return price
+        if not Done:
+            raise errors.ErrorExtractingPrice(
+                'failed to get the price')
 
+        return price
 
     def simulateSwap(self, route, cap, prices):
         In = cap
         assert len(prices) == len(route), 'unequal route and prices'
-        
+
         for index, swap in enumerate(route):
             price = prices[index]
 
@@ -373,12 +381,11 @@ class Blockchain:
                 swap['to'],
                 swap['from']) / (1 + ((In/price[swap['from']]) * self.r1))
             In = Out
-            
+
         return Out - cap
 
-
-    async def pollRoutes(self, routes = [], save = True, currentPrice = False, 
-        value = 1.009027027):
+    async def pollRoutes(self, routes=[], save=True, currentPrice=False,
+                         value=1.009027027):
 
         routeInfo = {}
         if not routes:
@@ -396,7 +403,15 @@ total of :- {routeLenght}
         """
         print(message)
         result = []
-        routesGen = self.genRoutes(value, routes, currentPrice = currentPrice)
+        routesGen = self.genRoutes(value, routes, currentPrice=currentPrice)
+
+        while True:
+            try:
+                pass
+            except (StopIteration, KeyboardInterrupt):
+                break
+            finally:
+                pass
 
         try:
             async for item in routesGen:
@@ -404,21 +419,21 @@ total of :- {routeLenght}
         except KeyboardInterrupt:
             print('\n interupted, exiting and saving')
         finally:
-            export = sorted(result, key = lambda v : v['USD Value'], reverse = True)
+            export = sorted(result, key=lambda v: v['USD Value'], reverse=True)
             if save:
                 writeJson(self.pollPath,
-                        {'MetaData': {
+                          {'MetaData': {
                             'time': time.ctime(),
-                            'total' : routeLenght,
-                            'routeInfo' : routeInfo
+                            'total': routeLenght,
+                            'routeInfo': routeInfo
                             },
-                        'Data':export})
-            else: return export
- 
+                           'Data': export})
+            else:
+                return export
 
-    async def genRoutes(self, value, routes: list[dict[str,str]] = [], converted: bool = False, 
-        wait: int = 10, currentPrice: bool = False, batch: int = 50):
- 
+    async def genRoutes(self, value, routes: list = [], converted: bool = False,
+                        wait: int = 10, currentPrice: bool = False, batch: int = 50):
+
         if not routes:
             routes = readJson(self.routePath)['Data']
 
@@ -429,7 +444,7 @@ total of :- {routeLenght}
         if not currentPrice:
             priceLookup = readJson(self.priceLookupPath)
         else:
-            priceLookup = self.lookupPrice(returns = True)
+            priceLookup = self.lookupPrice(returns=True)
 
         found = 0
         async with aiohttp.ClientSession() as sess:
@@ -448,7 +463,6 @@ total of :- {routeLenght}
                     print('Host rate limit reached, batch size probably too big')
                     print("skipping routes")
                     continue
-                
 
                 for Pos, result in enumerate(results):
                     for pos, item in enumerate(result):
@@ -462,21 +476,20 @@ total of :- {routeLenght}
                                 USD_Value = 0
 
                             yield {
-                                'route' : SimpRoutes[Pos][pos + 2],
-                                'index' : rates[-1],
-                                'capital' : capital if not converted else capital * 1e18,
-                                'simplified' : SimpRoutes[Pos][pos],
-                                'EP' : EP if not converted else EP * 1e18, 
-                                'USD Value' : USD_Value,
+                                'route': SimpRoutes[Pos][pos + 2],
+                                'index': rates[-1],
+                                'capital': capital if not converted else capital * 1e18,
+                                'simplified': SimpRoutes[Pos][pos],
+                                'EP': EP if not converted else EP * 1e18,
+                                'USD Value': USD_Value,
                             }
 
-                print(f'                           found {found}', end = '\r')
-                step = marker * batch if marker * batch < routeLenght else routeLenght 
-                print(f'route {step} of {routeLenght}', end = '\r')
-        
+                print(f'                           found {found}', end='\r')
+                step = marker * batch if marker * batch < routeLenght else routeLenght
+                print(f'route {step} of {routeLenght}', end='\r')
 
     def screenRoutes(self, routes):
-        
+
         history = set()
         result = []
 
@@ -504,12 +517,13 @@ class Aurora(Blockchain):
         self.arbAddress = ''
         self.pollPath = os.path.join(self.dataPath, 'Aurora', 'pollResult.json')
         self.routePath = os.path.join(self.dataPath, 'Aurora', 'arbRoutes.json')
-    
+
     def __repr__(self):
         return 'Aurora Blockchain'
 
+
 class Arbitrum(Blockchain):
-    def __init__(self, url:str = 'http://127.0.0.1:8545'):
+    def __init__(self, url: str = 'http://127.0.0.1:8545'):
         super().__init__(url)
         self.source = 'https://arbiscan.io/address/'
         self.testData = ''
@@ -520,14 +534,15 @@ class Arbitrum(Blockchain):
         self.coinGeckoId = ''
         self.geckoTerminalName = 'arbitrum'
         self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath,'Arbitrum','pollResult.json')
-        self.routePath = os.path.join(self.dataPath,'Arbitrum', 'arbRoutes.json')
+        self.pollPath = os.path.join(self.dataPath, 'Arbitrum', 'pollResult.json')
+        self.routePath = os.path.join(self.dataPath, 'Arbitrum', 'arbRoutes.json')
 
     def __repr__(self):
         return 'Arbitrum Blockchain'
 
+
 class BSC(Blockchain):
-    def __init__(self, url:str = 'http://127.0.0.1:8545'):
+    def __init__(self, url: str = 'http://127.0.0.1:8545'):
         super().__init__(url)
         self.source = 'https://bscscan.com/address/'
         self.testData = ''
@@ -538,15 +553,15 @@ class BSC(Blockchain):
         self.coinGeckoId = 'binance-smart-chain'
         self.geckoTerminalName = 'bsc'
         self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath,'BSC', 'pollResult.json')
-        self.routePath = os.path.join(self.dataPath,'BSC', 'arbRoute.json')
-      
+        self.pollPath = os.path.join(self.dataPath, 'BSC', 'pollResult.json')
+        self.routePath = os.path.join(self.dataPath, 'BSC', 'arbRoute.json')
+
     def __repr__(self):
         return 'Binance SmartChain'
 
 
 class Kovan(Blockchain):
-    def __init__(self, url:str = 'http://127.0.0.1:8545'):
+    def __init__(self, url: str = 'http://127.0.0.1:8545'):
         super().__init__(url)
         self.source = ''
         self.exchanges = None
@@ -555,15 +570,15 @@ class Kovan(Blockchain):
         self.startExchanges = None
         self.coinGeckoId = ''
         self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath,'Kovan','pollResult.json')
-        self.routePath = os.path.join(self.dataPath,'Kovan', 'arbRoute.json')
-
+        self.pollPath = os.path.join(self.dataPath, 'Kovan', 'pollResult.json')
+        self.routePath = os.path.join(self.dataPath, 'Kovan', 'arbRoute.json')
 
     def __repr__(self):
-        return 'Kovan Testnet' 
+        return 'Kovan Testnet'
+
 
 class Goerli(Blockchain):
-    def __init__(self, url:str = 'http://127.0.0.1:8545'):
+    def __init__(self, url: str = 'http://127.0.0.1:8545'):
         super().__init__(url)
         self.source = ''
         self.exchanges = None
@@ -572,15 +587,15 @@ class Goerli(Blockchain):
         self.startExchanges = None
         self.coinGeckoId = ''
         self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath,'Goerli','pollResult.json')
-        self.routePath = os.path.join(self.dataPath,'Goerli', 'arbRoute.json')
-
+        self.pollPath = os.path.join(self.dataPath, 'Goerli', 'pollResult.json')
+        self.routePath = os.path.join(self.dataPath, 'Goerli', 'arbRoute.json')
 
     def __repr__(self):
-        return 'Goerli Testnet' 
+        return 'Goerli Testnet'
+
 
 class Fantom(Blockchain):
-    def __init__(self, url:str = 'http://127.0.0.1:8545'):
+    def __init__(self, url: str = 'http://127.0.0.1:8545'):
         super().__init__(url)
         self.source = ''
         self.exchanges = None
@@ -589,15 +604,15 @@ class Fantom(Blockchain):
         self.startExchanges = None
         self.coinGeckoId = ''
         self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath,'Goerli','pollResult.json')
-        self.routePath = os.path.join(self.dataPath,'Goerli', 'arbRoute.json')
-
+        self.pollPath = os.path.join(self.dataPath, 'Goerli', 'pollResult.json')
+        self.routePath = os.path.join(self.dataPath, 'Goerli', 'arbRoute.json')
 
     def __repr__(self):
-        return 'Goerli Testnet' 
- 
+        return 'Goerli Testnet'
+
+
 class Polygon(Blockchain):
-    def __init__(self, url:str = 'http://127.0.0.1:8545'):
+    def __init__(self, url: str = 'http://127.0.0.1:8545'):
         super().__init__(url)
         self.source = ''
         self.exchanges = None
@@ -606,6 +621,5 @@ class Polygon(Blockchain):
         self.startExchanges = None
         self.coinGeckoId = ''
         self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath,'Polygon','pollResult.json')
-        self.routePath = os.path.join(self.dataPath,'Polygon', 'arbRoute.json')
-
+        self.pollPath = os.path.join(self.dataPath, 'Polygon', 'pollResult.json')
+        self.routePath = os.path.join(self.dataPath, 'Polygon', 'arbRoute.json')

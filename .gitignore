@@ -1,8 +1,9 @@
-.pytest_cache
+\.pytest_cache
 \.vscode
 \build
 \data
-\env
+\reports
+\.venv310
 \__pycache__
 .env
 

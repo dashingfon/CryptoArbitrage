@@ -1,10 +1,11 @@
-#from dotenv import load_dotenv
-#from brownie import interface
-import asyncio, aiohttp
+# from dotenv import load_dotenv
+# from brownie import interface
+import asyncio
+import aiohttp
 from asyncio.proactor_events import _ProactorBasePipeTransport
 import scripts.Blockchains as Blc
 import scripts.Config as Cfg
-#import scripts.Controller as Ctr
+# import scripts.Controller as Ctr
 from scripts.utills import silence_event_loop_closed
 
 
@@ -32,12 +33,11 @@ Route = [
         "from": "USDC_2cd580d"
       }
     ]
-#config = readJson('Config.json')
+# config = readJson('Config.json')
 
 
 async def main():
     await Chain.pollRoutes()
-    
 
 
 if __name__ == '__main__':
@@ -45,18 +45,15 @@ if __name__ == '__main__':
     _ProactorBasePipeTransport.__del__ = silence_event_loop_closed(_ProactorBasePipeTransport.__del__)
     asyncio.run(main())
 
+    # load_dotenv()
 
-    #load_dotenv()
+    # chain = Blc.BSC()
 
-    #chain = Blc.BSC()
+    # ep = chain.simulateSwap(route,0.02867159537482727,prices)
+    # print(ep)
 
-    #ep = chain.simulateSwap(route,0.02867159537482727,prices)
-    #print(ep)
+    # routes = chain.getArbRoute(tokens = 'all',save = False)
+    # chain.pollRoutes(routes)
 
-    #routes = chain.getArbRoute(tokens = 'all',save = False)
-    #chain.pollRoutes(routes)
-    
-    #controller = Ctr.Controller(chain)
-    #controller.arb(amount = 3)
-
-    
+    # controller = Ctr.Controller(chain)
+    # controller.arb(amount = 3)

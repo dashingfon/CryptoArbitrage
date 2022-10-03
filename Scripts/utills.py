@@ -1,10 +1,12 @@
 from functools import wraps, lru_cache
 from datetime import timedelta, datetime
-import time, requests, json, os
+import time
+import requests
+import json
+import os
 from web3 import Web3
 from eth_abi import encode_abi
 from bs4 import BeautifulSoup
-
 
 
 def readJson(path):
@@ -16,9 +18,11 @@ def readJson(path):
         temp = {}
     return temp
 
-def writeJson(path,content):
-    with open(path,'w') as PP:
-        json.dump(content, PP, indent = 2)
+
+def writeJson(path, content):
+    with open(path, 'w') as PP:
+        json.dump(content, PP, indent=2)
+
 
 ConfigPath = r'scripts\Config.json'
 config = readJson(ConfigPath)
@@ -30,13 +34,12 @@ dodoRouter = config['Test']['dodoRouter']
 PAIR, cap = config['Test']['PAIR'], config['Test']['cap']
 fee = config['Test']['fee']
 
-'''
-This is the Ratelimited decorator used to limit requests
-'''
+
 def split_list(listA: list[dict[str, str]], n: int):
     for x in range(0, len(listA), n):
         chunk = listA[x: n + x]
         yield chunk
+
 
 def silence_event_loop_closed(func):
     @wraps(func)
@@ -56,7 +59,7 @@ def RateLimited(maxPerSecond):
         lastTimeCalled = [0.0]
 
         @wraps(func)
-        def ratelimitedFunction(*args,**kwargs):
+        def ratelimitedFunction(*args, **kwargs):
             elapsed = time.process_time_ns() - lastTimeCalled[0]
             lefttowait = mininterval - elapsed
             if lefttowait > 0:
@@ -72,62 +75,69 @@ def RateLimited(maxPerSecond):
 def isTestnet(blockchain):
     return str(blockchain)[-7:] == 'Testnet'
 
+
 def getPaths(contents):
     num = 1
     result = []
     defs = ['address[]']
     for i in contents:
         args = [i]
-        result.append(encode_abi(defs,args))
+        result.append(encode_abi(defs, args))
         print(f'address data {num} :- {Web3.toHex(encode_abi(defs,args))}')
     return result
 
-def getPayloadBytes(Map,pair):
+
+def getPayloadBytes(Map, pair):
     data = getPaths(Map[1])
 
-    defs = ['address[]','bytes[]','address','uint256','uint256']
-    args = [Map[0],data,pair,int(cap),fee]
+    defs = ['address[]', 'bytes[]', 'address', 'uint256', 'uint256']
+    args = [Map[0], data, pair, int(cap), fee]
     assert len(args[0]) == len(args[1])
 
-    DATA = Web3.toHex(encode_abi(defs,args))
+    DATA = Web3.toHex(encode_abi(defs, args))
     print(f'prepped Data :- ')
     print(DATA)
     return DATA
 
+
 def setPreparedData():
     Map = {
-        1 : [[fonswapRouter], [[T2,T3,T1,T4]]],
-        2 : [[dodoRouter,fonswapRouter], [[T2,T3,T1],[T1,T4]]],
-        3 : [[fonswapRouter,dodoRouter], [[T2,T3],[T3,T1,T4]]],
-        4 : [[dodoRouter,fonswapRouter,dodoRouter], [[T2,T3],[T3,T1],[T1,T4]]]
+        1: [[fonswapRouter], [[T2, T3, T1, T4]]],
+        2: [[dodoRouter, fonswapRouter], [[T2, T3, T1], [T1, T4]]],
+        3: [[fonswapRouter, dodoRouter], [[T2, T3], [T3, T1, T4]]],
+        4: [[dodoRouter, fonswapRouter, dodoRouter], [[T2, T3], [T3, T1], [T1, T4]]]
     }
     result = []
-    for i in range(1,5):
+    for i in range(1, 5):
         result.append(getPayloadBytes(Map[i]))
     config['Test']['PrepedSwapData'] = result
-    with open(r'scripts\Config.json','w') as CJ:
-        json.dump(config,CJ,indent = 2)
+    with open(r'scripts\Config.json', 'w') as CJ:
+        json.dump(config, CJ, indent=2)
 
-def poll(chain,route,prices):
-    print(chain.pollRoute(route = route, prices = prices))
+
+def poll(chain, route, prices):
+    print(chain.pollRoute(route=route, prices=prices))
+
 
 def sortTokens(address1, address2):
     first = str.encode(address1).hex()
     second = str.encode(address2).hex()
 
     if first > second:
-        return (address2,address1)
+        return (address2, address1)
     elif first < second:
-        return (address1,address2)
+        return (address1, address2)
     else:
         raise ValueError('addresses are the same')
 
+
 def lookupPrice(Chain):
-    lookup = Chain.lookupPrice(returns = True)
+    lookup = Chain.lookupPrice(returns=True)
     tokens = Chain.tokens
     for key, value in tokens.items():
         if value not in lookup:
             print(f'Token {key}, Address {value} not included')
+
 
 def parseEchanges(item):
     new = {}
@@ -142,12 +152,13 @@ def parseEchanges(item):
         print(f'incorrect exchange data, KeyError :- {e}')
     return new
 
+
 def extractSymbol(content):
     print('extracting symbol ...')
     try:
         soup = BeautifulSoup(content, 'html.parser')
-        placeHolder = soup.find('div',id = "ContentPlaceHolder1_tr_tokeninfo")
-        #print(placeHolder)
+        placeHolder = soup.find('div', id="ContentPlaceHolder1_tr_tokeninfo")
+        # '# 'print(placeHolder)
         raw = placeHolder.find('a').contents[-1].split('(')[-1].split(')')[0]
     except Exception as e:
         print('an error occured')
@@ -156,8 +167,9 @@ def extractSymbol(content):
         return None
     return raw
 
+
 @RateLimited(2)
-def fetch(url,session,Headers,Params):
+def fetch(url, session, Headers, Params):
     print('fetching data ...')
     attemptsAllowed = 4
     tries = 0
@@ -165,7 +177,7 @@ def fetch(url,session,Headers,Params):
 
     while tries < attemptsAllowed and not done:
         try:
-            response = session.get(url = url,headers = Headers,params = Params)
+            response = session.get(url=url, headers=Headers, params=Params)
         except ConnectionError:
             print('Error')
             time.sleep(10)
@@ -181,7 +193,8 @@ def fetch(url,session,Headers,Params):
         print(f'status code :- {response.status_code}')
         return {}
 
-def cache(content,name):
+
+def cache(content, name):
     print('caching content ...')
     tokens = {}
     exchanges = {}
@@ -189,15 +202,16 @@ def cache(content,name):
     for i in content['included']:
         if i['type'] == 'dex':
             exchanges[i['id']] = i['attributes']['identifier']
-        elif i['type'] == 'token' :
+        elif i['type'] == 'token':
             tokens[i['id']] = {'symbol': i['attributes']['symbol'],
-                            'address' : i['attributes']['address']}
+                               'address': i['attributes']['address']}
         elif i['type'] == 'network':
             assert i['attributes']['identifier'] == name
 
-    return (tokens,exchanges)
+    return (tokens, exchanges)
 
-def trim_and_map(blockchain, tokens, exchanges, minSwaps = 3):
+
+def trim_and_map(blockchain, tokens, exchanges, minSwaps=3):
     print('trimming and mapping ...')
     exchanges = parseEchanges(exchanges)
     assert exchanges
@@ -229,10 +243,10 @@ def trim_and_map(blockchain, tokens, exchanges, minSwaps = 3):
         elif token not in checked and token not in ignore:
             address = tokens[token]
             froResponse = fetch(
-                    blockchain.source + address,session,blockchain.headers,{})
+                    blockchain.source + address, session, blockchain.headers, {})
             assert froResponse, "Empty response returned"
             froSymbol = extractSymbol(froResponse.text)
-            if not froSymbol: 
+            if not froSymbol:
                 ignore.add(token)
                 continue
             froSymbol = f'{froSymbol}_{address[-7:]}'
@@ -250,7 +264,7 @@ def trim_and_map(blockchain, tokens, exchanges, minSwaps = 3):
             token1 = tokens[1] if tokens[1] not in remappingsResult else remappingsResult[tokens[1]]
 
             if via not in exchangesResult:
-                exchangesResult[via] = {'pairs' : {},'router' : '','factory' : ''}
+                exchangesResult[via] = {'pairs': {}, 'router': '', 'factory': ''}
             exchangesResult[via]['pairs'][f'{token0} - {token1}'] = value
 
     finalExchangeCount = 0
@@ -258,40 +272,41 @@ def trim_and_map(blockchain, tokens, exchanges, minSwaps = 3):
         finalExchangeCount += len(val['pairs'])
 
     return {
-        'MetaData' : {
-            'TokenCount' : {
-                'initial' : initialTokens,
-                'final' : len(tokensResult)
+        'MetaData': {
+            'TokenCount': {
+                'initial': initialTokens,
+                'final': len(tokensResult)
             },
-            'PairsCount' : {
-                'initial' : initialExchangeCount,
-                'final' : finalExchangeCount
+            'PairsCount': {
+                'initial': initialExchangeCount,
+                'final': finalExchangeCount
             },
-            'SwapsPerToken' : swapsCount/initialTokens,
-            'Distribution' : distribution
+            'SwapsPerToken': swapsCount/initialTokens,
+            'Distribution': distribution
         },
         'Data': {
-            "TokensRemappings": remappingsResult, 
-            "Tokens": tokensResult, 
-            "Exchanges": exchangesResult }
+            "TokensRemappings": remappingsResult,
+            "Tokens": tokensResult,
+            "Exchanges": exchangesResult}
         }
 
-def buildData(blockchain, minLiquidity = 300000, saveArtifact = False):
+
+def buildData(blockchain, minLiquidity=300000, saveArtifact=False):
     print(f'building {str(blockchain)} Data ...\n')
     tokens, exchanges = {}, {}
-    filePath = os.path.join(blockchain.dataPath,'dataDump.json')
-    artifactPath = os.path.join(blockchain.dataPath,'artifactDump.json')
+    filePath = os.path.join(blockchain.dataPath, 'dataDump.json')
+    artifactPath = os.path.join(blockchain.dataPath, 'artifactDump.json')
     url = f'https://app.geckoterminal.com/api/p1/{blockchain.geckoTerminalName}/pools?include=dex%2Cdex.network%2Cdex.network.network_metric%2Ctokens&page=1&items=100'
     page = 1
-    session= requests.Session()
+    session = requests.Session()
 
     Done = False
     while not Done:
         print(f"Page {page} ...")
-        raw = fetch(url,session,{},{})
-        assert raw,"Fetched Data is empty..."
+        raw = fetch(url, session, {}, {})
+        assert raw, "Fetched Data is empty..."
         data = raw.json()
-        tokenCache, exchangeCache = cache(data,blockchain.geckoTerminalName)
+        tokenCache, exchangeCache = cache(data, blockchain.geckoTerminalName)
 
         for item in data['data']:
             assert item['type'] == 'pool'
@@ -308,42 +323,42 @@ def buildData(blockchain, minLiquidity = 300000, saveArtifact = False):
                 if exchangeCache[dex] not in exchanges:
                     exchanges[exchangeCache[dex]] = {
                         'pairs': {},
-                        'router' : '',
-                        'factory' : ''
+                        'router': '',
+                        'factory': ''
                     }
                 exchanges[exchangeCache[dex]]['pairs'][' - '.join(Ts)] = item['attributes']['address']
-                
+
         if data['links']['next']:
             url = data['links']['next']
             page += 1
-        else: 
+        else:
             Done = True
             print('Done')
 
     if saveArtifact:
-        writeJson(artifactPath,{
-            "MetaData" : {
-            'datetime' : time.ctime(),
-            'blockchain' : str(blockchain),
-        },
-        "Data" : {'tokens' : tokens,
-            'exchanges' : exchanges},
-            
-        })
+        writeJson(artifactPath, {
+            "MetaData": {
+                'datetime': time.ctime(),
+                'blockchain': str(blockchain),
+            },
+            "Data": {'tokens': tokens,
+                     'exchanges': exchanges},
+            })
 
-    result = trim_and_map(blockchain,tokens,exchanges)
+    result = trim_and_map(blockchain, tokens, exchanges)
 
-    writeJson(filePath,{
-        "MetaData" : {
-            'datetime' : time.ctime(),
-            'blockchain' : str(blockchain),
-            'minimunLiquidity' : minLiquidity,
+    writeJson(filePath, {
+        "MetaData": {
+            'datetime': time.ctime(),
+            'blockchain': str(blockchain),
+            'minimunLiquidity': minLiquidity,
             **result['MetaData']
         },
-        "Data" : result['Data'],
+        "Data": result['Data'],
         })
 
-def setExchangesData(chain,dumpPath,existingExchange,temp = True):
+
+def setExchangesData(chain, dumpPath, existingExchange, temp=True):
     dump = readJson(dumpPath)['Data']
     result = {}
     for key in dump['Exchanges'].keys():
@@ -352,12 +367,9 @@ def setExchangesData(chain,dumpPath,existingExchange,temp = True):
             result[key]['pairs'] = dump['Exchanges'][key]['pairs']
         else:
             result[key] = dump['Exchanges'][key]
-    
+
     dump['Exchanges'] = result
     config[str(chain)] = dump
 
     Path = ConfigPath if not temp else r'temp.json'
-    writeJson(Path,config)
-
-
-
+    writeJson(Path, config)
