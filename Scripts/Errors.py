@@ -1,4 +1,4 @@
-'''Errors module containing all the errors definition'''
+'''Module containing all the Errors definition'''
 
 
 class InvalidTokensArgument(Exception):
@@ -18,4 +18,8 @@ class ErrorExtractingPrice(Exception):
 
 
 class InvalidBlockchainObject(Exception):
+    pass
+
+
+class PollingRuntimeError(Exception):
     pass

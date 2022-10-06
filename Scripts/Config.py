@@ -63,7 +63,7 @@ OPTIONS = [
     'factory' : factory,
     'routers' : [fonswapRouter,dodoRouter,dodoRouter,fonswapRouter],
     'fee' : fee},
-    
+
     {'tokens' : {'TST1' : T1,'TST2' : T2,'TST3' : T3,'TST4' : T4},
     'pair' : PAIR,
     'out' : f,
@@ -132,8 +132,8 @@ AuroraTokens = {
 AuroraStartTokens = ['USDT', 'USDC', 'NEAR', 'WETH']
 AuroraStartExchanges = ['dodo']
 AuroraExchanges = {
-    'trisolaris' : {
-        'pairs' : {
+    'trisolaris': {
+        'pairs': {
         frozenset(('AURORA', 'WETH')) : '0x5eeC60F348cB1D661E4A5122CF4638c7DB7A886e',
         frozenset(('NEAR', 'WETH')) : '0x63da4DB6Ef4e7C62168aB03982399F9588fCd198',
         frozenset(('NEAR', 'USDC')) : '0x20F8AeFB5697B77E0BB835A8518BE70775cdA1b0',
@@ -287,7 +287,7 @@ AuroraTestData = {
 # BSC Network
 
 BSCTokens = config["Binance SmartChain"]['Tokens']
-BSCStartTokens = ['BSC-USD','WBNB']
+BSCStartTokens = ['BSC-USD_3197955','WBNB_3bc095c']
 BSCStartExchanges = ['pancakeswap', 'sushiswap', 'mdex','biswap','apeswap','babyswap','fstswap']
 BSCExchanges = parseEchanges(config["Binance SmartChain"]['Exchanges'])
 

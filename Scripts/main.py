@@ -1,48 +1,36 @@
+import pathlib
+import logging
+import logging.config
+import asyncio
+from asyncio.proactor_events import _ProactorBasePipeTransport
 # from dotenv import load_dotenv
 # from brownie import interface
-import asyncio
-import aiohttp
-from asyncio.proactor_events import _ProactorBasePipeTransport
+
+
 import scripts.Blockchains as Blc
-import scripts.Config as Cfg
+# import scripts.Config as Cfg
 # import scripts.Controller as Ctr
 from scripts.utills import silence_event_loop_closed
 
-
-exchanges = Cfg.BSCExchanges
+path = pathlib.PurePath(__file__).parent.parent
+logging.config.fileConfig(str(path.joinpath("logging.conf")))
 Chain = Blc.BSC()
-Route = [
-      {
-        "from": "WBNB_3bc095c",
-        "to": "BSC-USD_3197955",
-        "via": "pancakeswap_v2"
-      },
-      {
-        "to": "BUSD_d087d56",
-        "via": "pancakeswap_v2",
-        "from": "BSC-USD_3197955"
-      },
-      {
-        "to": "USDC_2cd580d",
-        "via": "pancakeswap_v2",
-        "from": "BUSD_d087d56"
-      },
-      {
-        "to": "WBNB_3bc095c",
-        "via": "pancakeswap_v2",
-        "from": "USDC_2cd580d"
-      }
-    ]
+
 # config = readJson('Config.json')
 
 
 async def main():
-    await Chain.pollRoutes()
+
+    _ProactorBasePipeTransport.__del__ = silence_event_loop_closed(
+        _ProactorBasePipeTransport.__del__)
+
+    routes = Chain.getArbRoute(tokens='default', save=False)
+    print(len(routes))
+    await Chain.pollRoutes(batch=10, routes=routes)
 
 
 if __name__ == '__main__':
 
-    _ProactorBasePipeTransport.__del__ = silence_event_loop_closed(_ProactorBasePipeTransport.__del__)
     asyncio.run(main())
 
     # load_dotenv()

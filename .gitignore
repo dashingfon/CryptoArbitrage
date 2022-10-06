@@ -1,5 +1,5 @@
 \.pytest_cache
-\.vscode
+\.mypy_cache
 \build
 \data
 \reports

@@ -1,17 +1,26 @@
-# The controller class that prepares and executes arbs
+'''The controller class that prepares and executes arbs'''
 import scripts.Config as Cfg
 import scripts.Errors as errors
 from scripts.utills import sortTokens, isTestnet
+import scripts.Models as models
 
 import os
 from eth_abi import encode_abi
 from web3 import Web3
 import attr
+import logging
+from typing import Type
+
+log = logging.getLogger()
 
 
 @attr.s
 class Controller():
-    def __init__(self, blockchain):
+
+    def __attrs_post_init__(self) -> None:
+        self.simplyfied = self.simplyfy(self.swaps)
+
+    def __init__(self, blockchain: Type[models.BaseBlockchain]) -> None:
         self.blockchainMap = Cfg.ControllerBlockchains
         if str(blockchain) in self.blockchainMap:
             self.blockchain = blockchain
@@ -64,7 +73,7 @@ class Controller():
                     history.add(routes[0])
                     history.add(routes[1])
                     if item['EP'] > 0:
-                        yield {'route' : routes[2],'simplified' : routes[0],'EP' : item['EP'],'capital' : item['capital']}
+                        yield {'route' : routes[2],'simplified' : routes[0],'EP' : item['EP'],'capital' : item['capital']}  # noqa: E501
 
     '''
     '''def check(self, route):
@@ -73,7 +82,7 @@ class Controller():
     def getProspect(self, Routes):
         for item in Routes:
             simplyfied = self.blockchain.simplyfy(item['route'])
-            if 'EP' in item and item['EP']/item['capital'] >= self.optimalAmount:
+            if 'EP' in item and item['EP']/item['capital'] >= self.optimalAmount:  # noqa: E501
                 item['EP'] *= 1e18
                 item['capital'] *= 1e18
                 item['simplified'] = simplyfied[0]
@@ -142,7 +151,7 @@ class Controller():
             values['pair'] = options['pair']
         else:
             values['pair'] = self.blockchain.exchanges[
-                item['route'][0]['via']]['pairs'][frozenset((names[0], names[1]))]
+                item['route'][0]['via']]['pairs'][frozenset((names[0], names[1]))]  # noqa: E501
 
         if 'factory' in options:
             values['factory'] = options['factory']

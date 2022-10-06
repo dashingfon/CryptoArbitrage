@@ -1,7 +1,7 @@
-from functools import wraps, lru_cache
-from datetime import timedelta, datetime
+from functools import wraps  # , lru_cache
+# from datetime import timedelta, datetime
 import time
-import requests
+# import requests
 import json
 import os
 from web3 import Web3
@@ -39,6 +39,17 @@ def split_list(listA: list[dict[str, str]], n: int):
     for x in range(0, len(listA), n):
         chunk = listA[x: n + x]
         yield chunk
+
+
+def split_list2(lit: list, curr: int = 0, gap: int = 1):
+    lenght = len(lit)
+    curr = 0
+    mark = curr + gap
+
+    while curr < lenght:
+        yield lit[curr:mark]
+        curr = mark
+        mark = mark * 2
 
 
 def silence_event_loop_closed(func):
@@ -95,7 +106,7 @@ def getPayloadBytes(Map, pair):
     assert len(args[0]) == len(args[1])
 
     DATA = Web3.toHex(encode_abi(defs, args))
-    print(f'prepped Data :- ')
+    print('prepped Data :- ')
     print(DATA)
     return DATA
 
@@ -105,7 +116,8 @@ def setPreparedData():
         1: [[fonswapRouter], [[T2, T3, T1, T4]]],
         2: [[dodoRouter, fonswapRouter], [[T2, T3, T1], [T1, T4]]],
         3: [[fonswapRouter, dodoRouter], [[T2, T3], [T3, T1, T4]]],
-        4: [[dodoRouter, fonswapRouter, dodoRouter], [[T2, T3], [T3, T1], [T1, T4]]]
+        4: [[dodoRouter, fonswapRouter, dodoRouter],
+            [[T2, T3], [T3, T1], [T1, T4]]]
     }
     result = []
     for i in range(1, 5):
@@ -243,7 +255,7 @@ def trim_and_map(blockchain, tokens, exchanges, minSwaps=3):
         elif token not in checked and token not in ignore:
             address = tokens[token]
             froResponse = fetch(
-                    blockchain.source + address, session, blockchain.headers, {})
+                    blockchain.source + address, session, blockchain.headers, {})  # noqa: E501
             assert froResponse, "Empty response returned"
             froSymbol = extractSymbol(froResponse.text)
             if not froSymbol:
@@ -260,11 +272,11 @@ def trim_and_map(blockchain, tokens, exchanges, minSwaps=3):
             tokens = list(key)
             if tokens[0] in ignore or tokens[1] in ignore:
                 continue
-            token0 = tokens[0] if tokens[0] not in remappingsResult else remappingsResult[tokens[0]]
-            token1 = tokens[1] if tokens[1] not in remappingsResult else remappingsResult[tokens[1]]
+            token0 = tokens[0] if tokens[0] not in remappingsResult else remappingsResult[tokens[0]]  # noqa: E501
+            token1 = tokens[1] if tokens[1] not in remappingsResult else remappingsResult[tokens[1]]  # noqa: E501
 
             if via not in exchangesResult:
-                exchangesResult[via] = {'pairs': {}, 'router': '', 'factory': ''}
+                exchangesResult[via] = {'pairs': {}, 'router': '', 'factory': ''}  # noqa: E501
             exchangesResult[via]['pairs'][f'{token0} - {token1}'] = value
 
     finalExchangeCount = 0
@@ -296,7 +308,7 @@ def buildData(blockchain, minLiquidity=300000, saveArtifact=False):
     tokens, exchanges = {}, {}
     filePath = os.path.join(blockchain.dataPath, 'dataDump.json')
     artifactPath = os.path.join(blockchain.dataPath, 'artifactDump.json')
-    url = f'https://app.geckoterminal.com/api/p1/{blockchain.geckoTerminalName}/pools?include=dex%2Cdex.network%2Cdex.network.network_metric%2Ctokens&page=1&items=100'
+    url = f'https://app.geckoterminal.com/api/p1/{blockchain.geckoTerminalName}/pools?include=dex%2Cdex.network%2Cdex.network.network_metric%2Ctokens&page=1&items=100'  # noqa: E501
     page = 1
     session = requests.Session()
 
@@ -315,7 +327,7 @@ def buildData(blockchain, minLiquidity=300000, saveArtifact=False):
                 rel = item['relationships']
                 for i in rel['tokens']['data']:
                     assert i['type'] == 'token'
-                    symbol = f"{tokenCache[i['id']]['symbol']}_{tokenCache[i['id']]['address'][-7:]}"
+                    symbol = f"{tokenCache[i['id']]['symbol']}_{tokenCache[i['id']]['address'][-7:]}"  # noqa: E501
                     tokens[symbol] = tokenCache[i['id']]['address']
                     Ts.append(symbol)
 
@@ -326,7 +338,7 @@ def buildData(blockchain, minLiquidity=300000, saveArtifact=False):
                         'router': '',
                         'factory': ''
                     }
-                exchanges[exchangeCache[dex]]['pairs'][' - '.join(Ts)] = item['attributes']['address']
+                exchanges[exchangeCache[dex]]['pairs'][' - '.join(Ts)] = item['attributes']['address']  # noqa: E501
 
         if data['links']['next']:
             url = data['links']['next']
