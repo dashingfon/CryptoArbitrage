@@ -5,27 +5,54 @@ Crypto Arbitrage is an arbitrage bot that spots the price discrepancies accross 
 CryptoArbitrage implement flash loans to maximize the potential profit
 
 
+## Initialization
+
+To begin, deploy the arb contract
+
+```python
+
+import brownie
+
+def deploy():
+    pass
+
+def main():
+    pass
+
+```
 ## Basic Usage
+
+After deploying the arbitrage contract
+
 
 *main.py*
 ```python
+
+ # to import the reauired classes and modules
 
 import scripts.Blockchains as Blc
 import scripts.Controller as Ctr
 import asyncio
 
-'''
-please note for windows you can suppress the proactor event loop closed error with
+```
 
-'
+*Note:* 
+For windows you can suppress the proactor event loop closed error with
+
+```python
+
 from asyncio.proactor_events import _ProactorBasePipeTransport
 from scripts.utills import silence_event_loop_closed
+
 _ProactorBasePipeTransport.__del__ = silence_event_loop_closed(
     _ProactorBasePipeTransport.__del__)
-'
-'''
 
-# The main function
+```
+
+To poll the routes and execute any profitable swaps
+
+*main.py*
+```python
 
 async def main():
 
@@ -33,7 +60,10 @@ async def main():
     Chain = Blc.BSC(url)
     Controller = Ctr(Chain)
 
-    await Controller.arb()
+    await Controller.arb(amount = 5)
+    
+    # This executes the first five arbitrage trades found
+    # default is set to 10
 
 
 if __name__ == '__main__':
@@ -45,15 +75,15 @@ To just poll the routes without making any trades
 
 *main.py*
 ```python
-# importing the required classes
 
 import scripts.Blockchains as Blc
 
-# The main function
 async def main():
-    await Blc.BSC().pollRoutes()
-    # it will generate a poll report file in the data folder
-
+    pollResult = await Blc.BSC().pollRoutes(save=False)
+    print(pollResult)
+    
+    # this polls the routes and returns the result in json
+    # it will generate a pollReport file in the data folder if save=True
 
 if __name__ == '__main__':
     asyncio.run(main())
@@ -68,8 +98,3 @@ if __name__ == '__main__':
 <img align="left" width="26px" src="https://img.shields.io/badge/GIT-E44C30?style=for-the-badge&logo=git&logoColor=white"/>
 
 
-
-
-[^note]:
-    Named footnotes will still render with numbers instead of the text but allow easier identification and linking.  
-    This footnote also has been made with a different syntax using 4 spaces for new lines.

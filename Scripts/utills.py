@@ -41,16 +41,43 @@ def split_list(listA: list[dict[str, str]], n: int):
         yield chunk
 
 
-def split_list2(lit: list, curr: int = 0, gap: int = 1):
-    lenght = len(lit)
-    curr = 0
-    mark = curr + gap
+def extractTokensFromHtml(content, tokens)
+    assert content, 'Empty content returned'
+        assert tokens, 'Empty tokens returned'
 
-    while curr < lenght:
-        yield lit[curr:mark]
-        curr = mark
-        mark = mark * 2
+        price = {}
+        soup = BeautifulSoup(content, 'html.parser')
 
+        tokensList = soup.find_all('li', class_='list-custom')
+        # print(tokensList)
+        done1, done2, slider = False, False, 0
+
+        while (not done1 or not done2) and slider < len(tokensList):
+            try:
+                raw = tokensList[slider].find(class_='list-amount').string
+                rawPrice = str(raw).split()
+                symbol = rawPrice[1]
+                amount = float(rawPrice[0].replace(',', ''))
+
+                if symbol == tokens['from'][:-8]:
+                    done1 = True
+                    price[tokens['from']] = amount
+                elif symbol == tokens['to'][:-8]:
+                    done2 = True
+                    price[tokens['to']] = amount
+
+            except (IndexError, ValueError) as e:
+                print(f'Error parsing item {raw}, error :- {e}')
+
+            except AttributeError as e:
+                msg = tokensList[slider].find(class_='list-amount')
+                print(f"Error parsing item {msg}, error :- {e}")
+
+            finally:
+                slider += 1
+
+        assert len(price) == 2, f'price :- {price}\n content :- {content}\n'
+        return price
 
 def silence_event_loop_closed(func):
     @wraps(func)

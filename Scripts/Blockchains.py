@@ -5,10 +5,16 @@ which other Blockchains then inherit from
 '''
   
 import scripts.Errors as errors
-from scripts.Utills import isTestnet, readJson, writeJson
+from scripts.Utills import (
+    isTestnet,
+    readJson,
+    writeJson,
+    extractTokensFromHtml
+    )
 import scripts.Models as models
 from scripts.Database import SQLModel, create_engine, Session, select
 
+import abc
 import time
 import os
 import asyncio
@@ -166,16 +172,14 @@ class Blockchain(models.BaseBlockchain):
     def routesFromDatabase(self, selection, where):
         pass
 
-    def getArbRoute(self, tokens: list[models.Token] = [],
+    def getArbRoute(self, tokens: Optional[list[models.Token]] = [],
                     exchanges: list = [],
                     graph=True, save=True, screen=True) -> Optional[list]:
 
         '''
         The method the produces and optionally saves the Arb routes
         '''
-
         routes = []
-
         if graph:
             self.buildGraph()
 
@@ -183,15 +187,9 @@ class Blockchain(models.BaseBlockchain):
 
         if not tokens:
             tokens = list(self.graph.keys())
-        else:
-            raise errors.InvalidTokensArgument(
-                f'invalid token argument {tokens}')
 
         if not exchanges:
             exchanges = list(self.exchanges.keys())
-        else:
-            raise errors.InvalidExchangesArgument(
-                f'invalid exchange argument {exchanges}')
 
         for token in tokens:
             routes += self.DLS(token, exchanges)
@@ -203,14 +201,6 @@ class Blockchain(models.BaseBlockchain):
             self.routesToDatabase(routes=routes)
         else:
             return routes
-
-    def getRate(self, price, to, fro) -> float:
-        if (to not in price) or (fro not in price):
-            raise errors.IncompletePrice(
-                f'token {to} and {fro} not in {price}')
-
-        # return self.r1 * price[to]/(1 + (self.impact * self.r1)) / price[fro]
-        return self.r1 * price[to] / price[fro]
 
     @staticmethod
     def cumSum(listItem: list) -> list:
@@ -226,6 +216,9 @@ class Blockchain(models.BaseBlockchain):
         rates = [[], []]
         liquidity = []
 
+        getRate: Callable = lambda price, to, fro: self.r1 * price[to] / price[fro]
+        # return self.r1 * price[to]/(1 + (self.impact * self.r1)) / price[fro]
+
         if prices:
             assert len(prices) == len(route)
         else:
@@ -234,8 +227,8 @@ class Blockchain(models.BaseBlockchain):
         simplified = self.simplyfy(route)
         for index, swap in enumerate(route):
             price = prices[index]
-            rate = (self.getRate(price, swap['to'], swap['from']),
-                    self.getRate(price, swap['from'], swap['to']))
+            rate = (getRate(price, swap['to'], swap['from']),
+                    getRate(price, swap['from'], swap['to']))
 
             if index == 0:
                 liquidity.append(price[swap['from']])
@@ -283,45 +276,6 @@ class Blockchain(models.BaseBlockchain):
         if returns:
             return {**temp, **prices}
 
-    @staticmethod
-    def extract(content, tokens):
-        assert content, 'Empty content returned'
-        assert tokens, 'Empty tokens returned'
-
-        price = {}
-        soup = BeautifulSoup(content, 'html.parser')
-
-        tokensList = soup.find_all('li', class_='list-custom')
-        # print(tokensList)
-        done1, done2, slider = False, False, 0
-
-        while (not done1 or not done2) and slider < len(tokensList):
-            try:
-                raw = tokensList[slider].find(class_='list-amount').string
-                rawPrice = str(raw).split()
-                symbol = rawPrice[1]
-                amount = float(rawPrice[0].replace(',', ''))
-
-                if symbol == tokens['from'][:-8]:
-                    done1 = True
-                    price[tokens['from']] = amount
-                elif symbol == tokens['to'][:-8]:
-                    done2 = True
-                    price[tokens['to']] = amount
-
-            except (IndexError, ValueError) as e:
-                print(f'Error parsing item {raw}, error :- {e}')
-
-            except AttributeError as e:
-                msg = tokensList[slider].find(class_='list-amount')
-                print(f"Error parsing item {msg}, error :- {e}")
-
-            finally:
-                slider += 1
-
-        assert len(price) == 2, f'price :- {price}\n content :- {content}\n'
-        return price
-
     async def getPrices(self, route, session) -> list:
         form: Callable[[Any], Any] = lambda i: [self.exchanges[i['via']]['pairs'][frozenset([i['from'], i['to']])], i, i['via']]  # noqa: E501
         tasks = [asyncio.create_task(self.getPrice(session, *form(i))) for i in route]  # noqa: E501
@@ -331,37 +285,16 @@ class Blockchain(models.BaseBlockchain):
     async def getPrice(self, session, addr, swap, exchange) -> Optional[dict]:
         retries: int = 3
         price: Optional[dict[str, str]] = {}
-        Done: bool = False
-
-        while retries > 0 and not Done:
-            try:
-                url = self.source + addr
-                async with Limiter:
-                    async with session.get(url, headers=self.headers, ssl=False) as response:  # noqa
-                        if response.status == 200:
-                            price = self.extract(await response.text(), swap)
-                        else:
-                            print(f'failed request, exchange :- {exchange}, pairs :- {swap}')
-                            break
-            except aiohttp.ServerDisconnectedError as e:
-                print(f"Oops, the server connection was dropped before we finished :- {e}")
-                await asyncio.sleep(1)
-                retries -= 1
-            except aiohttp.ClientConnectionError as e:
-                print(f"Oops, the connection was dropped before we finished :- {e}")
-                await asyncio.sleep(1)
-                retries -= 1
-            except aiohttp.ClientError as e:
-                print(f"Oops, something else went wrong with the request :- {e}")
-                await asyncio.sleep(1)
-                retries -= 1
-            else:
-                Done = True
-
-        if not Done:
-            raise errors.ErrorExtractingPrice(
-                'failed to get the price')
-
+        
+        url = self.source + addr
+        async with Limiter:
+            async with session.get(url, headers=self.headers, ssl=False) as response:  # noqa
+                if response.status == 200:
+                    price = extractTokensFromHtml(await response.text(), swap)
+                else:
+                    print(f'failed request, exchange :- {exchange}, pairs :- {swap}')
+                    break
+            
         return price
 
     @Cache
@@ -406,26 +339,30 @@ total of :- {routeLenght}
         routesGen = self.genRoutes(routes=routes, value=value,
                                    currentPrice=currentPrice)
 
-        while True:
+        Done = False
+
+        while not Done:
             try:
                 result.append(await anext(routesGen))
             except StopAsyncIteration:
-                break
+                Done = True
             except KeyboardInterrupt:
                 print('\n interupted, exiting and saving')
-            finally:
-                export = sorted(result, key=lambda v: v['USD Value'],
-                                reverse=True)
-            if save:
-                writeJson(self.pollPath,
-                          {'MetaData': {
-                            'time': time.ctime(),
-                            'total': routeLenght,
-                            'routeInfo': routeInfo
-                            },
-                           'Data': export})
-            else:
-                return export
+                Done = True
+        
+        export = sorted(result, key=lambda v: v['USD Value'],
+                        reverse=True)
+
+        if save:
+            writeJson(self.pollPath,
+                        {'MetaData': {
+                        'time': time.ctime(),
+                        'total': routeLenght,
+                        'routeInfo': routeInfo
+                        },
+                        'Data': export})
+        else:
+            return export
 
     async def genRoutes(self, routes: Optional[list[models.Route]] = [],
                         value: float = 1.009027027,
@@ -473,10 +410,13 @@ total of :- {routeLenght}
                         except AssertionError:
                             log.exception('Error polling route')
                             Done = True
+                        except Exception:
+                            log.exception('Fatal Error')
+                            Done = True
 
                 except StopIteration:
                     log.info('Done polling tasks')
-                    break
+                    Done = True
 
                 for Pos, result in enumerate(results):
                     for pos, item in enumerate(result):

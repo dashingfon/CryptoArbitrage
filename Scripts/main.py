@@ -25,11 +25,5 @@ async def main():
 
 
 if __name__ == '__main__':
-
     asyncio.run(main())
 
-    # ep = chain.simulateSwap(route,0.02867159537482727,prices)
-    # print(ep)
-
-    # controller = Ctr.Controller(chain)
-    # controller.arb(amount = 3)

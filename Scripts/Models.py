@@ -13,12 +13,12 @@ class Token:
     '''Token class'''
     name: str = attr.ib(repr=False)
     address: str = attr.ib(repr=False)
-    join: str = attr.ib()
+    shortjoin: str = attr.ib(init=False)
+    fulljoin: str = attr.ib(init=False, repr=False)
 
-    @classmethod
-    def from_name_and_address(cls, name, address) -> 'Token':
-        join = f'{name}_{address[-7:]}'
-        return cls(name, address, join)
+    def __attrs_post_init__(self) -> None:
+        self.shortJoin = f'{name}_{address[-7:]}'
+        self.fullJoin = f'{name}_{address}'
 
     '''def __attrs_post_init__(self) -> None:
         self.join = f"{self.name}_{self.address[-7:]}"'''
@@ -44,7 +44,7 @@ class Route:
     '''Route class'''
     swaps: list[dict[str, Token]] = attr.ib(repr=False)
     prices: list[Optional[dict[str, str]]] = attr.ib(repr=False, factory=list)
-    simplyfied: str = attr.ib(init=False)
+    simplyfied: str = attr.ib(init=False, repr=False)
     simplyfied_short: str = attr.ib(init=False)
     index: float = attr.ib(repr=False, default=0)
     capital: float = attr.ib(repr=False, default=0)
@@ -69,11 +69,18 @@ class Route:
             result.append(load)
         return result
 
-    def simplyfy(self) -> str:
+    def simplyfy(self, mode: str = 'long') -> str:
         '''function to generate a tring repreentation from the wap attribute'''
+        match mode:
+            case 'long':
+                break
+            case 'short':
+                break
+
         result = [f"{self.swaps[0]['from']} {self.swaps[0]['to']} {self.swaps[0]['via']}"]  # noqa: E501
         for j in self.swaps[1:]:
             result.append(f"{j['from']} {j['to']} {j['via']}")
+        
         return ' - '.join(result)
 
     @classmethod

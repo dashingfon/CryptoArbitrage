@@ -263,7 +263,8 @@
         "factory": "0x0eb58E5c8aA63314ff5547289185cC4583DfCBD5",
         "fee": 99700
       }
-    }
+    },
+    "ArbContractAddress" : ""
   },
   "Aurora Blockchain": {
     "Tokens": {},
