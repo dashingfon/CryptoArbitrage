@@ -18,7 +18,7 @@ log = logging.getLogger()
 class Controller():
 
     def __attrs_post_init__(self) -> None:
-        self.simplyfied = self.simplyfy(self.swaps)
+        pass
 
     def __init__(self, blockchain: Type[models.BaseBlockchain]) -> None:
         self.blockchainMap = Cfg.ControllerBlockchains

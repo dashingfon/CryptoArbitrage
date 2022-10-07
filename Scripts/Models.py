@@ -1,39 +1,51 @@
+'''Model module containing the extra data type'''
+
 from abc import ABC, abstractmethod
 from typing import Optional, Any, AsyncGenerator
 from sqlmodel import Field, SQLModel
 from cache import AsyncTTL
 import attr
+import logging
 
 
 @attr.s(slots=True, frozen=True)
 class Token:
+    '''Token class'''
     name: str = attr.ib(repr=False)
     address: str = attr.ib(repr=False)
-    join: str = attr.ib(init=False)
+    join: str = attr.ib()
 
-    def __attrs_post_init__(self) -> None:
-        pass
+    @classmethod
+    def from_name_and_address(cls, name, address) -> 'Token':
+        join = f'{name}_{address[-7:]}'
+        return cls(name, address, join)
+
+    '''def __attrs_post_init__(self) -> None:
+        self.join = f"{self.name}_{self.address[-7:]}"'''
 
 
-class RouteModel(SQLModel):
+class Routes(SQLModel, table=True):
+    '''Route Model class'''
     id: Optional[int] = Field(default=None, primary_key=True)
     simplyfied_Sht: str = Field()
     simplyfied_full: str = Field()
     startToken: str = Field(index=True)
     startExchanges: str = Field(index=True)
     amountOfSwaps: int = Field(index=True)
-    index: float = Field()
-    capital: float = Field()
-    EP: float = Field()
-    USD_Value: float = Field()
-    time: float = Field()
+    time: float = Field(index=True)
+
+    @classmethod
+    def fromString(cls, string):
+        pass
 
 
 @attr.s(slots=True)
 class Route:
+    '''Route class'''
     swaps: list[dict[str, Token]] = attr.ib(repr=False)
     prices: list[Optional[dict[str, str]]] = attr.ib(repr=False, factory=list)
     simplyfied: str = attr.ib(init=False)
+    simplyfied_short: str = attr.ib(init=False)
     index: float = attr.ib(repr=False, default=0)
     capital: float = attr.ib(repr=False, default=0)
     EP: float = attr.ib(repr=False, default=0)
@@ -41,8 +53,10 @@ class Route:
 
     def __attrs_post_init__(self) -> None:
         self.simplyfied = self.simplyfy()
+        self.simplyfied_short
 
     def assemble(self) -> list[dict[str, Token]]:
+        '''function to aemble the swap atribute from string'''
         result = []
         routeList = self.simplyfied.split(' - ')
         for item in routeList:
@@ -56,6 +70,7 @@ class Route:
         return result
 
     def simplyfy(self) -> str:
+        '''function to generate a tring repreentation from the wap attribute'''
         result = [f"{self.swaps[0]['from']} {self.swaps[0]['to']} {self.swaps[0]['via']}"]  # noqa: E501
         for j in self.swaps[1:]:
             result.append(f"{j['from']} {j['to']} {j['via']}")
@@ -74,14 +89,14 @@ class Route:
     def fromFullString(cls, string: str) -> 'Route':
         pass
 
-    def toModel(self) -> RouteModel:
-        pass
-
     def convert(self) -> None:
         pass
 
 
 class BaseBlockchain(ABC):
+    '''Base blockchain implementation'''
+    url: str
+    arbAddress: str
 
     @abstractmethod
     async def genRoutes(self, **kwargs: Any) -> AsyncGenerator:  # type ignore
@@ -95,6 +110,7 @@ class BaseBlockchain(ABC):
 
 
 class Spliter:
+    '''iterator class for spliting a list into batches'''
     def __init__(self, items: list, cache: AsyncTTL,
                  start: int = 0, gap: int = 1) -> None:
 
@@ -102,6 +118,9 @@ class Spliter:
         self.items: list = items
         self.start: int = start
         self.end: int = self.start + gap
+
+        logging.info(f'Spliter class; List lenght :- {len(self.items)}')
+        logging.info(f'start :- {start} gap :- {gap}')
 
     def __iter__(self) -> 'Spliter':
         return self
@@ -120,6 +139,8 @@ class Spliter:
                 gap = cacheLenght // 3
             elif 12 <= cacheLenght <= 30 and gap > cacheLenght // 2:
                 gap = cacheLenght // 2
+
+            logging.info(f'gap :- {gap} start :- {start}')
 
             self.start += gap
             self.end = self.start + gap * 2

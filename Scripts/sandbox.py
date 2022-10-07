@@ -1,12 +1,12 @@
 from collections import OrderedDict
 import scripts.Blockchains as Blc
 import scripts.utills as utills
-import scripts.Models as models
+# import scripts.Models as models
 import time
-'''import abc
+# import abc
 import asyncio
-import aiohttp
-import pathlib'''
+# import aiohttp
+# import pathlib'''
 # from bs4 import BeautifulSoup
 from web3 import Web3
 from web3.eth import AsyncEth
@@ -116,23 +116,83 @@ if __name__ == '__main__':
     # evalExchanges2()
     # evalExchanges(15)
 
-    class Rive:
-        def __init__(self, val, amount=8) -> None:
-            self.val = val
-            self.amount = amount
+    url = 'https://bsc-dataseed.binance.org'
+    w3 = Web3(Web3.HTTPProvider(url))
 
-        def __iter__(self) -> 'Rive':
-            return self
+    addresses = [
+        Web3.toChecksumAddress("0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"),
+        Web3.toChecksumAddress("0x55d398326f99059ff775485246999027b3197955"),
+        Web3.toChecksumAddress("0xe9e7cea3dedca5984780bafc599bd69add087d56"),
+        Web3.toChecksumAddress("0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82"),
+        Web3.toChecksumAddress("0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"),
+        Web3.toChecksumAddress("0x2170ed0880ac9a755fd29b2688956bd959f933f8"),
+        Web3.toChecksumAddress("0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c"),
+        Web3.toChecksumAddress("0xba2ae424d960c26247dd6c32edc70b295c744c43")
+    ]
+    abi = [
+        {
+        "inputs": [],
+        "name": "factory",
+        "outputs": [
+            {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+        },
+        {
+        "inputs": [],
+        "name": "getReserves",
+        "outputs": [
+            {
+            "internalType": "uint112",
+            "name": "_reserve0",
+            "type": "uint112"
+            },
+            {
+            "internalType": "uint112",
+            "name": "_reserve1",
+            "type": "uint112"
+            },
+            {
+            "internalType": "uint32",
+            "name": "_blockTimestampLast",
+            "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+        },
+    ]
 
-        def __next__(self) -> None:
-            if self.amount:
-                print(self.val)
-                self.amount -= 1
-            else:
-                raise StopIteration
+    async def trid(address, abi=abi):
+        Contract = w3.eth.contract(address=address, abi=abi)
+        resu, gri, _ = Contract.functions.getReserves().call()
+        return resu, gri
 
-    e = Rive(7)
-    for i in e:
-        pass
+    async def reed():
+        tasks = []
+        for i in addresses:
+            tasks.append(asyncio.create_task(trid(i)))
 
-    
+        done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_EXCEPTION)
+        results = []
+
+        for p in pending:
+            p.cancel()
+
+        for item in done:
+            results.append(await item)
+            '''try:
+                results.append(await item)
+            except RuntimeError as e:
+                print(e)'''
+
+        print(len(done))
+        print(results)
+
+
+    asyncio.run(reed())

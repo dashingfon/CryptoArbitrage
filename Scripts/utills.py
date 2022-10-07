@@ -1,7 +1,7 @@
 from functools import wraps  # , lru_cache
 # from datetime import timedelta, datetime
 import time
-# import requests
+import requests
 import json
 import os
 from web3 import Web3

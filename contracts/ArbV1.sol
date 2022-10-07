@@ -98,7 +98,8 @@ contract ArbV1 {
     }
 
     function _sendCoin(address payable recipient, uint amount) private {
-        recipient.transfer(amount);
+        (bool success, ) = recipient.call{value: amount}("");
+        require (success, "Transfer Failed.");
         emit transferSent(address(0),recipient);
     }
     

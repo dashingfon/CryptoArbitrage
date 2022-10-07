@@ -3,12 +3,11 @@ Blockchain module containing the different blockchain implementation
 The main blockchain class inherits from the BaseBlockchain
 which other Blockchains then inherit from
 '''
-
-import scripts.Config as Cfg
+  
 import scripts.Errors as errors
-# import scripts.Database as db
-from scripts.utills import isTestnet, readJson, writeJson
+from scripts.Utills import isTestnet, readJson, writeJson
 import scripts.Models as models
+from scripts.Database import SQLModel, create_engine, Session, select
 
 import time
 import os
@@ -18,20 +17,19 @@ from aiolimiter import AsyncLimiter
 from bs4 import BeautifulSoup
 from pycoingecko import CoinGeckoAPI
 from cache import AsyncTTL
-from typing import AsyncGenerator, Callable, Coroutine, Optional, Any
+from typing import AsyncGenerator, Callable, Optional, Any
 import logging
 
 
-log: logging.Logger = logging.getLogger()
-
 MAX_SIZE: int = 150
 TIME_TO_LIVE: int = 5
-
 Cache: AsyncTTL = AsyncTTL(time_to_live=TIME_TO_LIVE, maxsize=MAX_SIZE)
 Limiter: AsyncLimiter = AsyncLimiter(25, 1)
+Config: dict = readJson('Config.json')
 
 
 class Blockchain(models.BaseBlockchain):
+    '''Blockchain chain class implementing from Base Blockchain'''
 
     def __init__(self) -> None:
         '''
@@ -40,6 +38,8 @@ class Blockchain(models.BaseBlockchain):
         depthLimit - Used to determine the longest cycle of swaps
         graph - a representation of the connected tokens across dexs
         arbRoutes - a list of the cyclic routes
+        header - requests header
+        url - blockchain node url
         dataPath - the path to the data directory
         '''
         self.impact: float = 0.00075
@@ -52,37 +52,59 @@ class Blockchain(models.BaseBlockchain):
             "Connection": "keep-alive"
             }
 
-        self.url: str = 'http://127.0.0.1:8545'
         self.dataPath: str = os.path.join(
             os.path.split(os.path.dirname(__file__))[0], 'data')
-        self.priceLookupPath: str = os.path.join(self.dataPath, 'PriceLookup.json')
+        self.priceLookupPath: str = os.path.join(self.dataPath, 'PriceLookup.json')  # noqa
+        self.url: str = 'http://127.0.0.1:8545'
 
-    def buildPairs(self,):
-        pass
+        self.databaseUrl: str = f'sqlite:///{os.path.join(self.dataPath, str(self))}' # noqa
+        self.engine: Any = create_engine(self.databaseUrl, echo=True)
+        self.source: str
+        self.exchanges: dict
+        self.startTokens = None
+        self.startExchanges = None
+        self.coinGeckoId: str
+        self.geckoTerminalName: str
+        self.arbAddress: str
 
-    def buildGraph(self, exchanges: dict = {}) -> None:
+    def buildGraph(self) -> None:
         '''
         The method to find the connections between the tokens
         '''
+        graph: dict = {}
+        pairs: dict = {}
 
-        graph = {}
-        if not exchanges:
-            exchanges = self.exchanges
+        exchanges: dict = Config[str(self)]['Exchanges']
+        tokens: dict = Config[str(self)]['Tokens']
 
         for dex, attributes in exchanges.items():
-            for pools in attributes['pairs'].keys():
-                pool = list(pools)
-                if pool[0] not in graph:
-                    graph[pool[0]] = []
-                if pool[1] not in graph:
-                    graph[pool[1]] = []
+            temp: dict = {}
+            pairs[dex] = attributes
+            for pools, addresses in attributes['pairs'].items():
+                pool = pools.split(' - ')
 
-                graph[pool[0]].append({'to': pool[1], 'via': dex})
-                graph[pool[1]].append({'to': pool[0], 'via': dex})
+                Token0 = models.Token(pool[0][-8:],
+                                      tokens[pool[0][-8:]], pool[0])
+                Token1 = models.Token(pool[1][-8:],
+                                      tokens[pool[1][-8:]], pool[1])
+                temp[frozenset([Token0, Token1])] = addresses
+
+                if Token0 not in graph:
+                    graph[Token0] = []
+                if Token1 not in graph:
+                    graph[Token1] = []
+
+                graph[Token0].append({'to': Token1, 'via': dex})
+                graph[Token1].append({'to': Token0, 'via': dex})
+
+            pairs[dex]['pairs'] = temp
 
         self.graph = graph
+        self.exchanges = pairs
 
-    def dive(self, depth, node, goal, path, followed) -> list:
+    def dive(self, depth: int, node: models.Token,
+             goal: models.Token, path: list[dict],
+             followed: list) -> list:
         '''
         recursive function to discover tradable arb routes
         called from DLS
@@ -133,7 +155,19 @@ class Blockchain(models.BaseBlockchain):
 
         return result
 
-    def getArbRoute(self, tokens='default', exchanges='all',
+    def routesToDatabase(self, routes: list[models.Route]):
+        SQLModel.metadata.create_all(self.engine)
+
+        with Session(self.engine) as sess:
+            for i in routes:
+                sess.add(models.Routes.fromString(i.simplyfied))
+            sess.commit()
+
+    def routesFromDatabase(self, selection, where):
+        pass
+
+    def getArbRoute(self, tokens: list[models.Token] = [],
+                    exchanges: list = [],
                     graph=True, save=True, screen=True) -> Optional[list]:
 
         '''
@@ -147,17 +181,13 @@ class Blockchain(models.BaseBlockchain):
 
         # add functionality to get routes from specific start exchanges
 
-        if tokens == 'default':
-            tokens = self.startTokens
-        elif tokens == 'all':
-            tokens = list(self.tokens.keys())
+        if not tokens:
+            tokens = list(self.graph.keys())
         else:
             raise errors.InvalidTokensArgument(
                 f'invalid token argument {tokens}')
 
-        if exchanges == 'default':
-            exchanges = self.startExchanges
-        elif exchanges == 'all':
+        if not exchanges:
             exchanges = list(self.exchanges.keys())
         else:
             raise errors.InvalidExchangesArgument(
@@ -170,14 +200,7 @@ class Blockchain(models.BaseBlockchain):
             routes = self.screenRoutes(routes)
 
         if save:
-            writeJson(self.routePath, {
-                'MetaData': {
-                    'time': time.ctime(),
-                    'total': len(routes),
-                    'Exchanges': exchanges,
-                    'Tokens': tokens,
-                    },
-                'Data': routes})
+            self.routesToDatabase(routes=routes)
         else:
             return routes
 
@@ -196,38 +219,6 @@ class Blockchain(models.BaseBlockchain):
             result.append(i*result[-1])
         return result
 
-    @staticmethod
-    def simplyfy(route):
-        result = [f"{route[0]['from']} {route[0]['to']} {route[0]['via']}"]
-        _result = [f"{route[0]['to']} {route[0]['from']} {route[0]['via']}"]
-        reverseRoute = [{
-            'from': route[0]['to'],
-            'to':  route[0]['from'],
-            'via': route[0]['via']
-        }]
-
-        for j in route[1:]:
-            result.append(f"{j['from']} {j['to']} {j['via']}")
-            _result.insert(0, f"{j['to']} {j['from']} {j['via']}")
-            reverseRoute.insert(0, {
-                'from': j['to'], 'to':  j['from'], 'via': j['via']
-                })
-
-        return [' - '.join(result), ' - '.join(_result), route, reverseRoute]
-
-    @staticmethod
-    def assemble(route):
-        result = []
-        routeList = route.split(' - ')
-        for item in routeList:
-            itemList = item.split()
-            load = {
-                'from': itemList[0],
-                'to': itemList[1],
-                'via': itemList[2],
-                }
-            result.append(load)
-        return result
 
     async def pollRoute(self, route, session,
                         prices=[]) -> tuple[list[Any], list[Any]]:
@@ -374,9 +365,9 @@ class Blockchain(models.BaseBlockchain):
         return price
 
     @Cache
-    async def getPrice2(self, addr, swap, exchange) -> Optional[dict]:
+    async def getPrice2(self, addr, swap) -> Optional[dict]:
         pass
-    
+
     def simulateSwap(self, route, cap, prices) -> float:
         In = cap
         assert len(prices) == len(route), 'unequal route and prices'
@@ -392,7 +383,7 @@ class Blockchain(models.BaseBlockchain):
 
         return Out - cap
 
-    async def pollRoutes(self, batch: int, routes: list = [],
+    async def pollRoutes(self, routes: list = [],
                          save: bool = True, currentPrice: bool = False,
                          value: float = 1.009027027) -> Optional[list]:
 
@@ -413,12 +404,12 @@ total of :- {routeLenght}
         print(message)
         result = []
         routesGen = self.genRoutes(routes=routes, value=value,
-                                   currentPrice=currentPrice, batch=batch)
+                                   currentPrice=currentPrice)
 
         while True:
             try:
                 result.append(await anext(routesGen))
-            except StopIteration:
+            except StopAsyncIteration:
                 break
             except KeyboardInterrupt:
                 print('\n interupted, exiting and saving')
@@ -456,18 +447,35 @@ total of :- {routeLenght}
         found = 0
         async with aiohttp.ClientSession() as sess:
             marker = 1
-            for item in subRoutes:
+            Done = False
+
+            while not Done:
                 try:
+                    item = next(subRoutes)
                     SimpRoutes = []
                     tasks = []
+                    '''tasks = [asyncio.create_task(
+                            self.pollRoute(i, sess)) for i in item]'''
                     for i in item:
                         SimpRoutes.append(self.simplyfy(i))
                         tasks.append(asyncio.create_task(
                             self.pollRoute(i, sess)))
-                    results = await asyncio.gather(*tasks)
 
-                except AssertionError:
-                    log.exception('Error polling tasks')
+                    done, pending = await asyncio.wait(tasks,
+                                                       return_when=asyncio.FIRST_EXCEPTION)
+                    for p in pending:
+                        p.cancel()
+
+                    results = []
+                    for res in done:
+                        try:
+                            results.append(await res)
+                        except AssertionError:
+                            log.exception('Error polling route')
+                            Done = True
+
+                except StopIteration:
+                    log.info('Done polling tasks')
                     break
 
                 for Pos, result in enumerate(results):
@@ -547,8 +555,6 @@ class Arbitrum(Blockchain):
         self.coinGeckoId = ''
         self.geckoTerminalName = 'arbitrum'
         self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath, 'Arbitrum', 'pollResult.json')
-        self.routePath = os.path.join(self.dataPath, 'Arbitrum', 'arbRoutes.json')
 
     def __repr__(self):
         return 'Arbitrum Blockchain'
@@ -568,8 +574,6 @@ class BSC(Blockchain):
         self.coinGeckoId = 'binance-smart-chain'
         self.geckoTerminalName = 'bsc'
         self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath, 'BSC', 'pollResult.json')
-        self.routePath = os.path.join(self.dataPath, 'BSC', 'arbRoute.json')
 
     def __repr__(self):
         return 'Binance SmartChain'
@@ -588,8 +592,6 @@ class Kovan(Blockchain):
         self.startExchanges = None
         self.coinGeckoId = ''
         self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath, 'Kovan', 'pollResult.json')
-        self.routePath = os.path.join(self.dataPath, 'Kovan', 'arbRoute.json')
 
     def __repr__(self):
         return 'Kovan Testnet'
@@ -608,8 +610,6 @@ class Goerli(Blockchain):
         self.startExchanges = None
         self.coinGeckoId = ''
         self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath, 'Goerli', 'pollResult.json')
-        self.routePath = os.path.join(self.dataPath, 'Goerli', 'arbRoute.json')
 
     def __repr__(self):
         return 'Goerli Testnet'
@@ -628,8 +628,6 @@ class Fantom(Blockchain):
         self.startExchanges = None
         self.coinGeckoId = ''
         self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath, 'Goerli', 'pollResult.json')
-        self.routePath = os.path.join(self.dataPath, 'Goerli', 'arbRoute.json')
 
     def __repr__(self):
         return 'Goerli Testnet'
@@ -648,5 +646,4 @@ class Polygon(Blockchain):
         self.startExchanges = None
         self.coinGeckoId = ''
         self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath, 'Polygon', 'pollResult.json')
-        self.routePath = os.path.join(self.dataPath, 'Polygon', 'arbRoute.json')
+

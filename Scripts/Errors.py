@@ -19,7 +19,3 @@ class ErrorExtractingPrice(Exception):
 
 class InvalidBlockchainObject(Exception):
     pass
-
-
-class PollingRuntimeError(Exception):
-    pass
