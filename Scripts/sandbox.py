@@ -1,20 +1,24 @@
 from collections import OrderedDict
 import scripts.Blockchains as Blc
-import scripts.utills as utills
+import scripts.Utills as utills
 # import scripts.Models as models
+import os
 import time
 # import abc
 import asyncio
 # import aiohttp
 # import pathlib'''
 # from bs4 import BeautifulSoup
-from web3 import Web3
+import web3
 from web3.eth import AsyncEth
 # import scripts.Config as Cfg
 # import datetime, os
 # from cache import AsyncTTL
 from asyncio.proactor_events import _ProactorBasePipeTransport
 # from brownie import interface
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 route = [
@@ -116,19 +120,12 @@ if __name__ == '__main__':
     # evalExchanges2()
     # evalExchanges(15)
 
-    url = 'https://bsc-dataseed.binance.org'
-    w3 = Web3(Web3.HTTPProvider(url))
+    url = f'https://bsc.nownodes.io/{os.environ.get("NowNodesBscKey")}'
+    w3 = web3.Web3(web3.Web3.HTTPProvider(url))
 
     addresses = [
-        Web3.toChecksumAddress("0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"),
-        Web3.toChecksumAddress("0x55d398326f99059ff775485246999027b3197955"),
-        Web3.toChecksumAddress("0xe9e7cea3dedca5984780bafc599bd69add087d56"),
-        Web3.toChecksumAddress("0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82"),
-        Web3.toChecksumAddress("0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"),
-        Web3.toChecksumAddress("0x2170ed0880ac9a755fd29b2688956bd959f933f8"),
-        Web3.toChecksumAddress("0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c"),
-        Web3.toChecksumAddress("0xba2ae424d960c26247dd6c32edc70b295c744c43")
-    ]
+        web3.Web3.toChecksumAddress("0x0ed7e52944161450477ee417de9cd3a859b14fd0"),
+        ]
     abi = [
         {
         "inputs": [],
@@ -170,8 +167,11 @@ if __name__ == '__main__':
 
     async def trid(address, abi=abi):
         Contract = w3.eth.contract(address=address, abi=abi)
-        resu, gri, _ = Contract.functions.getReserves().call()
-        return resu, gri
+
+        account = w3.eth.account.from_key(os.environ.get('BEACON'))
+        print(str(account.address))
+        e = Contract.functions.getReserves().call({'from': account.address})
+        return e
 
     async def reed():
         tasks = []

@@ -9,8 +9,6 @@ def getChain():
 
     if Chain == 'Aurora':
         return Blc.Aurora()
-    elif Chain == 'Kovan':
-        return Blc.Kovan()
     else:
         raise ValueError('Invalid Chain Argument')
 

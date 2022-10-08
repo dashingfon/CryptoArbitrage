@@ -3,21 +3,6 @@
 
 import json
 
-
-def parseEchanges(item):
-    new = {}
-    try:
-        for key, value in item.items():
-            temp = {}
-            new[key] = value
-            for i, j in value['pairs'].items():
-                temp[frozenset(i.split(' - '))] = j
-            new[key]['pairs'] = temp
-    except KeyError as e:
-        print(f'incorrect exchange data, KeyError :- {e}')
-    return new
-
-
 with open(r'scripts\Config.json') as CJ:
     config = json.load(CJ)
 
@@ -284,51 +269,3 @@ AuroraTestData = {
     ],
 }
 
-# BSC Network
-
-BSCTokens = config["Binance SmartChain"]['Tokens']
-BSCStartTokens = ['BSC-USD_3197955','WBNB_3bc095c']
-BSCStartExchanges = ['pancakeswap', 'sushiswap', 'mdex','biswap','apeswap','babyswap','fstswap']
-BSCExchanges = parseEchanges(config["Binance SmartChain"]['Exchanges'])
-
-
-# Kovan Network
-KovanTokens = {
-
-}
-KovanStartTokens = {
-
-}
-KovanStartExchanges = []
-KovanExchanges = {
-
-}
-
-# Arbitrum Network
-
-ArbitrumTokens = {
-
-}
-ArbitrumStartTokens = {
-
-}
-ArbitrumStartExchanges = []
-ArbitrumExchanges = {
-
-}
-
-# Goerli Network
-
-GoerliTokens = {
-
-}
-
-GoerliStartTokens = {
-
-}
-
-GoerliStartExchanges = []
-
-GoerliExchanges = {
-
-}

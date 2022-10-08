@@ -12,15 +12,15 @@ def create_db_table():
     SQLModel.metadata.create_all(engine)
 
 
-def insert_values(*args: dict):
+def insert_values():
     _1 = models.Routes(
         simplyfied_Sht='yeah', simplyfied_full='nah',
-        startToken='BNB', startExchanges='binance',
-        amountOfSwaps=6, time=time.time()
+        startToken='ETH', startExchanges='binance',
+        amountOfSwaps=4, time=time.time()
     )
     _2 = models.Routes(
         simplyfied_Sht='yeah', simplyfied_full='nah',
-        startToken='BNB', startExchanges='binance',
+        startToken='ETH', startExchanges='binance',
         amountOfSwaps=6, time=time.time()
     )
 
@@ -31,17 +31,25 @@ def insert_values(*args: dict):
         sess.commit()
 
 
-def select_values(selection, where):
+def select_values(selection, *where):
     with Session(engine) as sess:
-        statement = select(selection).where(where)
+        raw = select(*selection)
 
-        reut = sess.exec(statement)
-        print(reut)
+        if not where:
+            statement = raw
+        for i in where:
+            statement = raw.where(i)
+
+        ''' reut = sess.exec(statement)
+        for r in reut:
+            print(r)'''
+        print(list(sess.exec(statement)))
 
 
 if __name__ == '__main__':
     create_db_table()
     # insert_values()
     select_values(
-        (models.Routes.amountOfSwaps, models.Routes.id),
-        (models.Routes.id <= 2))
+        (models.Routes.startToken, models.Routes.amountOfSwaps),
+        (models.Routes.amountOfSwaps >= 2),
+        (models.Routes.startToken == 'ETH'))

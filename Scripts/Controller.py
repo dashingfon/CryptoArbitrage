@@ -1,33 +1,20 @@
 '''The controller class that prepares and executes arbs'''
 import scripts.Config as Cfg
-import scripts.Errors as errors
-from scripts.utills import sortTokens, isTestnet
+from scripts.Utills import sortTokens, isTestnet
 import scripts.Models as models
 
 import os
 from eth_abi import encode_abi
 from web3 import Web3
-import attr
 import logging
 from typing import Type
 
-log = logging.getLogger()
 
-
-@attr.s
 class Controller():
 
-    def __attrs_post_init__(self) -> None:
-        pass
-
     def __init__(self, blockchain: Type[models.BaseBlockchain]) -> None:
-        self.blockchainMap = Cfg.ControllerBlockchains
-        if str(blockchain) in self.blockchainMap:
-            self.blockchain = blockchain
-        else:
-            raise errors.InvalidBlockchainObject(
-                f'Invalid Blockchain Object {blockchain}')
-
+        self.verifyChain(blockchain)
+        self.blockchain = blockchain
         self.contractAbi = Cfg.contractAbi
         self.contractAddress = self.blockchain.arbAddress
         self.routerAbi = Cfg.routerAbi
@@ -39,6 +26,14 @@ class Controller():
         self.web3 = Web3(Web3.HTTPProvider(self.blockchain.url,
                                            request_kwargs={'timeout': 300}))
         self.pv = os.environ.get('BEACON')
+
+    def verifyChain(self, blockchain: Type[models.BaseBlockchain]) -> None:
+        self.blockchainMap = Cfg.ControllerBlockchains
+        if str(blockchain) in self.blockchainMap:
+            self.blockchain = blockchain
+        else:
+            raise RuntimeError(
+                f'Invalid Blockchain Object {blockchain}')
 
     def getContract(self, address='', abi=''):
         if not address:
@@ -234,7 +229,7 @@ class Controller():
             tranx = self.web3.eth.send_raw_transaction(txCreate.rawTransaction)
 
         txReceipt = self.web3.eth.wait_for_transaction_receipt(tranx)
-        print(f'tx succesful with hash: {txReceipt.transactionHash.hex()}')
+        logging.info(f'tx succesful with hash: {txReceipt.transactionHash.hex()}')  # noqa
 
     def arb(self, routes=[], amount=10,  keyargs=[]):
 

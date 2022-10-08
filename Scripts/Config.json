@@ -264,12 +264,15 @@
         "fee": 99700
       }
     },
-    "ArbContractAddress" : ""
+    "ArbContractAddress" : "",
+    "isSetup" : true
   },
   "Aurora Blockchain": {
     "Tokens": {},
     "Exchanges": {},
-    "TokensRemappings": {}
+    "TokensRemappings": {},
+    "ArbContractAddress" : "",
+    "isSetup" : false
   },
   "ABIs": {
     "Router_abi": [
