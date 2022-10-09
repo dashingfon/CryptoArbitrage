@@ -170,5 +170,7 @@ h1   {color: blue;}
 <img align="left" width="30px" src="https://img.shields.io/badge/GIT-E44C30?style=for-the-badge&logo=git&logoColor=white"/>
 </div>
 
+<div>
 *Please Note*:
 Crypto-Arbitrage is still in active development, some of the functionalities have not been extensively tested
+</div>
