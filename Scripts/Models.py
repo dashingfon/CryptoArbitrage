@@ -1,11 +1,16 @@
 '''Model module containing the extra data type'''
 
 from abc import ABC, abstractmethod
-from typing import Optional, AsyncGenerator
+from typing import Optional, AsyncGenerator, Callable
 from sqlmodel import Field, SQLModel
 from cache import AsyncTTL
 import attr
 import logging
+
+Price = dict['Token', float]
+GetRate = Callable[[Price, 'Token', 'Token', float], float]
+getRate: GetRate = lambda price, to, fro, r1: r1 * price[to] / price[fro]  # noqa
+# return self.r1 * price[to]/(1 + (self.impact * self.r1)) / price[fro]
 
 
 @attr.s(slots=True)
@@ -46,7 +51,7 @@ class Routes(SQLModel, table=True):
 class Route:
     '''Route class'''
     swaps: list[dict[str, Token | str]] = attr.ib(repr=False)
-    prices: list[Optional[dict[str, str]]] = attr.ib(repr=False, factory=list)
+    prices: list[Optional[Price]] = attr.ib(repr=False, factory=list)
     simplyfied: str = attr.ib(init=False, repr=False)
     simplyfied_short: str = attr.ib(init=False)
     index: float = attr.ib(repr=False, default=0)
@@ -62,9 +67,12 @@ class Route:
         '''function to generate a tring repreentation from the wap attribute'''
 
         if mode == 'long':
-            pass
+            result = [f"{self.swaps[0]['from']} {self.swaps[0]['to']} {self.swaps[0]['via']}"]  # noqa: E501
+            for j in self.swaps[1:]:
+                result.append(f"{j['from']} {j['to']} {j['via']}")
+
         elif mode == 'short':
-            pass
+            result = [f"{self.swaps[0]['from']} {self.swaps[0]['to']} {self.swaps[0]['via']}"]  # noqa: E501
 
         result = [f"{self.swaps[0]['from']} {self.swaps[0]['to']} {self.swaps[0]['via']}"]  # noqa: E501
         for j in self.swaps[1:]:
@@ -74,7 +82,7 @@ class Route:
 
     @classmethod
     def toReversed(cls, items: list[dict[str, Token | str]],
-                   prices: list[Optional[dict[str, str]]]) -> 'Route':
+                   prices: list[Optional[Price]]) -> 'Route':
 
         temp = cls(items[::-1])
         temp.prices = prices[::-1] if prices else []
@@ -104,6 +112,63 @@ class Route:
 
     def fromWei(self) -> None:
         pass
+
+    @staticmethod
+    def cumSum(listItem: list) -> list:
+        result = [listItem[0]]
+        for i in listItem[1:]:
+            result.append(i*result[-1])
+        return result
+
+    def simSwap(self, route, cap, prices):
+        In = cap
+        assert len(prices) == len(route), 'unequal route and prices'
+
+        for index, swap in enumerate(route):
+            price = prices[index]
+
+            Out = In * self.getRate(
+                price,
+                swap['to'],
+                swap['from']) / (1 + ((In/price[swap['from']]) * self.r1))
+            In = Out
+
+        return Out - cap
+
+    def calculate(self, r1: float, impact: float,
+                  denom: str = 'Wei'):
+
+        rates: list[list[float]] = [[], []]
+        liquidity = []
+
+        for index, swap in enumerate(self.swaps):
+            price: Price = self.prices[index]
+
+            rate = (getRate(price, swap['to'], swap['from'], r1),
+                    getRate(price, swap['from'], swap['to'], r1))
+
+            if index == 0:
+                liquidity.append(price[swap['from']])
+                forward = price[swap['to']]
+                rates[0].append(rate[0])
+            elif index == len(self.swaps) - 1:
+                rates[0].append(rate[0] * rates[0][-1])
+                liquidity += [
+                    min(price[swap['from']], forward), price[swap['to']]]
+            else:
+                rates[0].append(rate[0] * rates[0][-1])
+                liquidity.append(min(price[swap['from']], forward))
+                forward = price[swap['to']]
+
+            rates[1].insert(0, rate[1])
+
+        least = min(liquidity)
+        reverse = liquidity[::-1]
+        rates[1] = [1] + self.cumSum(rates[1])
+        rates[0] = [1] + rates[0]
+
+        cap0 = least / rates[0][liquidity.index(least)] * impact
+        cap1 = least / rates[1][reverse.index(least)] * impact
 
 
 class BaseBlockchain(ABC):

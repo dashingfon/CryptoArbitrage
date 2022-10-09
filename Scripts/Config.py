@@ -2,8 +2,9 @@
 # Controller Settings
 
 import json
+import ast
 
-with open(r'scripts\Config.json') as CJ:
+with open('scripts\\Config.json') as CJ:
     config = json.load(CJ)
 
 ControllerBlockchains = set((
@@ -61,7 +62,7 @@ OPTIONS = [
     'out' : f,
     'factory' : factory,
     'routers' : [fonswapRouter,dodoRouter,fonswapRouter,dodoRouter],
-    'fee' : fee},
+    'fee' : fee}
 
     ]
 
@@ -84,7 +85,7 @@ ITEMS = [
     {
         'EP' : cap * (l - 1), 'capital' : cap,
         'simplified' : "TST4 TST2 fonswap - TST2 TST3 fonswap - TST3 TST1 fonswap - TST1 TST4 fonswap",
-        'route' : [{'from': 'TST4', 'to': 'TST2', 'via': 'fonswap'}, {'from': 'TST2', 'to': 'TST3', 'via': 'dodo'}, {'from': 'TST3', 'to': 'TST1', 'via': 'fonswap'},{'from': 'TST1', 'to': 'TST4', 'via': 'dodo'}] ,
+        'route' : [{'from': 'TST4', 'to': 'TST2', 'via': 'fonswap'}, {'from': 'TST2', 'to': 'TST3', 'via': 'dodo'}, {'from': 'TST3', 'to': 'TST1', 'via': 'fonswap'},{'from': 'TST1', 'to': 'TST4', 'via': 'dodo'}]
     },
 ]
 
@@ -174,38 +175,38 @@ AuroraTestData = {
     'EXCHANGES' : {
     'trisolaris' : {
         'pairs' : {
-        frozenset(('AURORA', 'WETH')) : '0x5eeC60F348cB1D661E4A5122CF4638c7DB7A886e',
-        frozenset(('NEAR', 'USDT')) : '0x03B666f3488a7992b2385B12dF7f35156d7b29cD',}},
+        ('AURORA', 'WETH') : '0x5eeC60F348cB1D661E4A5122CF4638c7DB7A886e',
+        ('NEAR', 'USDT') : '0x03B666f3488a7992b2385B12dF7f35156d7b29cD',}},
     'auroraswap' : {
         'pairs' : {
-        frozenset(('USDT', 'USDC')) : '0xec538fafafcbb625c394c35b11252cef732368cd',
-        frozenset(('USDC', 'NEAR')) : '0x480a68ba97d70495e80e11e05d59f6c659749f27',}},
+        ('USDT', 'USDC') : '0xec538fafafcbb625c394c35b11252cef732368cd',
+        ('USDC', 'NEAR') : '0x480a68ba97d70495e80e11e05d59f6c659749f27',}},
     'wannaswap' : {
         'pairs' : {
-        frozenset(('AURORA', 'NEAR')) : '0x7e9ea10e5984a09d19d05f31ca3cb65bb7df359d',
-        frozenset(('NEAR', 'WETH')) : '0x256d03607eee0156b8a2ab84da1d5b283219fe97',
-        frozenset(('USDC', 'NEAR')) : '0xbf560771b6002a58477efbcdd6774a5a1947587b',}
+        ('AURORA', 'NEAR') : '0x7e9ea10e5984a09d19d05f31ca3cb65bb7df359d',
+        ('NEAR', 'WETH') : '0x256d03607eee0156b8a2ab84da1d5b283219fe97',
+        ('USDC', 'NEAR') : '0xbf560771b6002a58477efbcdd6774a5a1947587b'}
         }},
     'GRAPH' : {
     'AURORA' : [
         {'to' : 'WETH','via' : 'trisolaris',},
-        {'to' : 'NEAR','via' : 'wannaswap',},],
+        {'to' : 'NEAR','via' : 'wannaswap',}],
     'WETH' : [
         {'to' : 'AURORA','via' : 'trisolaris',},
-        {'to' : 'NEAR','via' : 'wannaswap',},],
+        {'to' : 'NEAR','via' : 'wannaswap',}],
     'NEAR' : [
         {'to' : 'USDT','via' : 'trisolaris',},
         {'to' : 'USDC','via' : 'auroraswap',},
         {'to' : 'AURORA','via' : 'wannaswap',},
         {'to' : 'WETH','via' : 'wannaswap',},
-        {'to' : 'USDC','via' : 'wannaswap',},],
+        {'to' : 'USDC','via' : 'wannaswap',}],
     'USDC' : [
         {'to' : 'USDT','via' : 'auroraswap',},
         {'to' : 'NEAR','via' : 'auroraswap',},
-        {'to' : 'NEAR','via' : 'wannaswap',},],
+        {'to' : 'NEAR','via' : 'wannaswap',}],
     'USDT': [
         {'to' : 'NEAR','via' : 'trisolaris',},
-        {'to' : 'USDC','via' : 'auroraswap',},],
+        {'to' : 'USDC','via' : 'auroraswap',}],
 },
     'TOKENS' : ['AURORA','WETH'],
     'PRICE' : {'WETH': 2.141651224104825, 'WBTC': 0.11160318},
@@ -263,9 +264,18 @@ AuroraTestData = {
         'via' : 'wannaswap'},
         {
         'from' : 'AURORA',
-        'to' : 'WETH',
-        'via' : 'trisolaris'},
-    ],
-    ],
+        "to" : 'WETH',
+        'via' : 'trisolaris'}
+    ]
+    ]
 }
 
+trof = config
+trof['Test']['PACKAGES'] = PACKAGES
+trof['Test']['PREPARED'] = PREPARED
+trof['Test']['TEST_DATA'] = AuroraTestData
+trof['Test']['ITEMS'] = ITEMS
+trof['Test']['OPTIONS'] = OPTIONS
+
+with open('scripts\\Config.json', 'w') as CJ:
+    json.dump(trof, CJ, indent=2)

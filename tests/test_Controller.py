@@ -1,7 +1,7 @@
 import scripts.Blockchains as Blc
 import scripts.Controller as Ctr
 import scripts.Config as Cfg
-from scripts.utills import sortTokens, getPayloadBytes
+from scripts.Utills import sortTokens, getPayloadBytes
 
 import pytest
 from brownie import accounts, Token, Factory, Router, TestArb

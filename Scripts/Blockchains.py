@@ -36,9 +36,6 @@ Cache: AsyncTTL = AsyncTTL(time_to_live=TIME_TO_LIVE, maxsize=MAX_SIZE)
 Limiter: AsyncLimiter = AsyncLimiter(25, 1)
 Config: dict = readJson('Config.json')
 
-Price = dict[models.Token, float]
-GetRate = Callable[[Price, models.Token, models.Token], float]
-
 
 class Blockchain(models.BaseBlockchain):
     '''Blockchain chain class implementing from Base Blockchain'''
@@ -57,8 +54,6 @@ class Blockchain(models.BaseBlockchain):
         self.dataPath: str = os.path.join(
             os.path.split(os.path.dirname(__file__))[0], 'data')
         self.priceLookupPath: str = os.path.join(self.dataPath, 'PriceLookup.json')  # noqa
-        self.getRate: GetRate = lambda price, to, fro: self.r1 * price[to] / price[fro]  # noqa
-        # return self.r1 * price[to]/(1 + (self.impact * self.r1)) / price[fro]
 
         self.url: str = 'http://127.0.0.1:8545'
         self.databaseUrl: str
@@ -238,13 +233,6 @@ class Blockchain(models.BaseBlockchain):
         else:
             return routes
 
-    @staticmethod
-    def cumSum(listItem: list) -> list:
-        result = [listItem[0]]
-        for i in listItem[1:]:
-            result.append(i*result[-1])
-        return result
-
     async def pollRoute(self,
                         route: models.Route,
                         prices=[],
@@ -415,12 +403,13 @@ total of :- {routeLenght}
 
         if save:
             writeJson(self.pollPath,
-                    {'MetaData': {
-                    'time': time.ctime(),
-                    'total': routeLenght,
-                    'routeInfo': routeInfo
-                    },
-                    'Data': export})
+                      {'MetaData': {
+                        'time': time.ctime(),
+                        'total': routeLenght,
+                        'routeInfo': routeInfo
+                        },
+                      'Data': export})
+            return None
         else:
             return export
 
