@@ -1,25 +1,16 @@
-'''Module containing all the Errors definition'''
 
 
-class InvalidTokensArgument(Exception):
+class BlockchainNotSetup(Exception):
     pass
 
 
-class InvalidExchangesArgument(Exception):
+class NoBlockchainContract(Exception):
     pass
 
 
-class IncompletePrice(Exception):
+class incorrectInput(Exception):
     pass
 
 
-class ErrorExtractingPrice(Exception):
-    pass
-
-
-class InvalidBlockchainObject(Exception):
-    pass
-
-
-class PollingRuntimeError(Exception):
+class InvalidSession(Exception):
     pass

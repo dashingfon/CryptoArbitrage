@@ -1,7 +1,9 @@
+from scripts import CONFIG_PATH
 from functools import wraps  # , lru_cache
 # from datetime import timedelta, datetime
 import time
-# import requests
+import logging
+import requests  # type: ignore
 import json
 import os
 from web3 import Web3
@@ -9,23 +11,22 @@ from eth_abi import encode_abi
 from bs4 import BeautifulSoup
 
 
-def readJson(path):
+def readJson(path: str) -> dict:
     try:
         with open(path) as PP:
             temp = json.load(PP)
     except FileNotFoundError as e:
-        print(e)
+        logging.exception(e)
         temp = {}
     return temp
 
 
-def writeJson(path, content):
+def writeJson(path: str, content: list | dict) -> None:
     with open(path, 'w') as PP:
         json.dump(content, PP, indent=2)
 
 
-ConfigPath = r'scripts\Config.json'
-config = readJson(ConfigPath)
+config = readJson(CONFIG_PATH)
 
 T1, T2 = config['Test']['T1'], config['Test']['T2']
 T3, T4 = config['Test']['T3'], config['Test']['T4']
@@ -35,21 +36,52 @@ PAIR, cap = config['Test']['PAIR'], config['Test']['cap']
 fee = config['Test']['fee']
 
 
-def split_list(listA: list[dict[str, str]], n: int):
+def split_list(listA: list[dict[str, str]],
+               n: int):
     for x in range(0, len(listA), n):
         chunk = listA[x: n + x]
         yield chunk
 
 
-def split_list2(lit: list, curr: int = 0, gap: int = 1):
-    lenght = len(lit)
-    curr = 0
-    mark = curr + gap
+def extractTokensFromHtml(content: str,
+                          tokens: dict) -> dict:
 
-    while curr < lenght:
-        yield lit[curr:mark]
-        curr = mark
-        mark = mark * 2
+    assert content, 'Empty content recieved'
+    assert tokens, 'Empty tokens recieved'
+
+    price = {}
+    soup = BeautifulSoup(content, 'html.parser')
+
+    tokensList = soup.find_all('li', class_='list-custom')
+    # print(tokensList)
+    done1, done2, slider = False, False, 0
+
+    while (not done1 or not done2) and slider < len(tokensList):
+        try:
+            raw = tokensList[slider].find(class_='list-amount').string
+            rawPrice = str(raw).split()
+            symbol = rawPrice[1]
+            amount = float(rawPrice[0].replace(',', ''))
+
+            if symbol == tokens['from'].name:
+                done1 = True
+                price[tokens['from']] = amount
+            elif symbol == tokens['to'].name:
+                done2 = True
+                price[tokens['to']] = amount
+
+        except (IndexError, ValueError) as e:
+            logging.exception(f'Error parsing item {raw}, error :- {e}')
+
+        except AttributeError as e:
+            msg = tokensList[slider].find(class_='list-amount')
+            logging.exception(f"Error parsing item {msg}, error :- {e}")
+
+        finally:
+            slider += 1
+
+    assert len(price) == 2, f'price :- {price}\n content :- {content}\n'
+    return price
 
 
 def silence_event_loop_closed(func):
@@ -74,7 +106,7 @@ def RateLimited(maxPerSecond):
             elapsed = time.process_time_ns() - lastTimeCalled[0]
             lefttowait = mininterval - elapsed
             if lefttowait > 0:
-                print(f'waiting {lefttowait} ...')
+                logging.debug(f'waiting {lefttowait} ...')
                 time.sleep(lefttowait)
             ret = func(*args, **kwargs)
             lastTimeCalled[0] = time.process_time_ns()
@@ -94,7 +126,7 @@ def getPaths(contents):
     for i in contents:
         args = [i]
         result.append(encode_abi(defs, args))
-        print(f'address data {num} :- {Web3.toHex(encode_abi(defs,args))}')
+        logging.info(f'address data {num} :- {Web3.toHex(encode_abi(defs,args))}')  # noqa E501
     return result
 
 
@@ -106,8 +138,8 @@ def getPayloadBytes(Map, pair):
     assert len(args[0]) == len(args[1])
 
     DATA = Web3.toHex(encode_abi(defs, args))
-    print('prepped Data :- ')
-    print(DATA)
+    # print('prepped Data :- ')
+    # print(DATA)
     return DATA
 
 
@@ -123,12 +155,7 @@ def setPreparedData():
     for i in range(1, 5):
         result.append(getPayloadBytes(Map[i]))
     config['Test']['PrepedSwapData'] = result
-    with open(r'scripts\Config.json', 'w') as CJ:
-        json.dump(config, CJ, indent=2)
-
-
-def poll(chain, route, prices):
-    print(chain.pollRoute(route=route, prices=prices))
+    writeJson(CONFIG_PATH, config)
 
 
 def sortTokens(address1, address2):
@@ -148,7 +175,7 @@ def lookupPrice(Chain):
     tokens = Chain.tokens
     for key, value in tokens.items():
         if value not in lookup:
-            print(f'Token {key}, Address {value} not included')
+            logging.debug(f'Token {key}, Address {value} not included')
 
 
 def parseEchanges(item):
@@ -161,7 +188,7 @@ def parseEchanges(item):
                 temp[frozenset(i.split(' - '))] = j
             new[key]['pairs'] = temp
     except KeyError as e:
-        print(f'incorrect exchange data, KeyError :- {e}')
+        logging.exception(f'incorrect exchange data, KeyError :- {e}')
     return new
 
 
@@ -172,17 +199,15 @@ def extractSymbol(content):
         placeHolder = soup.find('div', id="ContentPlaceHolder1_tr_tokeninfo")
         # '# 'print(placeHolder)
         raw = placeHolder.find('a').contents[-1].split('(')[-1].split(')')[0]
-    except Exception as e:
-        print('an error occured')
-        print(placeHolder)
-        print(e)
+    except Exception:
+        logging.exception(f"fatal error, possible cause - '{placeHolder}'")
         return None
     return raw
 
 
 @RateLimited(2)
 def fetch(url, session, Headers, Params):
-    print('fetching data ...')
+    logging.info('fetching data ...')
     attemptsAllowed = 4
     tries = 0
     done = False
@@ -191,23 +216,22 @@ def fetch(url, session, Headers, Params):
         try:
             response = session.get(url=url, headers=Headers, params=Params)
         except ConnectionError:
-            print('Error')
+            logging.exception('error!')
             time.sleep(10)
             tries += 1
-            print(f'Retring... \n{attemptsAllowed - tries} tries left')
+            logging.info(f'Retring... \n{attemptsAllowed - tries} tries left')
         else:
             done = True
 
     if response.status_code == 200:
         return response
     else:
-        print('unsuccesful request!')
-        print(f'status code :- {response.status_code}')
+        logging.warning(f'unsuccesful request!, status code :- {response.status_code}')  # noqa E501
         return {}
 
 
 def cache(content, name):
-    print('caching content ...')
+    logging.info('caching content ...')
     tokens = {}
     exchanges = {}
 
@@ -224,7 +248,7 @@ def cache(content, name):
 
 
 def trim_and_map(blockchain, tokens, exchanges, minSwaps=3):
-    print('trimming and mapping ...')
+    logging.info('trimming and mapping ...')
     exchanges = parseEchanges(exchanges)
     assert exchanges
     tokensResult, exchangesResult, remappingsResult = {}, {}, {}
@@ -236,8 +260,8 @@ def trim_and_map(blockchain, tokens, exchanges, minSwaps=3):
     for val in exchanges.values():
         initialExchangeCount += len(val['pairs'])
 
-    print(f'Total initial tokens :- {initialTokens}')
-    print(f'Total initial exchanges :- {initialExchangeCount}')
+    logging.info(f'Total initial tokens :- {initialTokens}')
+    logging.info(f'Total initial exchanges :- {initialExchangeCount}')
 
     session = requests.Session()
     blockchain.buildGraph(exchanges)
@@ -304,7 +328,7 @@ def trim_and_map(blockchain, tokens, exchanges, minSwaps=3):
 
 
 def buildData(blockchain, minLiquidity=300000, saveArtifact=False):
-    print(f'building {str(blockchain)} Data ...\n')
+    logging.info(f'building {str(blockchain)} Data ...\n')
     tokens, exchanges = {}, {}
     filePath = os.path.join(blockchain.dataPath, 'dataDump.json')
     artifactPath = os.path.join(blockchain.dataPath, 'artifactDump.json')
@@ -314,7 +338,7 @@ def buildData(blockchain, minLiquidity=300000, saveArtifact=False):
 
     Done = False
     while not Done:
-        print(f"Page {page} ...")
+        logging.info(f"Page {page} ...")
         raw = fetch(url, session, {}, {})
         assert raw, "Fetched Data is empty..."
         data = raw.json()
@@ -345,7 +369,7 @@ def buildData(blockchain, minLiquidity=300000, saveArtifact=False):
             page += 1
         else:
             Done = True
-            print('Done')
+            logging.info('Done')
 
     if saveArtifact:
         writeJson(artifactPath, {
@@ -383,5 +407,10 @@ def setExchangesData(chain, dumpPath, existingExchange, temp=True):
     dump['Exchanges'] = result
     config[str(chain)] = dump
 
-    Path = ConfigPath if not temp else r'temp.json'
+    Path = CONFIG_PATH if not temp else r'temp.json'
     writeJson(Path, config)
+    logging.info('Exchanges data set!')
+
+
+def setContractAddress(blockchain):
+    logging.info('Contract address set!')

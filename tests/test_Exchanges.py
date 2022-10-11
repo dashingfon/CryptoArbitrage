@@ -128,7 +128,7 @@ def test_factories_pairs(Chain):
                 print(f'Exchange {exchange}, Pair {tokens} incorrect')
                 print(f'Got :- {got}')
                 print(f'Expected :- {address.lower()}')
-                print(f'Token addresses :- {(toks[tokens[0]],toks[tokens[1]])}')
+                print(f'Token addresses :- {(toks[tokens[0]],toks[tokens[1]])}')  # noqa
                 print('')
             pair += 1
         page += 1

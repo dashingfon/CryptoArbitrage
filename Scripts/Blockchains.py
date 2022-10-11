@@ -4,91 +4,159 @@ The main blockchain class inherits from the BaseBlockchain
 which other Blockchains then inherit from
 '''
 
-import scripts.Config as Cfg
+from scripts import CONFIG_PATH
 import scripts.Errors as errors
-# import scripts.Database as db
-from scripts.utills import isTestnet, readJson, writeJson
-import scripts.Models as models
-
+from scripts.Models import (
+    Token,
+    Route,
+    Routes,
+    BaseBlockchain,
+    Price,
+    Spliter
+    )
+from scripts.Utills import (
+    isTestnet,
+    readJson,
+    writeJson,
+    extractTokensFromHtml
+    )
+from scripts.Database import (
+    SQLModel,
+    create_engine,
+    Session,
+    select
+    )
 import time
 import os
 import asyncio
 import aiohttp
 from aiolimiter import AsyncLimiter
-from bs4 import BeautifulSoup
 from pycoingecko import CoinGeckoAPI
 from cache import AsyncTTL
-from typing import AsyncGenerator, Callable, Coroutine, Optional, Any
+from typing import AsyncGenerator, Callable, Optional, Any
 import logging
 
 
-log: logging.Logger = logging.getLogger()
-
-MAX_SIZE: int = 150
-TIME_TO_LIVE: int = 5
-
-Cache: AsyncTTL = AsyncTTL(time_to_live=TIME_TO_LIVE, maxsize=MAX_SIZE)
-Limiter: AsyncLimiter = AsyncLimiter(25, 1)
+Cache: AsyncTTL = AsyncTTL(time_to_live=5, maxsize=150)
+Limiter: AsyncLimiter = AsyncLimiter(max_rate=25, time_period=1)
+Config: dict = readJson(CONFIG_PATH)
 
 
-class Blockchain(models.BaseBlockchain):
+class Blockchain(BaseBlockchain):
+    '''Blockchain chain class implementation
+    inheriting from the Base Blockchain.
+    Must implement genRoutes according to the superclass'''
 
     def __init__(self) -> None:
-        '''
-        impact - the amount of price impact allowed
-        r1 - The swap fee on dexs
-        depthLimit - Used to determine the longest cycle of swaps
-        graph - a representation of the connected tokens across dexs
-        arbRoutes - a list of the cyclic routes
-        dataPath - the path to the data directory
-        '''
+
         self.impact: float = 0.00075
         self.r1: float = 0.997
         self.depthLimit: int = 4
         self.graph: dict = {}
-        self.arbRoutes: list = []
+        self.exchanges: dict
+        self.arbRoutes: list
         self.headers: dict[str, str] = {
             'User-Agent': 'PostmanRuntime/7.29.0',
             "Connection": "keep-alive"
             }
-
-        self.url: str = 'http://127.0.0.1:8545'
         self.dataPath: str = os.path.join(
             os.path.split(os.path.dirname(__file__))[0], 'data')
-        self.priceLookupPath: str = os.path.join(self.dataPath, 'PriceLookup.json')
+        self.priceLookupPath: str = os.path.join(self.dataPath, 'PriceLookup.json')  # noqa
+        self.url: str = 'http://127.0.0.1:8545'
+        self.databaseUrl: str
+        self.engine: Any
+        self.source: str
+        self.coinGeckoId: str
+        self.geckoTerminalName: str
+        '''
+        impact: float :- the amount of price impact allowed
+        r1: float :- The swap fee on dexs
+        depthLimit: int :- Used to determine the longest cycle of swaps
+        graph: dict :- a representation of the connected tokens across dexs
+        arbRoutes: list :- a list of the cyclic routes
+        header: dict :- requests header
+        url: str :- blockchain node url
+        dataPath: str :- the path to the data directory
+        priceLookupPath: str
+        getRate: GetRate
+        url: str
+        databaseUrl: str
+        engine: Any
+        source: str
+        exchanges: dict
+        coinGeckoId: str
+        geckoTerminalName: str
+        '''
 
-    def buildPairs(self,):
+    @property
+    def isSetup(self) -> bool:
+        chainContent = Config.get(str(self))
+        if chainContent:
+            if chainContent.get('setup'):
+                return True
+        return False
+
+    @property
+    def arbAddress(self) -> Optional[str]:
+        chainContent = Config.get(str(self))
+        if chainContent:
+            if chainContent.get('arbAddress'):
+                return chainContent.get('arbAddress')
+        return None
+
+    def setup(self) -> None:
         pass
 
-    def buildGraph(self, exchanges: dict = {}) -> None:
+    def buildGraph(self, exchanges: dict = {}, tokens: dict = {}) -> None:
         '''
-        The method to find the connections between the tokens
+        returns the graphical representation of the connection between tokens
         '''
+        graph: dict = {}
+        pairs: dict = {}
 
-        graph = {}
-        if not exchanges:
-            exchanges = self.exchanges
+        if not exchanges and not self.isSetup:
+            raise errors.BlockchainNotSetup(f"{self} not setup")
+        elif not exchanges:
+            exchanges = Config[str(self)]['Exchanges']
+
+        if not tokens and not self.isSetup:
+            raise errors.BlockchainNotSetup(f"{self} not setup")
+        elif not tokens:
+            tokens = Config[str(self)]['Tokens']
 
         for dex, attributes in exchanges.items():
-            for pools in attributes['pairs'].keys():
-                pool = list(pools)
-                if pool[0] not in graph:
-                    graph[pool[0]] = []
-                if pool[1] not in graph:
-                    graph[pool[1]] = []
+            temp: dict = {}
+            pairs[dex] = attributes
+            for pools, addresses in attributes['pairs'].items():
+                pool = pools.split(' - ')
 
-                graph[pool[0]].append({'to': pool[1], 'via': dex})
-                graph[pool[1]].append({'to': pool[0], 'via': dex})
+                Token0 = Token(pool[0][:-8], tokens[pool[0]])
+                Token1 = Token(pool[1][:-8], tokens[pool[1]])
+
+                temp[frozenset([Token0, Token1])] = addresses
+
+                if Token0 not in graph:
+                    graph[Token0] = []
+                if Token1 not in graph:
+                    graph[Token1] = []
+
+                graph[Token0].append({'to': Token1, 'via': dex})
+                graph[Token1].append({'to': Token0, 'via': dex})
+
+            pairs[dex]['pairs'] = temp
 
         self.graph = graph
+        self.exchanges = pairs
 
-    def dive(self, depth, node, goal, path, followed) -> list:
+    def dive(self, depth: int, node: Token, goal: Token,
+             path: list[dict[str, Token | str]],
+             followed: list) -> list[Route]:
         '''
         recursive function to discover tradable arb routes
         called from DLS
         '''
 
-        result = []
+        result: list[Route] = []
         if depth <= self.depthLimit and node in self.graph:
             for i in self.graph[node]:
                 if frozenset([i['to'], i['via'], path[-1]['to']]) in followed:
@@ -96,7 +164,7 @@ class Blockchain(models.BaseBlockchain):
                 elif i['to'] == goal:
                     new_path = path + [i]
                     new_path[-1]['from'] = new_path[-2]['to']
-                    result.append(new_path)
+                    result.append(Route(swaps=new_path))
                 elif depth < self.depthLimit:
                     drop = followed + [frozenset(
                                         [i['to'], i['via'], path[-1]['to']])]
@@ -107,20 +175,16 @@ class Blockchain(models.BaseBlockchain):
 
         return result
 
-    def DLS(self, goal, exchanges) -> list:
-        # implementation of depth limited search
+    def DLS(self, goal: Token,
+            exchanges: list) -> list[Route]:
+        '''implementation of depth limited search'''
 
         start = []
         result = []
-        path = {'from': goal}
+        path: dict[str, Token | str] = {'from': goal}
         depth = 1
 
-        if exchanges == 'default':
-            exchanges = self.startExchanges
-
-        if goal in self.graph and exchanges == 'all':
-            start = self.graph[goal]
-        elif goal in self.graph:
+        if goal in self.graph:
             for i in self.graph[goal]:
                 if i['via'] in exchanges:
                     start.append(i)
@@ -133,153 +197,89 @@ class Blockchain(models.BaseBlockchain):
 
         return result
 
-    def getArbRoute(self, tokens='default', exchanges='all',
-                    graph=True, save=True, screen=True) -> Optional[list]:
+    def toDatabase(self, routes: list[Route]) -> None:
+        '''method to get data from the database'''
+        if routes:
+            SQLModel.metadata.create_all(self.engine)
+
+            with Session(self.engine) as sess:
+                for i in routes:
+                    sess.add(Routes.fromString(i.simplyfied))
+                sess.commit()
+
+    def fromDatabase(self, selection: tuple, where: tuple = ()) -> list:
+        '''method to save data to the database'''
+        with Session(self.engine) as sess:
+            raw = select(*selection)
+
+            statement = raw
+            for i in where:
+                statement = statement.where(i)
+
+            return list(sess.exec(statement))
+
+    def getArbRoute(self, tokens: Optional[list[Token]] = [],
+                    exchanges: list = [],
+                    graph: bool = True,
+                    save: bool = True,
+                    screen: bool = True) -> list | None:
 
         '''
         The method the produces and optionally saves the Arb routes
         '''
-
-        routes = []
-
         if graph:
             self.buildGraph()
 
-        # add functionality to get routes from specific start exchanges
-
-        if tokens == 'default':
-            tokens = self.startTokens
-        elif tokens == 'all':
-            tokens = list(self.tokens.keys())
-        else:
-            raise errors.InvalidTokensArgument(
-                f'invalid token argument {tokens}')
-
-        if exchanges == 'default':
-            exchanges = self.startExchanges
-        elif exchanges == 'all':
+        if not tokens:
+            tokens = list(self.graph.keys())
+        if not exchanges:
             exchanges = list(self.exchanges.keys())
-        else:
-            raise errors.InvalidExchangesArgument(
-                f'invalid exchange argument {exchanges}')
 
+        routes = []
         for token in tokens:
             routes += self.DLS(token, exchanges)
 
-        if screen:
+        if screen and routes:
             routes = self.screenRoutes(routes)
 
         if save:
-            writeJson(self.routePath, {
-                'MetaData': {
-                    'time': time.ctime(),
-                    'total': len(routes),
-                    'Exchanges': exchanges,
-                    'Tokens': tokens,
-                    },
-                'Data': routes})
+            self.toDatabase(routes=routes)
+            return None
         else:
             return routes
 
-    def getRate(self, price, to, fro) -> float:
-        if (to not in price) or (fro not in price):
-            raise errors.IncompletePrice(
-                f'token {to} and {fro} not in {price}')
+    async def pollRoute(self,
+                        route: Route,
+                        prices: list[Price] = [],
+                        usdVal: float = 1,
+                        **kwargs) -> list[Route]:
+        '''calculates the index, expected profit and
+        optimal capital of a list of routes'''
 
-        # return self.r1 * price[to]/(1 + (self.impact * self.r1)) / price[fro]
-        return self.r1 * price[to] / price[fro]
-
-    @staticmethod
-    def cumSum(listItem: list) -> list:
-        result = [listItem[0]]
-        for i in listItem[1:]:
-            result.append(i*result[-1])
-        return result
-
-    @staticmethod
-    def simplyfy(route):
-        result = [f"{route[0]['from']} {route[0]['to']} {route[0]['via']}"]
-        _result = [f"{route[0]['to']} {route[0]['from']} {route[0]['via']}"]
-        reverseRoute = [{
-            'from': route[0]['to'],
-            'to':  route[0]['from'],
-            'via': route[0]['via']
-        }]
-
-        for j in route[1:]:
-            result.append(f"{j['from']} {j['to']} {j['via']}")
-            _result.insert(0, f"{j['to']} {j['from']} {j['via']}")
-            reverseRoute.insert(0, {
-                'from': j['to'], 'to':  j['from'], 'via': j['via']
-                })
-
-        return [' - '.join(result), ' - '.join(_result), route, reverseRoute]
-
-    @staticmethod
-    def assemble(route):
-        result = []
-        routeList = route.split(' - ')
-        for item in routeList:
-            itemList = item.split()
-            load = {
-                'from': itemList[0],
-                'to': itemList[1],
-                'via': itemList[2],
-                }
-            result.append(load)
-        return result
-
-    async def pollRoute(self, route, session,
-                        prices=[]) -> tuple[list[Any], list[Any]]:
-
-        rates = [[], []]
-        liquidity = []
+        session = kwargs.get('session')
+        mode = kwargs.get('mode')
 
         if prices:
-            assert len(prices) == len(route)
-        else:
-            prices = await self.getPrices(route, session)
+            assert len(prices) == len(route.swaps)
 
-        simplified = self.simplyfy(route)
-        for index, swap in enumerate(route):
-            price = prices[index]
-            rate = (self.getRate(price, swap['to'], swap['from']),
-                    self.getRate(price, swap['from'], swap['to']))
-
-            if index == 0:
-                liquidity.append(price[swap['from']])
-                forward = price[swap['to']]
-                rates[0].append(rate[0])
-            elif index == len(route) - 1:
-                rates[0].append(rate[0] * rates[0][-1])
-                liquidity += [
-                    min(price[swap['from']], forward), price[swap['to']]]
+        elif mode == 'fromExplorer':
+            if type(session) == aiohttp.ClientSession:
+                prices = await self.getPrices(route, session)
             else:
-                rates[0].append(rate[0] * rates[0][-1])
-                liquidity.append(min(price[swap['from']], forward))
-                forward = price[swap['to']]
+                raise errors.InvalidSession(
+                    f'Expected type ClientSession, got type {type(session)}'
+                )
+        else:
+            prices = await self.getPrices(route)
 
-            rates[1].insert(0, rate[1])
-
-        least = min(liquidity)
-        reverse = liquidity[::-1]
-        rates[1] = [1] + self.cumSum(rates[1])
-        rates[0] = [1] + rates[0]
-
-        cap0 = least / rates[0][liquidity.index(least)] * self.impact
-        cap1 = least / rates[1][reverse.index(least)] * self.impact
-
-        return (
-            [cap0, rates[0], self.simulateSwap(simplified[2], cap0, prices)],
-            [cap1, rates[1], self.simulateSwap(simplified[3], cap1, prices[::-1])]  # noqa: E501
-        )
+        return route.calculate(self.r1, self.impact, usdVal)
 
     def lookupPrice(self, returns=False) -> Optional[dict]:
         temp = readJson(self.priceLookupPath)
         prices = {}
 
         if not isTestnet(self):
-            tokenAdresses = list(self.tokens.values())
+            tokenAdresses = list(self.graph.keys())
 
             coinGecko = CoinGeckoAPI()
             prices = coinGecko.get_token_price(
@@ -291,223 +291,206 @@ class Blockchain(models.BaseBlockchain):
 
         if returns:
             return {**temp, **prices}
+        return None
 
-    @staticmethod
-    def extract(content, tokens):
-        assert content, 'Empty content returned'
-        assert tokens, 'Empty tokens returned'
+    async def getPrices(self, route: Route,
+                        session: aiohttp.ClientSession | None = None) -> list[Price]:  # noqa E501
 
-        price = {}
-        soup = BeautifulSoup(content, 'html.parser')
+        form: Callable[[Any], list] = lambda i: [self.exchanges[i['via']]['pairs'][frozenset([i['from'], i['to']])], i, i['via']]  # noqa: E501
+        tasks = []
+        if session:
+            for i in route.swaps:
+                tasks.append(asyncio.create_task(
+                    self.getPriceFromExplorer(session, *form(i))
+                ))
+        else:
+            for i in route.swaps:
+                tasks.append(asyncio.create_task(
+                    self.getPrice(*form(i)[:2])
+                ))
 
-        tokensList = soup.find_all('li', class_='list-custom')
-        # print(tokensList)
-        done1, done2, slider = False, False, 0
-
-        while (not done1 or not done2) and slider < len(tokensList):
-            try:
-                raw = tokensList[slider].find(class_='list-amount').string
-                rawPrice = str(raw).split()
-                symbol = rawPrice[1]
-                amount = float(rawPrice[0].replace(',', ''))
-
-                if symbol == tokens['from'][:-8]:
-                    done1 = True
-                    price[tokens['from']] = amount
-                elif symbol == tokens['to'][:-8]:
-                    done2 = True
-                    price[tokens['to']] = amount
-
-            except (IndexError, ValueError) as e:
-                print(f'Error parsing item {raw}, error :- {e}')
-
-            except AttributeError as e:
-                msg = tokensList[slider].find(class_='list-amount')
-                print(f"Error parsing item {msg}, error :- {e}")
-
-            finally:
-                slider += 1
-
-        assert len(price) == 2, f'price :- {price}\n content :- {content}\n'
-        return price
-
-    async def getPrices(self, route, session) -> list:
-        form: Callable[[Any], Any] = lambda i: [self.exchanges[i['via']]['pairs'][frozenset([i['from'], i['to']])], i, i['via']]  # noqa: E501
-        tasks = [asyncio.create_task(self.getPrice(session, *form(i))) for i in route]  # noqa: E501
         return await asyncio.gather(*tasks)
 
     @Cache
-    async def getPrice(self, session, addr, swap, exchange) -> Optional[dict]:
-        retries: int = 3
-        price: Optional[dict[str, str]] = {}
-        Done: bool = False
+    async def getPriceFromExplorer(self, session: aiohttp.ClientSession,
+                                   addr: str,
+                                   swap: dict[str, Token | str],
+                                   exchange: str) -> dict:
 
-        while retries > 0 and not Done:
-            try:
-                url = self.source + addr
-                async with Limiter:
-                    async with session.get(url, headers=self.headers, ssl=False) as response:  # noqa
-                        if response.status == 200:
-                            price = self.extract(await response.text(), swap)
-                        else:
-                            print(f'failed request, exchange :- {exchange}, pairs :- {swap}')
-                            break
-            except aiohttp.ServerDisconnectedError as e:
-                print(f"Oops, the server connection was dropped before we finished :- {e}")
-                await asyncio.sleep(1)
-                retries -= 1
-            except aiohttp.ClientConnectionError as e:
-                print(f"Oops, the connection was dropped before we finished :- {e}")
-                await asyncio.sleep(1)
-                retries -= 1
-            except aiohttp.ClientError as e:
-                print(f"Oops, something else went wrong with the request :- {e}")
-                await asyncio.sleep(1)
-                retries -= 1
-            else:
-                Done = True
+        price: Price = {}
 
-        if not Done:
-            raise errors.ErrorExtractingPrice(
-                'failed to get the price')
+        url = self.source + addr
+        async with Limiter:
+            async with session.get(url, headers=self.headers, ssl=False) as response:  # noqa
+
+                if response.status == 200:
+                    price = extractTokensFromHtml(await response.text(), swap)
+                else:
+                    print(f'failed request, exchange :- {exchange}, pairs :- {swap}')  # noqa
 
         return price
 
     @Cache
-    async def getPrice2(self, addr, swap, exchange) -> Optional[dict]:
+    async def getPrice(self, addr, swap) -> Optional[dict]:
         pass
-    
-    def simulateSwap(self, route, cap, prices) -> float:
-        In = cap
-        assert len(prices) == len(route), 'unequal route and prices'
 
-        for index, swap in enumerate(route):
-            price = prices[index]
-
-            Out = In * self.getRate(
-                price,
-                swap['to'],
-                swap['from']) / (1 + ((In/price[swap['from']]) * self.r1))
-            In = Out
-
-        return Out - cap
-
-    async def pollRoutes(self, batch: int, routes: list = [],
+    async def pollRoutes(self, routes: list[Route] = [],
                          save: bool = True, currentPrice: bool = False,
-                         value: float = 1.009027027) -> Optional[list]:
+                         value: float = 1.009027027,
+                         startTokens: str | None = None,
+                         startExchanges: str | None = None,
+                         amountOfSwaps: int | None = None) -> Optional[list]:
 
-        routeInfo = {}
+        # convert: Callable = lambda v: print('NotImplemented')
         if not routes:
-            routes = readJson(self.routePath)
-            routeInfo = routes['MetaData']
-            routes = routes['Data']
+            filters = []
+            if startTokens:
+                filters.append(Routes.startToken == startTokens)
+            if startExchanges:
+                filters.append(
+                    Routes.startExchanges == startExchanges)
+            if amountOfSwaps:
+                filters.append(
+                    Routes.amountOfSwaps == amountOfSwaps)
+
+            routeFull = self.fromDatabase(
+                (Routes.simplyfied_full,),
+                tuple(filters)
+            )
+            routes = [Route.fromFullString(route) for route in routeFull]
+
         routeLenght = len(routes)
 
-        message = f"""
-polling routes ...
+        logging.info('polling routes ...')
+        logging.info(f'filtering by :- {value}')
+        logging.info(f'total of :- {routeLenght}')
 
-filtering by :- {value}
-total of :- {routeLenght}
-
-        """
-        print(message)
         result = []
         routesGen = self.genRoutes(routes=routes, value=value,
-                                   currentPrice=currentPrice, batch=batch)
+                                   currentPrice=currentPrice)
 
-        while True:
+        Done = False
+
+        while not Done:
             try:
                 result.append(await anext(routesGen))
-            except StopIteration:
-                break
+            except StopAsyncIteration:
+                Done = True
             except KeyboardInterrupt:
-                print('\n interupted, exiting and saving')
-            finally:
-                export = sorted(result, key=lambda v: v['USD Value'],
-                                reverse=True)
-            if save:
-                writeJson(self.pollPath,
-                          {'MetaData': {
-                            'time': time.ctime(),
-                            'total': routeLenght,
-                            'routeInfo': routeInfo
-                            },
-                           'Data': export})
-            else:
-                return export
+                logging.info('\n interupted, exiting')
+                Done = True
 
-    async def genRoutes(self, routes: Optional[list[models.Route]] = [],
-                        value: float = 1.009027027,
-                        converted: bool = False,
-                        currentPrice: bool = False) -> AsyncGenerator:
+        export = sorted(result)
+        # convert the export
+        if save:
+            writeJson(self.dataPath,
+                      {'MetaData': {
+                        'time': time.ctime(),
+                        'total': routeLenght
+                        },
+                       'Data': export})
+            return None
+        else:
+            return export
+
+    async def genRoutes(self, value: float,
+                        routes: list[Route] = [],
+                        **kwargs) -> AsyncGenerator:
+        '''method to generate the profitable routes
+        Keyword arguments:
+
+        currentPrice: bool
+        startTokens: str
+        startExchnages: str
+        amountOfSwaps: int
+        '''
 
         if not routes:
-            routes = readJson(self.routePath)['Data']
+            filters = []
+            if kwargs.get('startTokens'):
+                filters.append(
+                    Routes.startToken == kwargs.get('startTokens'))
+            if kwargs.get('startExchanges'):
+                filters.append(
+                    Routes.startExchanges == kwargs.get('startExchanges'
+                    ))  # noqa E124
+            if kwargs.get('amountOfSwaps'):
+                filters.append(
+                    Routes.amountOfSwaps == kwargs.get('amountOfSwaps'))
+
+            routeFull = self.fromDatabase(
+                (Routes.simplyfied_full,),
+                tuple(filters)
+            )
+            routes = [Route.fromFullString(route) for route in routeFull]
 
         routes = self.screenRoutes(routes)
-        subRoutes = models.Spliter(routes, Cache)
+        subRoutes = Spliter(routes, Cache)
         routeLenght = len(routes)
 
-        if not currentPrice:
+        if not kwargs.get('currentPrice'):
             priceLookup = readJson(self.priceLookupPath)
         else:
             priceLookup = self.lookupPrice(returns=True)
 
         found = 0
-        async with aiohttp.ClientSession() as sess:
-            marker = 1
-            for item in subRoutes:
-                try:
-                    SimpRoutes = []
-                    tasks = []
-                    for i in item:
-                        SimpRoutes.append(self.simplyfy(i))
-                        tasks.append(asyncio.create_task(
-                            self.pollRoute(i, sess)))
-                    results = await asyncio.gather(*tasks)
+        marker = 1
+        Done = False
 
-                except AssertionError:
-                    log.exception('Error polling tasks')
-                    break
-
-                for Pos, result in enumerate(results):
-                    for pos, item in enumerate(result):
-                        capital, rates, EP = item
-                        startToken = SimpRoutes[Pos][pos + 2][0]['from']
-                        if rates[-1] >= value:
-                            found += 1
-                            if self.tokens[startToken] in priceLookup:
-                                USD_Value = priceLookup[
-                                    self.tokens[startToken]]['usd']
-                            else:
-                                USD_Value = 0
-
-                            yield {
-                                'route': SimpRoutes[Pos][pos + 2],
-                                'index': rates[-1],
-                                'capital': capital if not converted else capital * 1e18,  # noqa: E501
-                                'simplified': SimpRoutes[Pos][pos],
-                                'EP': EP if not converted else EP * 1e18,
-                                'USD Value': USD_Value,
-                            }
+        while not Done:
+            try:
+                item = next(subRoutes)
+                tasks = []
+                for i in item:
                     marker += 1
+                    UsdVal = priceLookup[i.swaps[0]['from']]
+                    tasks.append(asyncio.create_task(
+                        self.pollRoute(route=i, usdVal=UsdVal)))
 
-                print(f'                           found {found}', end='\r')
-                print(f'route {marker} of {routeLenght}', end='\r')
+                done, pending = await asyncio.wait(tasks,
+                                        return_when=asyncio.FIRST_EXCEPTION)  # noqa E128
+                for p in pending:
+                    p.cancel()
 
-    def screenRoutes(self, routes) -> list:
+                results: list[Route] = []
+                for res in done:
+                    try:
+                        results += await res
+                    except AssertionError:
+                        logging.exception('Error polling route')
+                        Done = True
+                    except Exception:
+                        logging.exception('Fatal Error')
+                        Done = True
+
+            except StopIteration:
+                logging.info('Done polling tasks')
+                Done = True
+
+            for route in results:
+                if route.index > value:
+                    found += 1
+                    yield route
+
+            logging.info(f'route {marker} of {routeLenght}, found {found}')
+        logging.info('done polling routes')
+
+    def screenRoutes(self, routes: list[Route]) -> list:
 
         history = set()
         result = []
 
         for route in routes:
-            simplifiedroute = self.simplyfy(route)
-            if simplifiedroute[0] not in history and \
-                    simplifiedroute[1] not in history:
+            reverse = Route.toReversed(
+                items=route.swaps,
+                prices=route.prices
+            )
+            if route.simplyfied_short not in history and \
+                    reverse.simplyfied_short not in history:
 
                 result.append(route)
-                history.add(simplifiedroute[0])
-                history.add(simplifiedroute[1])
+                history.add(route.simplyfied_short)
+                history.add(reverse.simplyfied_short)
 
         return result
 
@@ -516,18 +499,11 @@ class Aurora(Blockchain):
 
     def __init__(self, url: str = '') -> None:
         super().__init__()
-        if url: self.url = url  # noqa
+        if url: self.url = url  # noqa E701
 
         self.source = 'https://aurorascan.dev/address/'
-        self.exchanges = Cfg.AuroraExchanges
-        self.tokens = Cfg.AuroraTokens
-        self.startTokens = Cfg.AuroraStartTokens
-        self.startExchanges = Cfg.AuroraStartExchanges
         self.coinGeckoId = 'aurora'
         self.geckoTerminalName = 'aurora'
-        self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath, 'Aurora', 'pollResult.json')
-        self.routePath = os.path.join(self.dataPath, 'Aurora', 'arbRoutes.json')
 
     def __repr__(self):
         return 'Aurora Blockchain'
@@ -537,18 +513,13 @@ class Arbitrum(Blockchain):
 
     def __init__(self, url: str = '') -> None:
         super().__init__()
-        if url: self.url = url  # noqa
+        if url: self.url = url  # noqa E701
 
         self.source = 'https://arbiscan.io/address/'
-        self.exchanges = None
-        self.tokens = None
-        self.startTokens = None
-        self.startExchanges = None
+        self.databaseUrl: str = f'sqlite:///{os.path.join(self.dataPath, "Database", str(self))}.db' # noqa E501
+        self.engine: Any = create_engine(self.databaseUrl)
         self.coinGeckoId = ''
         self.geckoTerminalName = 'arbitrum'
-        self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath, 'Arbitrum', 'pollResult.json')
-        self.routePath = os.path.join(self.dataPath, 'Arbitrum', 'arbRoutes.json')
 
     def __repr__(self):
         return 'Arbitrum Blockchain'
@@ -558,78 +529,27 @@ class BSC(Blockchain):
 
     def __init__(self, url: str = '') -> None:
         super().__init__()
-        if url: self.url = url  # noqa
-
+        if url: self.url = url  # noqa E701
+        self.databaseUrl: str = f'sqlite:///{os.path.join(self.dataPath, "Database", str(self))}.db' # noqa E501
+        self.engine: Any = create_engine(self.databaseUrl)
         self.source = 'https://bscscan.com/address/'
-        self.exchanges = Cfg.BSCExchanges
-        self.tokens = Cfg.BSCTokens
-        self.startTokens = Cfg.BSCStartTokens
-        self.startExchanges = Cfg.BSCStartExchanges
         self.coinGeckoId = 'binance-smart-chain'
         self.geckoTerminalName = 'bsc'
-        self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath, 'BSC', 'pollResult.json')
-        self.routePath = os.path.join(self.dataPath, 'BSC', 'arbRoute.json')
 
     def __repr__(self):
         return 'Binance SmartChain'
-
-
-class Kovan(Blockchain):
-
-    def __init__(self, url: str = '') -> None:
-        super().__init__()
-        if url: self.url = url  # noqa
-
-        self.source = ''
-        self.exchanges = None
-        self.tokens = None
-        self.startTokens = None
-        self.startExchanges = None
-        self.coinGeckoId = ''
-        self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath, 'Kovan', 'pollResult.json')
-        self.routePath = os.path.join(self.dataPath, 'Kovan', 'arbRoute.json')
-
-    def __repr__(self):
-        return 'Kovan Testnet'
-
-
-class Goerli(Blockchain):
-
-    def __init__(self, url: str = '') -> None:
-        super().__init__()
-        if url: self.url = url  # noqa
-
-        self.source = ''
-        self.exchanges = None
-        self.tokens = None
-        self.startTokens = None
-        self.startExchanges = None
-        self.coinGeckoId = ''
-        self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath, 'Goerli', 'pollResult.json')
-        self.routePath = os.path.join(self.dataPath, 'Goerli', 'arbRoute.json')
-
-    def __repr__(self):
-        return 'Goerli Testnet'
 
 
 class Fantom(Blockchain):
 
     def __init__(self, url: str = '') -> None:
         super().__init__()
-        if url: self.url = url  # noqa
+        if url: self.url = url  # noqa E701
 
         self.source = ''
-        self.exchanges = None
-        self.tokens = None
-        self.startTokens = None
-        self.startExchanges = None
+        self.databaseUrl: str = f'sqlite:///{os.path.join(self.dataPath, "Database", str(self))}' # noqa E501
+        self.engine: Any = create_engine(self.databaseUrl)
         self.coinGeckoId = ''
-        self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath, 'Goerli', 'pollResult.json')
-        self.routePath = os.path.join(self.dataPath, 'Goerli', 'arbRoute.json')
 
     def __repr__(self):
         return 'Goerli Testnet'
@@ -639,14 +559,9 @@ class Polygon(Blockchain):
 
     def __init__(self, url: str = '') -> None:
         super().__init__()
-        if url: self.url = url  # noqa
+        if url: self.url = url  # noqa E701
 
         self.source = ''
-        self.exchanges = None
-        self.tokens = None
-        self.startTokens = None
-        self.startExchanges = None
+        self.databaseUrl: str = f'sqlite:///{os.path.join(self.dataPath, "Database", str(self))}' # noqa E501
+        self.engine: Any = create_engine(self.databaseUrl)
         self.coinGeckoId = ''
-        self.arbAddress = ''
-        self.pollPath = os.path.join(self.dataPath, 'Polygon', 'pollResult.json')
-        self.routePath = os.path.join(self.dataPath, 'Polygon', 'arbRoute.json')

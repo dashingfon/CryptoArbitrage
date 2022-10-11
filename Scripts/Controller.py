@@ -1,85 +1,64 @@
 '''The controller class that prepares and executes arbs'''
-import scripts.Config as Cfg
-import scripts.Errors as errors
-from scripts.utills import sortTokens, isTestnet
+
+from scripts import CONFIG_PATH
+from scripts.Utills import sortTokens, isTestnet, readJson
 import scripts.Models as models
+import scripts.Errors as errors
 
 import os
 from eth_abi import encode_abi
 from web3 import Web3
-import attr
 import logging
-from typing import Type
+from typing import Any, Type
 
-log = logging.getLogger()
+Config: dict = readJson(CONFIG_PATH)
 
 
-@attr.s
 class Controller():
 
-    def __attrs_post_init__(self) -> None:
-        self.simplyfied = self.simplyfy(self.swaps)
-
     def __init__(self, blockchain: Type[models.BaseBlockchain]) -> None:
+        self.verifyChain(blockchain)
+        self.blockchain: Any = blockchain
+        self.contractAbi: list = Cfg.contractAbi
+        self.routerAbi: list = Cfg.routerAbi
+        self.swapFuncSig: str = '0x38ed1739'
+        # 'swapExactTokensForTokens(uint256,uint256,address[],address,uint256)'
+        self.approveFuncSig: str = '0x095ea7b3'
+        # 'approve(address,uint256)'
+        self.optimalAmount: float = 1.009027027
+        self.web3: Web3 = Web3(Web3.HTTPProvider(self.blockchain.url,
+                                           request_kwargs={'timeout': 300}))  # noqa E128
+        self.pv: str = os.environ.get('BEACON')
+
+    def verifyChain(self, blockchain: Type[models.BaseBlockchain]) -> None:
         self.blockchainMap = Cfg.ControllerBlockchains
         if str(blockchain) in self.blockchainMap:
             self.blockchain = blockchain
         else:
-            raise errors.InvalidBlockchainObject(
+            raise RuntimeError(
                 f'Invalid Blockchain Object {blockchain}')
 
-        self.contractAbi = Cfg.contractAbi
-        self.contractAddress = self.blockchain.arbAddress
-        self.routerAbi = Cfg.routerAbi
-        self.swapFuncSig = '0x38ed1739'
-        # 'swapExactTokensForTokens(uint256,uint256,address[],address,uint256)'
-        self.approveFuncSig = '0x095ea7b3'
-        # 'approve(address,uint256)'
-        self.optimalAmount = 1.009027027
-        self.web3 = Web3(Web3.HTTPProvider(self.blockchain.url,
-                                           request_kwargs={'timeout': 300}))
-        self.pv = os.environ.get('BEACON')
+    def getContract(self, address: str = '',
+                    abi: list = []) -> Any:
+        if not address and not self.blockchain.arbAddress:
+            raise errors.NoBlockchainContract(
+                f'{self.blockchain} has no contract address'
+            )
+        elif not address:
+            address = self.blockchain.arbAddress
 
-    def getContract(self, address='', abi=''):
-        if not address:
-            address = self.contractAddress
         if not abi:
             abi = self.contractAbi
         return self.web3.eth.contract(address=address, abi=abi)
 
-    def getAccount(self):
+    def getAccount(self) -> Any:
         if isTestnet(self.blockchain):
             return self.web3.eth.accounts[0]
         else:
             return self.web3.eth.account.from_key(self.pv)
 
-    '''def getRoutes(self, pollResult = True, arbRoute = False):
-        history = set()
-
-        if arbRoute:
-            self.blockchain.pollRoutes()
-            pollResult = True
-
-        if pollResult:
-            try:
-                with open(self.blockchain.pollPath, 'r') as PP:
-                    pollPath = json.load(PP)
-            except FileNotFoundError:
-                warnings.warn('Poll result file not found')
-            else:
-                for item in pollPath['Data']:
-                    route = self.blockchain.assemble(item['route'])
-                    routes = self.blockchain.simplyfy(route)
-                    history.add(routes[0])
-                    history.add(routes[1])
-                    if item['EP'] > 0:
-                        yield {'route' : routes[2],'simplified' : routes[0],'EP' : item['EP'],'capital' : item['capital']}  # noqa: E501
-
-    '''
-    '''def check(self, route):
-        return self.blockchain.pollRoute(route)
-'''
     def getProspect(self, Routes):
+
         for item in Routes:
             simplyfied = self.blockchain.simplyfy(item['route'])
             if 'EP' in item and item['EP']/item['capital'] >= self.optimalAmount:  # noqa: E501
@@ -103,7 +82,8 @@ class Controller():
                     item['route'] = simplyfied[3]
                     yield item
 
-    def getAmountsOut(self, routerAddress, amount, addresses):
+    def getAmountsOut(self, routerAddress: str, amount: int,
+                      addresses: list[str]) -> int:
         Router = self.getContract(routerAddress, self.routerAbi)
         amounts = Router.functions.getAmountsOut(amount, addresses).call()
         return amounts[-1]
@@ -117,7 +97,7 @@ class Controller():
             current = nexxt
         return current
 
-    def getValues(self, item, options):
+    def getValues(self, item: dict, options: dict) -> dict:
         '''
         options contents
 
@@ -234,7 +214,7 @@ class Controller():
             tranx = self.web3.eth.send_raw_transaction(txCreate.rawTransaction)
 
         txReceipt = self.web3.eth.wait_for_transaction_receipt(tranx)
-        print(f'tx succesful with hash: {txReceipt.transactionHash.hex()}')
+        logging.info(f'tx succesful with hash: {txReceipt.transactionHash.hex()}')  # noqa
 
     def arb(self, routes=[], amount=10,  keyargs=[]):
 
