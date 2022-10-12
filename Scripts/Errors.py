@@ -14,3 +14,19 @@ class incorrectInput(Exception):
 
 class InvalidSession(Exception):
     pass
+
+
+class InvalidMode(Exception):
+    pass
+
+
+class InvalidBlockchainObject(Exception):
+    pass
+
+
+class CannotInitializeDirectly(Exception):
+    pass
+
+
+class PrivateKeyNotSet(Exception):
+    pass

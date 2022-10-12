@@ -4,7 +4,7 @@ The main blockchain class inherits from the BaseBlockchain
 which other Blockchains then inherit from
 '''
 
-from scripts import CONFIG_PATH
+from scripts import CONFIG_PATH, DATABASE_URL
 import scripts.Errors as errors
 from scripts.Models import (
     Token,
@@ -33,13 +33,15 @@ import aiohttp
 from aiolimiter import AsyncLimiter
 from pycoingecko import CoinGeckoAPI
 from cache import AsyncTTL
-from typing import AsyncGenerator, Callable, Optional, Any
+from typing import AsyncGenerator, Callable, Optional, Any, Type
 import logging
+import web3
 
 
 Cache: AsyncTTL = AsyncTTL(time_to_live=5, maxsize=150)
 Limiter: AsyncLimiter = AsyncLimiter(max_rate=25, time_period=1)
 Config: dict = readJson(CONFIG_PATH)
+Engine: Any = create_engine(DATABASE_URL)
 
 
 class Blockchain(BaseBlockchain):
@@ -48,7 +50,9 @@ class Blockchain(BaseBlockchain):
     Must implement genRoutes according to the superclass'''
 
     def __init__(self) -> None:
-
+        if type(self) == Blockchain:
+            raise errors.CannotInitializeDirectly(
+                f'cannot initialize {self} dirrectly')
         self.impact: float = 0.00075
         self.r1: float = 0.997
         self.depthLimit: int = 4
@@ -63,8 +67,11 @@ class Blockchain(BaseBlockchain):
             os.path.split(os.path.dirname(__file__))[0], 'data')
         self.priceLookupPath: str = os.path.join(self.dataPath, 'PriceLookup.json')  # noqa
         self.url: str = 'http://127.0.0.1:8545'
-        self.databaseUrl: str
-        self.engine: Any
+        self.tableName = f'{str(self)} Routes'
+        self.table: Type[Routes] = type(self.tableName,
+                          (Routes,),  # noqa E128
+                          {'__tablename__': self.tableName.lower()},
+                          table=True)
         self.source: str
         self.coinGeckoId: str
         self.geckoTerminalName: str
@@ -75,13 +82,12 @@ class Blockchain(BaseBlockchain):
         graph: dict :- a representation of the connected tokens across dexs
         arbRoutes: list :- a list of the cyclic routes
         header: dict :- requests header
-        url: str :- blockchain node url
         dataPath: str :- the path to the data directory
         priceLookupPath: str
-        getRate: GetRate
+        tableName: str
+        table: Any
         url: str
-        databaseUrl: str
-        engine: Any
+        table: Any
         source: str
         exchanges: dict
         coinGeckoId: str
@@ -130,8 +136,10 @@ class Blockchain(BaseBlockchain):
             for pools, addresses in attributes['pairs'].items():
                 pool = pools.split(' - ')
 
-                Token0 = Token(pool[0][:-8], tokens[pool[0]])
-                Token1 = Token(pool[1][:-8], tokens[pool[1]])
+                Token0 = Token(pool[0][:-8],
+                               web3.Web3.toChecksumAddress(tokens[pool[0]]))
+                Token1 = Token(pool[1][:-8],
+                               web3.Web3.toChecksumAddress(tokens[pool[1]]))
 
                 temp[frozenset([Token0, Token1])] = addresses
 
@@ -200,16 +208,16 @@ class Blockchain(BaseBlockchain):
     def toDatabase(self, routes: list[Route]) -> None:
         '''method to get data from the database'''
         if routes:
-            SQLModel.metadata.create_all(self.engine)
+            SQLModel.metadata.create_all(Engine)
 
-            with Session(self.engine) as sess:
+            with Session(Engine) as sess:
                 for i in routes:
-                    sess.add(Routes.fromString(i.simplyfied))
+                    sess.add(self.table.fromString(i.simplyfied))
                 sess.commit()
 
     def fromDatabase(self, selection: tuple, where: tuple = ()) -> list:
         '''method to save data to the database'''
-        with Session(self.engine) as sess:
+        with Session(Engine) as sess:
             raw = select(*selection)
 
             statement = raw
@@ -271,10 +279,11 @@ class Blockchain(BaseBlockchain):
                 )
         else:
             prices = await self.getPrices(route)
+        route.prices = prices
 
         return route.calculate(self.r1, self.impact, usdVal)
 
-    def lookupPrice(self, returns=False) -> Optional[dict]:
+    def lookupPrice(self) -> None:
         temp = readJson(self.priceLookupPath)
         prices = {}
 
@@ -288,10 +297,6 @@ class Blockchain(BaseBlockchain):
                 vs_currencies='usd')
 
         writeJson(self.priceLookupPath, {**temp, **prices})
-
-        if returns:
-            return {**temp, **prices}
-        return None
 
     async def getPrices(self, route: Route,
                         session: aiohttp.ClientSession | None = None) -> list[Price]:  # noqa E501
@@ -345,16 +350,16 @@ class Blockchain(BaseBlockchain):
         if not routes:
             filters = []
             if startTokens:
-                filters.append(Routes.startToken == startTokens)
+                filters.append(self.table.startToken == startTokens)
             if startExchanges:
                 filters.append(
-                    Routes.startExchanges == startExchanges)
+                    self.table.startExchanges == startExchanges)
             if amountOfSwaps:
                 filters.append(
-                    Routes.amountOfSwaps == amountOfSwaps)
+                    self.table.amountOfSwaps == amountOfSwaps)
 
             routeFull = self.fromDatabase(
-                (Routes.simplyfied_full,),
+                (self.table.simplyfied_full,),
                 tuple(filters)
             )
             routes = [Route.fromFullString(route) for route in routeFull]
@@ -409,17 +414,17 @@ class Blockchain(BaseBlockchain):
             filters = []
             if kwargs.get('startTokens'):
                 filters.append(
-                    Routes.startToken == kwargs.get('startTokens'))
+                    self.table.startToken == kwargs.get('startTokens'))
             if kwargs.get('startExchanges'):
                 filters.append(
-                    Routes.startExchanges == kwargs.get('startExchanges'
+                    self.table.startExchanges == kwargs.get('startExchanges'
                     ))  # noqa E124
             if kwargs.get('amountOfSwaps'):
                 filters.append(
-                    Routes.amountOfSwaps == kwargs.get('amountOfSwaps'))
+                    self.table.amountOfSwaps == kwargs.get('amountOfSwaps'))
 
             routeFull = self.fromDatabase(
-                (Routes.simplyfied_full,),
+                (self.table.simplyfied_full,),
                 tuple(filters)
             )
             routes = [Route.fromFullString(route) for route in routeFull]
@@ -428,10 +433,9 @@ class Blockchain(BaseBlockchain):
         subRoutes = Spliter(routes, Cache)
         routeLenght = len(routes)
 
-        if not kwargs.get('currentPrice'):
-            priceLookup = readJson(self.priceLookupPath)
-        else:
-            priceLookup = self.lookupPrice(returns=True)
+        if kwargs.get('currentPrice'):
+            self.lookupPrice()
+        priceLookup = readJson(self.priceLookupPath)
 
         found = 0
         marker = 1
@@ -500,7 +504,6 @@ class Aurora(Blockchain):
     def __init__(self, url: str = '') -> None:
         super().__init__()
         if url: self.url = url  # noqa E701
-
         self.source = 'https://aurorascan.dev/address/'
         self.coinGeckoId = 'aurora'
         self.geckoTerminalName = 'aurora'
@@ -514,10 +517,7 @@ class Arbitrum(Blockchain):
     def __init__(self, url: str = '') -> None:
         super().__init__()
         if url: self.url = url  # noqa E701
-
         self.source = 'https://arbiscan.io/address/'
-        self.databaseUrl: str = f'sqlite:///{os.path.join(self.dataPath, "Database", str(self))}.db' # noqa E501
-        self.engine: Any = create_engine(self.databaseUrl)
         self.coinGeckoId = ''
         self.geckoTerminalName = 'arbitrum'
 
@@ -530,8 +530,6 @@ class BSC(Blockchain):
     def __init__(self, url: str = '') -> None:
         super().__init__()
         if url: self.url = url  # noqa E701
-        self.databaseUrl: str = f'sqlite:///{os.path.join(self.dataPath, "Database", str(self))}.db' # noqa E501
-        self.engine: Any = create_engine(self.databaseUrl)
         self.source = 'https://bscscan.com/address/'
         self.coinGeckoId = 'binance-smart-chain'
         self.geckoTerminalName = 'bsc'
@@ -545,14 +543,12 @@ class Fantom(Blockchain):
     def __init__(self, url: str = '') -> None:
         super().__init__()
         if url: self.url = url  # noqa E701
-
         self.source = ''
-        self.databaseUrl: str = f'sqlite:///{os.path.join(self.dataPath, "Database", str(self))}' # noqa E501
-        self.engine: Any = create_engine(self.databaseUrl)
         self.coinGeckoId = ''
+        self.geckoTerminalName = 'bsc'
 
     def __repr__(self):
-        return 'Goerli Testnet'
+        return 'Fantom Blockchain'
 
 
 class Polygon(Blockchain):
@@ -560,8 +556,9 @@ class Polygon(Blockchain):
     def __init__(self, url: str = '') -> None:
         super().__init__()
         if url: self.url = url  # noqa E701
-
         self.source = ''
-        self.databaseUrl: str = f'sqlite:///{os.path.join(self.dataPath, "Database", str(self))}' # noqa E501
-        self.engine: Any = create_engine(self.databaseUrl)
         self.coinGeckoId = ''
+        self.geckoTerminalName = 'bsc'
+
+    def __repr__(self):
+        return 'Polygon Blockchain'

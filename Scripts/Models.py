@@ -13,23 +13,29 @@ getRate: GetRate = lambda price, to, fro, r1: r1 * price[to] / price[fro]  # noq
 # return self.r1 * price[to]/(1 + (self.impact * self.r1)) / price[fro]
 
 
-@attr.s(slots=True, order=True)
+@attr.s(slots=True)
+class Swap():
+    fro: 'Token' = attr.ib()
+    to: 'Token' = attr.ib()
+    via: str = attr.ib()
+
+
+@attr.s(slots=True, order=True, frozen=True)
 class Token:
     '''Token class'''
     name: str = attr.ib(repr=False, order=False)
     address: str = attr.ib(repr=False, order=str.lower)
-    shortJoin: str = attr.ib(init=False, order=False)
-    fullJoin: str = attr.ib(init=False, repr=False, order=False)
 
-    def __attrs_post_init__(self) -> None:
-        self.shortJoin = f'{self.name}_{self.address[-7:]}'
-        self.fullJoin = f'{self.name}_{self.address}'
+    @property
+    def shortJoin(self) -> str:
+        return f'{self.name}_{self.address[-7:]}'
 
-    '''def __hash__(self) -> int:
-        return int(self.address)'''
+    @property
+    def fullJoin(self) -> str:
+        return f'{self.name}_{self.address}'
 
 
-class Routes(SQLModel, table=True):
+class Routes(SQLModel):
     '''Route Model class'''
     id: Optional[int] = Field(default=None, primary_key=True)
     simplyfied_Sht: str = Field()
@@ -44,9 +50,8 @@ class Routes(SQLModel, table=True):
         pass
 
 
-class Test(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    simplyfied_Sht: str = Field()
+name = 'Blockchain  i'
+DR = type(name, (Routes,), {'__tablename__': name.lower()}, table=True)
 
 
 @attr.s(slots=True, order=True)
@@ -68,6 +73,10 @@ class Route:
     def simplyfy(self, mode: str = 'long') -> str:
         '''function to generate a string repreentation
         from the swap attribute'''
+
+        if mode != "long" or mode != 'short':
+            raise ValueError(
+                f"expected 'long' or 'short' got{mode}")
 
         if mode == 'long':
             result = [f"{self.swaps[0]['from'].fullJoin} {self.swaps[0]['to'].fullJoin} {self.swaps[0]['via']}"]  # noqa: E501
@@ -184,6 +193,10 @@ class Route:
 class BaseBlockchain(ABC):
     '''Base blockchain implementation'''
     url: str
+
+    @property
+    def arbAddress(self) -> Optional[str]:
+        pass
 
     @abstractmethod
     async def genRoutes(self, value: float,

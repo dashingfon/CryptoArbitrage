@@ -9,16 +9,19 @@ import os
 from eth_abi import encode_abi
 from web3 import Web3
 import logging
-from typing import Any, Type
+from typing import Any
+from dotenv import load_dotenv
 
+load_dotenv()
 Config: dict = readJson(CONFIG_PATH)
 
 
 class Controller():
 
-    def __init__(self, blockchain: Type[models.BaseBlockchain]) -> None:
+    def __init__(self, blockchain: Any,
+                 testing: bool = False) -> None:
+
         self.verifyChain(blockchain)
-        self.blockchain: Any = blockchain
         self.contractAbi: list = Cfg.contractAbi
         self.routerAbi: list = Cfg.routerAbi
         self.swapFuncSig: str = '0x38ed1739'
@@ -28,14 +31,14 @@ class Controller():
         self.optimalAmount: float = 1.009027027
         self.web3: Web3 = Web3(Web3.HTTPProvider(self.blockchain.url,
                                            request_kwargs={'timeout': 300}))  # noqa E128
-        self.pv: str = os.environ.get('BEACON')
+        self.pv: str | None = os.environ.get('BEACON')
+        self.testing = testing
 
-    def verifyChain(self, blockchain: Type[models.BaseBlockchain]) -> None:
-        self.blockchainMap = Cfg.ControllerBlockchains
-        if str(blockchain) in self.blockchainMap:
-            self.blockchain = blockchain
+    def verifyChain(self, blockchain: Any) -> None:
+        if issubclass(type(blockchain), models.BaseBlockchain):
+            self.blockchain: Any = blockchain
         else:
-            raise RuntimeError(
+            raise errors.InvalidBlockchainObject(
                 f'Invalid Blockchain Object {blockchain}')
 
     def getContract(self, address: str = '',
@@ -52,35 +55,16 @@ class Controller():
         return self.web3.eth.contract(address=address, abi=abi)
 
     def getAccount(self) -> Any:
-        if isTestnet(self.blockchain):
+        if self.testing:
             return self.web3.eth.accounts[0]
+        elif not self.pv:
+            raise errors.PrivateKeyNotSet('no private key set')
         else:
             return self.web3.eth.account.from_key(self.pv)
 
     def getProspect(self, Routes):
 
-        for item in Routes:
-            simplyfied = self.blockchain.simplyfy(item['route'])
-            if 'EP' in item and item['EP']/item['capital'] >= self.optimalAmount:  # noqa: E501
-                item['EP'] *= 1e18
-                item['capital'] *= 1e18
-                item['simplified'] = simplyfied[0]
-                item['route'] = simplyfied[2]
-                yield item
-            elif 'EP' not in item and str(self.blockchain)[-7:] != 'Testnet':
-                result = self.check(item['route'])
-
-                if result[0][2] / result[0][0] >= self.optimalAmount:
-                    item['EP'] = result[0][2] * 1e18
-                    item['capital'] = result[0][0] * 1e18
-                    item['simplified'] = simplyfied[0]
-                    yield item
-                elif result[1][2] / result[1][0] >= self.optimalAmount:
-                    item['EP'] = result[1][2] * 1e18
-                    item['capital'] = result[1][0] * 1e18
-                    item['simplified'] = simplyfied[1]
-                    item['route'] = simplyfied[3]
-                    yield item
+        pass
 
     def getAmountsOut(self, routerAddress: str, amount: int,
                       addresses: list[str]) -> int:
@@ -144,7 +128,7 @@ class Controller():
 
         return values
 
-    def prepPayload(self, item, options={}, simulate=False):
+    def prepPayload(self, item, options={}, simulate=False, **metaData):
 
         val = self.getValues(item=item, options=options)
 

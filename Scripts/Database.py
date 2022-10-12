@@ -4,12 +4,6 @@ import scripts.Models as models
 import time
 
 
-def getEngine(filename):
-    url = f'sqlite:///{filename}'
-    Engine = create_engine(url, echo=True)
-    return Engine
-
-
 if __name__ == '__main__':
 
     filename = "data\\databae.db"

@@ -5,7 +5,6 @@ import scripts.Utills as utills
 import os
 import time
 import attr
-# import abc
 import asyncio
 # import aiohttp
 # import pathlib'''
@@ -65,7 +64,7 @@ def main():
 
 if __name__ == '__main__':
     # main()
-    _ProactorBasePipeTransport.__del__ = utills.silence_event_loop_closed(  # type: ignore
+    _ProactorBasePipeTransport.__del__ = utills.silence_event_loop_closed(  # type: ignore # noqa E501 
         _ProactorBasePipeTransport.__del__)
 
     chain = Blc.BSC()
@@ -130,40 +129,40 @@ if __name__ == '__main__':
         ]
     abi = [
         {
-        "inputs": [],
-        "name": "factory",
-        "outputs": [
-            {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
+            "inputs": [],
+            "name": "factory",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
         },
         {
-        "inputs": [],
-        "name": "getReserves",
-        "outputs": [
-            {
-            "internalType": "uint112",
-            "name": "_reserve0",
-            "type": "uint112"
-            },
-            {
-            "internalType": "uint112",
-            "name": "_reserve1",
-            "type": "uint112"
-            },
-            {
-            "internalType": "uint32",
-            "name": "_blockTimestampLast",
-            "type": "uint32"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
+            "inputs": [],
+            "name": "getReserves",
+            "outputs": [
+                {
+                    "internalType": "uint112",
+                    "name": "_reserve0",
+                    "type": "uint112"
+                },
+                {
+                    "internalType": "uint112",
+                    "name": "_reserve1",
+                    "type": "uint112"
+                },
+                {
+                    "internalType": "uint32",
+                    "name": "_blockTimestampLast",
+                    "type": "uint32"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
         },
     ]
 
@@ -180,7 +179,8 @@ if __name__ == '__main__':
         for i in addresses:
             tasks.append(asyncio.create_task(trid(i)))
 
-        done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_EXCEPTION)
+        done, pending = await asyncio.wait(
+            tasks, return_when=asyncio.FIRST_EXCEPTION)
         results = []
 
         for p in pending:
@@ -198,12 +198,16 @@ if __name__ == '__main__':
 
     # asyncio.run(reed())
 
-    '''@attr.s(order=True)
-    class tred():
-        r: int = attr.ib()
-        d: str = attr.ib()
+    class Dref():
+        pass
 
-    d = [
-        tred(8, 'g'), tred(8, 'p'), tred(9, 'o')
-    ]
-    print(sorted(d))'''
+    class Ftih(Dref):
+        pass
+
+    class Gtin(Ftih):
+        pass
+
+    e = Gtin()
+    t = Ftih()
+    print(issubclass(type(t), Dref))
+    print(issubclass(type(e), Ftih))
