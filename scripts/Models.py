@@ -5,19 +5,13 @@ from typing import Optional, AsyncGenerator, Callable
 from sqlmodel import Field, SQLModel
 from cache import AsyncTTL
 import attr
+import time
 import logging
 
 Price = dict['Token', float]
 GetRate = Callable[[Price, 'Token', 'Token', float], float]
 getRate: GetRate = lambda price, to, fro, r1: r1 * price[to] / price[fro]  # noqa
 # return self.r1 * price[to]/(1 + (self.impact * self.r1)) / price[fro]
-
-
-@attr.s(slots=True)
-class Swap():
-    fro: 'Token' = attr.ib()
-    to: 'Token' = attr.ib()
-    via: str = attr.ib()
 
 
 @attr.s(slots=True, order=True, frozen=True)
@@ -35,6 +29,13 @@ class Token:
         return f'{self.name}_{self.address}'
 
 
+@attr.s(slots=True)
+class Swap():
+    fro: Token = attr.ib()
+    to: Token = attr.ib()
+    via: str = attr.ib()
+
+
 class Routes(SQLModel):
     '''Route Model class'''
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -46,18 +47,27 @@ class Routes(SQLModel):
     time: float = Field(index=True)
 
     @classmethod
-    def fromString(cls, string: str) -> 'Routes':
-        pass
+    def fromSwaps(cls, swaps: list[Swap]) -> 'Routes':
 
+        short, long = [], []
+        for j in swaps:
+            long.append(f"{j.fro.fullJoin} {j.to.fullJoin} {j.via}")  # noqa: E501
+            short.append(f"{j.fro.shortJoin} {j.to.shortJoin} {j.via}")  # noqa: E501
 
-name = 'Blockchain  i'
-DR = type(name, (Routes,), {'__tablename__': name.lower()}, table=True)
+        return Routes(
+           simplyfied_Sht=' - '.join(short),
+           simplyfied_full=' - '.join(long),
+           startToken=swaps[0].fro.shortJoin,
+           startExchanges=swaps[0].via,
+           amountOfSwaps=len(swaps),
+           time=time.time()
+        )
 
 
 @attr.s(slots=True, order=True)
 class Route:
     '''Route class'''
-    swaps: list[dict[str, Token]] = attr.ib(repr=False, order=False)
+    swaps: list[Swap] = attr.ib(repr=False, order=False)
     prices: list[Price] = attr.ib(repr=False, factory=list, order=False)
     simplyfied: str = attr.ib(init=False, repr=False, order=False)
     simplyfied_short: str = attr.ib(init=False, order=False)
@@ -78,20 +88,19 @@ class Route:
             raise ValueError(
                 f"expected 'long' or 'short' got{mode}")
 
+        result = []
         if mode == 'long':
-            result = [f"{self.swaps[0]['from'].fullJoin} {self.swaps[0]['to'].fullJoin} {self.swaps[0]['via']}"]  # noqa: E501
-            for j in self.swaps[1:]:
-                result.append(f"{j['from'].fullJoin} {j['to'].fullJoin} {j['via']}")  # noqa: E501
+            for j in self.swaps:
+                result.append(f"{j.fro.fullJoin} {j.to.fullJoin} {j.via}")  # noqa: E501
 
         elif mode == 'short':
-            result = [f"{self.swaps[0]['from'].shortJoin} {self.swaps[0]['to'].shortJoin} {self.swaps[0]['via']}"]  # noqa: E501
-            for j in self.swaps[1:]:
-                result.append(f"{j['from'].shortJoin} {j['to'].shortJoin} {j['via']}")  # noqa: E501
+            for j in self.swaps:
+                result.append(f"{j.fro.shortJoin} {j.to.shortJoin} {j.via}")  # noqa: E501
 
         return ' - '.join(result)
 
     @classmethod
-    def toReversed(cls, items: list[dict[str, Token]],
+    def toReversed(cls, items: list[Swap],
                    prices: list[Price]) -> 'Route':
 
         temp = cls(items[::-1])
@@ -100,7 +109,11 @@ class Route:
         return temp
 
     @classmethod
-    def fromFullString(cls, string: str) -> 'Route':
+    def fromFullString(cls, string: str, prices: list[dict] = [],
+                       usdVal: float = 0, index: float = 0,
+                       EP: float = 0,
+                       capital: float = 0) -> 'Route':
+
         result: list = []
         routeList = string.split(' - ')
         for item in routeList:
@@ -108,14 +121,21 @@ class Route:
             token1 = itemList[0].split('_')
             token2 = itemList[1].split('_')
 
-            load = {
-                'from': Token(token1[0], token1[1]),
-                'to': Token(token2[0], token2[1]),
-                'via': itemList[2],
-                }
-            result.append(load)
+            swap = Swap(
+                fro=Token(token1[0], token1[1]),
+                to=Token(token2[0], token2[1]),
+                via=itemList[2]
+            )
+            result.append(swap)
 
-        return cls(swaps=result)
+        newRoute = cls(swaps=result)
+        newRoute.prices = prices
+        newRoute.USD_Value = usdVal
+        newRoute.index = index
+        newRoute.EP = EP
+        newRoute.capital = capital
+
+        return newRoute
 
     @staticmethod
     def cumSum(listItem: list) -> list:
@@ -135,8 +155,8 @@ class Route:
 
             Out = In * getRate(
                 price,
-                swap['to'],
-                swap['from'], r1) / (1 + ((In/price[swap['from']]) * r1))
+                swap.to,
+                swap.fro, r1) / (1 + ((In/price[swap.fro]) * r1))
             In = Out
 
         return Out - self.capital
@@ -155,21 +175,21 @@ class Route:
         for index, swap in enumerate(self.swaps):
             price: Price = self.prices[index]
 
-            rate = (getRate(price, swap['to'], swap['from'], r1),
-                    getRate(price, swap['from'], swap['to'], r1))
+            rate = (getRate(price, swap.to, swap.fro, r1),
+                    getRate(price, swap.fro, swap.to, r1))
 
             if index == 0:
-                liquidity.append(price[swap['from']])
-                forward = price[swap['to']]
+                liquidity.append(price[swap.fro])
+                forward = price[swap.to]
                 rates[0].append(rate[0])
             elif index == len(self.swaps) - 1:
                 rates[0].append(rate[0] * rates[0][-1])
                 liquidity += [
-                    min(price[swap['from']], forward), price[swap['to']]]
+                    min(price[swap.fro], forward), price[swap.to]]
             else:
                 rates[0].append(rate[0] * rates[0][-1])
-                liquidity.append(min(price[swap['from']], forward))
-                forward = price[swap['to']]
+                liquidity.append(min(price[swap.fro], forward))
+                forward = price[swap.to]
 
             rates[1].insert(0, rate[1])
 

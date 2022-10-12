@@ -4,7 +4,6 @@ from asyncio.proactor_events import _ProactorBasePipeTransport
 # from brownie import interface
 
 import scripts.Blockchains as Blc
-# import scripts.Config as Cfg
 # import scripts.Controller as Ctr
 from scripts.Utills import silence_event_loop_closed
 # load_dotenv()

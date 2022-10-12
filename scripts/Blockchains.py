@@ -8,6 +8,7 @@ from scripts import CONFIG_PATH, DATABASE_URL
 import scripts.Errors as errors
 from scripts.Models import (
     Token,
+    Swap,
     Route,
     Routes,
     BaseBlockchain,
@@ -26,6 +27,8 @@ from scripts.Database import (
     Session,
     select
     )
+import logging
+import web3
 import time
 import os
 import asyncio
@@ -34,8 +37,6 @@ from aiolimiter import AsyncLimiter
 from pycoingecko import CoinGeckoAPI
 from cache import AsyncTTL
 from typing import AsyncGenerator, Callable, Optional, Any, Type
-import logging
-import web3
 
 
 Cache: AsyncTTL = AsyncTTL(time_to_live=5, maxsize=150)
@@ -111,7 +112,7 @@ class Blockchain(BaseBlockchain):
         return None
 
     def setup(self) -> None:
-        pass
+        '''method to fetch all the token and pair addresses'''
 
     def buildGraph(self, exchanges: dict = {}, tokens: dict = {}) -> None:
         '''
@@ -136,10 +137,8 @@ class Blockchain(BaseBlockchain):
             for pools, addresses in attributes['pairs'].items():
                 pool = pools.split(' - ')
 
-                Token0 = Token(pool[0][:-8],
-                               web3.Web3.toChecksumAddress(tokens[pool[0]]))
-                Token1 = Token(pool[1][:-8],
-                               web3.Web3.toChecksumAddress(tokens[pool[1]]))
+                Token0 = Token(pool[0][:-8], tokens[pool[0]])
+                Token1 = Token(pool[1][:-8], tokens[pool[1]])
 
                 temp[frozenset([Token0, Token1])] = addresses
 
@@ -157,7 +156,7 @@ class Blockchain(BaseBlockchain):
         self.exchanges = pairs
 
     def dive(self, depth: int, node: Token, goal: Token,
-             path: list[dict[str, Token | str]],
+             path: list[Swap],
              followed: list) -> list[Route]:
         '''
         recursive function to discover tradable arb routes
@@ -167,19 +166,20 @@ class Blockchain(BaseBlockchain):
         result: list[Route] = []
         if depth <= self.depthLimit and node in self.graph:
             for i in self.graph[node]:
-                if frozenset([i['to'], i['via'], path[-1]['to']]) in followed:
+                if frozenset([i['to'], i['via'], path[-1].to]) in followed:
                     pass
-                elif i['to'] == goal:
-                    new_path = path + [i]
-                    new_path[-1]['from'] = new_path[-2]['to']
-                    result.append(Route(swaps=new_path))
-                elif depth < self.depthLimit:
-                    drop = followed + [frozenset(
-                                        [i['to'], i['via'], path[-1]['to']])]
-                    new_path = path + [i]
-                    new_path[-1]['from'] = new_path[-2]['to']
-                    result += self.dive(
-                                depth + 1, i['to'], goal, new_path, drop)
+                else:
+                    new_path = path + [Swap(
+                                       fro=i['to'], to=i['to'], via=i['via'])]
+                    new_path[-1].fro = new_path[-2].to
+
+                    if i['to'] == goal:
+                        result.append(Route(swaps=new_path))
+                    elif depth < self.depthLimit:
+                        drop = followed + [frozenset(
+                                            [i['to'], i['via'], path[-1].to])]
+                        result += self.dive(
+                                    depth + 1, i['to'], goal, new_path, drop)
 
         return result
 
@@ -189,7 +189,7 @@ class Blockchain(BaseBlockchain):
 
         start = []
         result = []
-        path: dict[str, Token | str] = {'from': goal}
+        path: dict[str, Token] = {'from': goal}
         depth = 1
 
         if goal in self.graph:
@@ -199,7 +199,7 @@ class Blockchain(BaseBlockchain):
 
         for i in start:
             followed = [frozenset([goal, i['to'], i['via']])]
-            new_path = [{**path, **i}]
+            new_path = [Swap(fro=path['from'], to=i['to'], via=i['via'])]
             # recursive function to search the node to the specified depth
             result += self.dive(depth + 1, i['to'], goal, new_path, followed)
 
@@ -211,8 +211,8 @@ class Blockchain(BaseBlockchain):
             SQLModel.metadata.create_all(Engine)
 
             with Session(Engine) as sess:
-                for i in routes:
-                    sess.add(self.table.fromString(i.simplyfied))
+                for route in routes:
+                    sess.add(self.table.fromSwaps(route.swaps))
                 sess.commit()
 
     def fromDatabase(self, selection: tuple, where: tuple = ()) -> list:
@@ -284,6 +284,9 @@ class Blockchain(BaseBlockchain):
         return route.calculate(self.r1, self.impact, usdVal)
 
     def lookupPrice(self) -> None:
+        '''
+        method to lookup token price with coingecko api wrapper
+        '''
         temp = readJson(self.priceLookupPath)
         prices = {}
 
@@ -300,6 +303,8 @@ class Blockchain(BaseBlockchain):
 
     async def getPrices(self, route: Route,
                         session: aiohttp.ClientSession | None = None) -> list[Price]:  # noqa E501
+
+        '''method to get the token prices asynchronously'''
 
         form: Callable[[Any], list] = lambda i: [self.exchanges[i['via']]['pairs'][frozenset([i['from'], i['to']])], i, i['via']]  # noqa: E501
         tasks = []
@@ -322,22 +327,43 @@ class Blockchain(BaseBlockchain):
                                    swap: dict[str, Token | str],
                                    exchange: str) -> dict:
 
+        '''method to get token prices using the explorer'''
         price: Price = {}
 
         url = self.source + addr
         async with Limiter:
-            async with session.get(url, headers=self.headers, ssl=False) as response:  # noqa
+            async with session.get(url, headers=self.headers, ssl=False) as response:  # noqa E501
 
                 if response.status == 200:
-                    price = extractTokensFromHtml(await response.text(), swap)
+                    try:
+                        price = extractTokensFromHtml(await response.text(), swap)  # noqa E501
+                    except AssertionError:
+                        logging.exception(
+                            f'failed request, exchange :- {exchange}, pairs :- {swap}')  # noqa E501
                 else:
-                    print(f'failed request, exchange :- {exchange}, pairs :- {swap}')  # noqa
+                    logging.error(
+                        f'error, status code {response.status}')
 
         return price
 
     @Cache
     async def getPrice(self, addr, swap) -> Optional[dict]:
-        pass
+        '''method to get the token prices from blockchain nodes'''
+
+    def convert(self, routes: list[Route]) -> list[dict]:
+        '''method to serialize the routes into json'''
+        result = []
+        for route in routes:
+            result.append(
+                {
+                    'route': route.simplyfied_short,
+                    'EP': route.USD_Value,
+                    'USD_Value': route.EP,
+                    'index': route.index,
+                    'capital': route.capital
+                }
+            )
+        return result
 
     async def pollRoutes(self, routes: list[Route] = [],
                          save: bool = True, currentPrice: bool = False,
@@ -346,7 +372,6 @@ class Blockchain(BaseBlockchain):
                          startExchanges: str | None = None,
                          amountOfSwaps: int | None = None) -> Optional[list]:
 
-        # convert: Callable = lambda v: print('NotImplemented')
         if not routes:
             filters = []
             if startTokens:
@@ -385,8 +410,7 @@ class Blockchain(BaseBlockchain):
                 logging.info('\n interupted, exiting')
                 Done = True
 
-        export = sorted(result)
-        # convert the export
+        export = self.convert(sorted(result))
         if save:
             writeJson(self.dataPath,
                       {'MetaData': {
@@ -447,7 +471,7 @@ class Blockchain(BaseBlockchain):
                 tasks = []
                 for i in item:
                     marker += 1
-                    UsdVal = priceLookup[i.swaps[0]['from']]
+                    UsdVal = priceLookup[i.swaps[0].fro]
                     tasks.append(asyncio.create_task(
                         self.pollRoute(route=i, usdVal=UsdVal)))
 
@@ -460,9 +484,6 @@ class Blockchain(BaseBlockchain):
                 for res in done:
                     try:
                         results += await res
-                    except AssertionError:
-                        logging.exception('Error polling route')
-                        Done = True
                     except Exception:
                         logging.exception('Fatal Error')
                         Done = True

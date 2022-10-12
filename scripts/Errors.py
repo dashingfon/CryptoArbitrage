@@ -1,3 +1,4 @@
+'''module containing all the custom errors definitions'''
 
 
 class BlockchainNotSetup(Exception):

@@ -1,6 +1,5 @@
 from scripts import CONFIG_PATH
-from functools import wraps  # , lru_cache
-# from datetime import timedelta, datetime
+from functools import wraps
 import time
 import logging
 import requests  # type: ignore
@@ -80,7 +79,7 @@ def extractTokensFromHtml(content: str,
         finally:
             slider += 1
 
-    assert len(price) == 2, f'price :- {price}\n content :- {content}\n'
+    assert len(price) == 2, f'content :- {content}'
     return price
 
 

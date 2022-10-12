@@ -1,4 +1,5 @@
 '''Module containing all the database methods and functions'''
+
 from sqlmodel import SQLModel, create_engine, Session, select
 import scripts.Models as models
 import time
