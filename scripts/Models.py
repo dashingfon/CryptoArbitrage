@@ -189,63 +189,6 @@ class Route:
 
         return [self, reverse]
 
-    @staticmethod
-    def cumSum(listItem: list) -> list:
-        result = [listItem[0]]
-        for i in listItem[1:]:
-            result.append(i*result[-1])
-        return result
-
-    def simSwap(self, route, cap, prices):
-        In = cap
-        assert len(prices) == len(route), 'unequal route and prices'
-
-        for index, swap in enumerate(route):
-            price = prices[index]
-
-            Out = In * self.getRate(
-                price,
-                swap['to'],
-                swap['from']) / (1 + ((In/price[swap['from']]) * self.r1))
-            In = Out
-
-        return Out - cap
-
-    def calculate(self, r1: float, impact: float,
-                  denom: str = 'Wei'):
-
-        rates: list[list[float]] = [[], []]
-        liquidity = []
-
-        for index, swap in enumerate(self.swaps):
-            price: Price = self.prices[index]
-
-            rate = (getRate(price, swap['to'], swap['from'], r1),
-                    getRate(price, swap['from'], swap['to'], r1))
-
-            if index == 0:
-                liquidity.append(price[swap['from']])
-                forward = price[swap['to']]
-                rates[0].append(rate[0])
-            elif index == len(self.swaps) - 1:
-                rates[0].append(rate[0] * rates[0][-1])
-                liquidity += [
-                    min(price[swap['from']], forward), price[swap['to']]]
-            else:
-                rates[0].append(rate[0] * rates[0][-1])
-                liquidity.append(min(price[swap['from']], forward))
-                forward = price[swap['to']]
-
-            rates[1].insert(0, rate[1])
-
-        least = min(liquidity)
-        reverse = liquidity[::-1]
-        rates[1] = [1] + self.cumSum(rates[1])
-        rates[0] = [1] + rates[0]
-
-        cap0 = least / rates[0][liquidity.index(least)] * impact
-        cap1 = least / rates[1][reverse.index(least)] * impact
-
 
 class BaseBlockchain(ABC):
     '''Base blockchain implementation'''
