@@ -1,16 +1,17 @@
 from scripts import CONFIG_PATH
+
 from functools import wraps
 import time
 import logging
 import requests  # type: ignore
 import json
-import os
 from web3 import Web3
 from eth_abi import encode_abi
 from bs4 import BeautifulSoup
 
 
 def readJson(path: str) -> dict:
+    '''function to read from json file'''
     try:
         with open(path) as PP:
             temp = json.load(PP)
@@ -21,6 +22,7 @@ def readJson(path: str) -> dict:
 
 
 def writeJson(path: str, content: list | dict) -> None:
+    '''function to write to a json file'''
     with open(path, 'w') as PP:
         json.dump(content, PP, indent=2)
 
@@ -33,13 +35,6 @@ fonswapRouter = config['Test']['fonswapRouter']
 dodoRouter = config['Test']['dodoRouter']
 PAIR, cap = config['Test']['PAIR'], config['Test']['cap']
 fee = config['Test']['fee']
-
-
-def split_list(listA: list[dict[str, str]],
-               n: int):
-    for x in range(0, len(listA), n):
-        chunk = listA[x: n + x]
-        yield chunk
 
 
 def extractTokensFromHtml(content: str,
@@ -112,10 +107,6 @@ def RateLimited(maxPerSecond):
             return ret
         return ratelimitedFunction
     return decorate
-
-
-def isTestnet(blockchain):
-    return str(blockchain)[-7:] == 'Testnet'
 
 
 def getPaths(contents):
@@ -196,7 +187,7 @@ def extractSymbol(content):
     try:
         soup = BeautifulSoup(content, 'html.parser')
         placeHolder = soup.find('div', id="ContentPlaceHolder1_tr_tokeninfo")
-        # '# 'print(placeHolder)
+        # print(placeHolder)
         raw = placeHolder.find('a').contents[-1].split('(')[-1].split(')')[0]
     except Exception:
         logging.exception(f"fatal error, possible cause - '{placeHolder}'")
@@ -236,10 +227,12 @@ def cache(content, name):
 
     for i in content['included']:
         if i['type'] == 'dex':
-            exchanges[i['id']] = i['attributes']['identifier']
+            address = Web3.toChecksumAddress(i['attributes']['identifier'])
+            exchanges[i['id']] = address
         elif i['type'] == 'token':
+            address = Web3.toChecksumAddress(i['attributes']['address'])
             tokens[i['id']] = {'symbol': i['attributes']['symbol'],
-                               'address': i['attributes']['address']}
+                               'address': address}
         elif i['type'] == 'network':
             assert i['attributes']['identifier'] == name
 
@@ -326,11 +319,15 @@ def trim_and_map(blockchain, tokens, exchanges, minSwaps=3):
         }
 
 
-def buildData(blockchain, minLiquidity=300000, saveArtifact=False):
+def buildData(blockchain, filePath: str, artifactPath: str,
+              minLiquidity: int = 300000,
+              saveArtifact: bool = False):
+
     logging.info(f'building {str(blockchain)} Data ...\n')
-    tokens, exchanges = {}, {}
-    filePath = os.path.join(blockchain.dataPath, 'dataDump.json')
-    artifactPath = os.path.join(blockchain.dataPath, 'artifactDump.json')
+    tokens: dict = {}
+    exchanges: dict = {}
+    logging.info(f'Dump path is {filePath}')
+    logging.info(f'Artifact path is {artifactPath}')
     url = f'https://app.geckoterminal.com/api/p1/{blockchain.geckoTerminalName}/pools?include=dex%2Cdex.network%2Cdex.network.network_metric%2Ctokens&page=1&items=100'  # noqa: E501
     page = 1
     session = requests.Session()
@@ -381,7 +378,7 @@ def buildData(blockchain, minLiquidity=300000, saveArtifact=False):
             })
 
     result = trim_and_map(blockchain, tokens, exchanges)
-
+    result['setup'] = True
     writeJson(filePath, {
         "MetaData": {
             'datetime': time.ctime(),
@@ -393,14 +390,12 @@ def buildData(blockchain, minLiquidity=300000, saveArtifact=False):
         })
 
 
-def setExchangesData(chain, dumpPath, existingExchange, temp=True):
+def setData(chain, dumpPath: str, supportedExchanges: set, temp=True):
+
     dump = readJson(dumpPath)['Data']
     result = {}
     for key in dump['Exchanges'].keys():
-        if key in existingExchange:
-            result[key] = existingExchange[key]
-            result[key]['pairs'] = dump['Exchanges'][key]['pairs']
-        else:
+        if not supportedExchanges or key in supportedExchanges:
             result[key] = dump['Exchanges'][key]
 
     dump['Exchanges'] = result

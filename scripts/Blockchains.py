@@ -4,7 +4,7 @@ The main blockchain class inherits from the BaseBlockchain
 which other Blockchains then inherit from
 '''
 
-from scripts import CONFIG_PATH, DATABASE_URL
+from scripts import CONFIG_PATH, DATABASE_URL, path
 import scripts.Errors as errors
 from scripts.Models import (
     Token,
@@ -16,10 +16,11 @@ from scripts.Models import (
     Spliter
     )
 from scripts.Utills import (
-    isTestnet,
     readJson,
     writeJson,
-    extractTokensFromHtml
+    extractTokensFromHtml,
+    buildData,
+    setData
     )
 from scripts.Database import (
     SQLModel,
@@ -28,9 +29,8 @@ from scripts.Database import (
     select
     )
 import logging
-import web3
+# import web3
 import time
-import os
 import asyncio
 import aiohttp
 from aiolimiter import AsyncLimiter
@@ -53,7 +53,7 @@ class Blockchain(BaseBlockchain):
     def __init__(self) -> None:
         if type(self) == Blockchain:
             raise errors.CannotInitializeDirectly(
-                f'cannot initialize {self} dirrectly')
+                'Blockchain class can only be used through inheritance')
         self.impact: float = 0.00075
         self.r1: float = 0.997
         self.depthLimit: int = 4
@@ -64,14 +64,13 @@ class Blockchain(BaseBlockchain):
             'User-Agent': 'PostmanRuntime/7.29.0',
             "Connection": "keep-alive"
             }
-        self.dataPath: str = os.path.join(
-            os.path.split(os.path.dirname(__file__))[0], 'data')
-        self.priceLookupPath: str = os.path.join(self.dataPath, 'PriceLookup.json')  # noqa
+        self.dataPath: str = str(path.joinpath('data'))
+        self.priceLookupPath: str = str(path.joinpath(self.dataPath, 'PriceLookup.json'))  # noqa
         self.url: str = 'http://127.0.0.1:8545'
-        self.tableName = f'{str(self)} Routes'
+        self.tableName: str = f'{str(self)} Routes'
         self.table: Type[Routes] = type(self.tableName,
                           (Routes,),  # noqa E128
-                          {'__tablename__': self.tableName.lower()},
+                          {'__tablename__': self.tableName},
                           table=True)
         self.source: str
         self.coinGeckoId: str
@@ -97,6 +96,8 @@ class Blockchain(BaseBlockchain):
 
     @property
     def isSetup(self) -> bool:
+        '''property to check if blockchain has been setup'''
+
         chainContent = Config.get(str(self))
         if chainContent:
             if chainContent.get('setup'):
@@ -105,19 +106,33 @@ class Blockchain(BaseBlockchain):
 
     @property
     def arbAddress(self) -> Optional[str]:
+        '''property to get the arbAddress'''
+
         chainContent = Config.get(str(self))
         if chainContent:
             if chainContent.get('arbAddress'):
                 return chainContent.get('arbAddress')
         return None
 
-    def setup(self) -> None:
+    def setup(self, supportedExchanges: set[str] = set(),
+              saveArtifact: bool = False,
+              temp: bool = False) -> None:
+
         '''method to fetch all the token and pair addresses'''
+
+        filePath = str(path.joinpath(self.dataPath, 'dataDump.json'))
+        artifactPath = str(path.joinpath(self.dataPath, 'artifactDump.json'))
+
+        buildData(blockchain=self, filePath=filePath,
+                  artifactPath=artifactPath, saveArtifact=saveArtifact)
+        setData(chain=self, dumpPath=filePath, temp=temp,
+                supportedExchanges=supportedExchanges)
 
     def buildGraph(self, exchanges: dict = {}, tokens: dict = {}) -> None:
         '''
         returns the graphical representation of the connection between tokens
         '''
+
         graph: dict = {}
         pairs: dict = {}
 
@@ -157,7 +172,7 @@ class Blockchain(BaseBlockchain):
 
     def dive(self, depth: int, node: Token, goal: Token,
              path: list[Swap],
-             followed: list) -> list[Route]:
+             followed: set) -> list[Route]:
         '''
         recursive function to discover tradable arb routes
         called from DLS
@@ -176,8 +191,8 @@ class Blockchain(BaseBlockchain):
                     if i['to'] == goal:
                         result.append(Route(swaps=new_path))
                     elif depth < self.depthLimit:
-                        drop = followed + [frozenset(
-                                            [i['to'], i['via'], path[-1].to])]
+                        drop = {*followed, frozenset(
+                                            [i['to'], i['via'], path[-1].to])}
                         result += self.dive(
                                     depth + 1, i['to'], goal, new_path, drop)
 
@@ -198,7 +213,7 @@ class Blockchain(BaseBlockchain):
                     start.append(i)
 
         for i in start:
-            followed = [frozenset([goal, i['to'], i['via']])]
+            followed = set(frozenset([goal, i['to'], i['via']]))
             new_path = [Swap(fro=path['from'], to=i['to'], via=i['via'])]
             # recursive function to search the node to the specified depth
             result += self.dive(depth + 1, i['to'], goal, new_path, followed)
@@ -290,14 +305,13 @@ class Blockchain(BaseBlockchain):
         temp = readJson(self.priceLookupPath)
         prices = {}
 
-        if not isTestnet(self):
-            tokenAdresses = list(self.graph.keys())
+        tokenAdresses = list(self.graph.keys())
 
-            coinGecko = CoinGeckoAPI()
-            prices = coinGecko.get_token_price(
-                id=self.coinGeckoId,
-                contract_addresses=tokenAdresses,
-                vs_currencies='usd')
+        coinGecko = CoinGeckoAPI()
+        prices = coinGecko.get_token_price(
+            id=self.coinGeckoId,
+            contract_addresses=tokenAdresses,
+            vs_currencies='usd')
 
         writeJson(self.priceLookupPath, {**temp, **prices})
 
@@ -357,10 +371,10 @@ class Blockchain(BaseBlockchain):
             result.append(
                 {
                     'route': route.simplyfied_short,
-                    'EP': route.USD_Value,
+                    'EP': route.USD_Value / 1e18,
                     'USD_Value': route.EP,
                     'index': route.index,
-                    'capital': route.capital
+                    'capital': route.capital / 1e18
                 }
             )
         return result

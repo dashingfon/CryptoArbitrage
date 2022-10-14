@@ -1,6 +1,5 @@
 import scripts.Blockchains as Blc
 import scripts.Controller as Ctr
-import scripts.Config as Cfg
 from scripts.Utills import sortTokens, getPayloadBytes
 
 import pytest
@@ -16,7 +15,7 @@ DEX_DATA = {
 TOKENS = {}
 revTOKENS = {}
 
-CtrSetup = Ctr.Controller(Blc.Kovan())
+CtrSetup = Ctr.Controller(Blc.Aurora(), True)
 
 
 @pytest.fixture(scope='module')

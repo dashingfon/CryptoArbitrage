@@ -197,17 +197,3 @@ if __name__ == '__main__':
         print(results)
 
     # asyncio.run(reed())
-
-    class Dref():
-        pass
-
-    class Ftih(Dref):
-        pass
-
-    class Gtin(Ftih):
-        pass
-
-    e = Gtin()
-    t = Ftih()
-    print(issubclass(type(t), Dref))
-    print(issubclass(type(e), Ftih))

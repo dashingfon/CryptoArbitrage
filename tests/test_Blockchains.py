@@ -99,7 +99,8 @@ class TestRate:
         rate = r1 * PRICE['WETH'] / PRICE['WBTC']
         assert rate == ChainSetup.getRate(PRICE, 'WETH', 'WBTC')
 
-    @pytest.mark.parametrize('prices', [{'WETH': 2.141651224104825}, {'WBTC': 0.11160318}])
+    @pytest.mark.parametrize('prices', [{'WETH': 2.141651224104825},
+                                        {'WBTC': 0.11160318}])
     def test_invalidRate(self, ChainSetup, prices):
         with pytest.raises(ValueError):
             ChainSetup.getRate(prices, 'WETH', 'WBTC')
@@ -145,7 +146,7 @@ class TestPollRoutes:
         cap1 = least / rates[1][reverse.index(least)] * ChainSetup.impact
         ans = (
             [cap0, rates[0], ChainSetup.simulateSwap(simp[2], cap0, prices)],
-            [cap1, rates[1], ChainSetup.simulateSwap(simp[3], cap1, prices[::-1])]
+            [cap1, rates[1], ChainSetup.simulateSwap(simp[3], cap1, prices[::-1])]  # noqa E501
         )
         res = ChainSetup.pollRoute(simp[2], prices=prices)
         print(f'answer {ans}')
@@ -165,8 +166,8 @@ class TestPollRoutes:
         assert ChainSetup.cumSum(listItem) == [2, 6, 6, 24]
 
     def test_simplyfy(self, ChainSetup):
-        ans = ['AURORA WETH trisolaris - WETH NEAR wannaswap - NEAR AURORA wannaswap',
-               'AURORA NEAR wannaswap - NEAR WETH wannaswap - WETH AURORA trisolaris',
+        ans = ['AURORA WETH trisolaris - WETH NEAR wannaswap - NEAR AURORA wannaswap',  # noqa E501
+               'AURORA NEAR wannaswap - NEAR WETH wannaswap - WETH AURORA trisolaris',  # noqa E501
                ARB_ROUTE[0], ARB_ROUTE[1]]
         result = ChainSetup.simplyfy(ARB_ROUTE[0])
         assert result == ans

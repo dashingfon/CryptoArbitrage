@@ -1,21 +1,24 @@
 '''The controller class that prepares and executes arbs'''
 
 from scripts import CONFIG_PATH
-from scripts.Utills import sortTokens, isTestnet, readJson
 import scripts.Models as models
 import scripts.Errors as errors
+from scripts.Utills import sortTokens, readJson
 
 import os
-from eth_abi import encode_abi
-from web3 import Web3
+import attr
 import logging
+from web3 import Web3
 from typing import Any
+from eth_abi import encode_abi
 from dotenv import load_dotenv
+
 
 load_dotenv()
 Config: dict = readJson(CONFIG_PATH)
 
 
+@attr.s
 class Controller():
 
     def __init__(self, blockchain: Any,
@@ -186,7 +189,7 @@ class Controller():
         contract = self.getContract()
         account = self.getAccount()
 
-        if isTestnet(self.blockchain):
+        if self.testing(self.blockchain):
             tranx = contract.functions.start(
                 *payload).transact({'from': account})
         else:

@@ -2,10 +2,10 @@
 
 from sqlmodel import SQLModel, create_engine, Session, select
 import scripts.Models as models
-import time
 
 
 if __name__ == '__main__':
+    import time
 
     filename = "data\\databae.db"
     url = f'sqlite:///{filename}'

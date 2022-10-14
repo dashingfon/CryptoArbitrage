@@ -86,7 +86,7 @@ class Route:
 
         if mode != "long" or mode != 'short':
             raise ValueError(
-                f"expected 'long' or 'short' got{mode}")
+                f"expected 'long' or 'short' got {mode}")
 
         result = []
         if mode == 'long':
@@ -128,12 +128,9 @@ class Route:
             )
             result.append(swap)
 
-        newRoute = cls(swaps=result)
-        newRoute.prices = prices
-        newRoute.USD_Value = usdVal
-        newRoute.index = index
-        newRoute.EP = EP
-        newRoute.capital = capital
+        newRoute = cls(swaps=result, prices=prices,
+                       USD_Value=usdVal, index=index,
+                       EP=EP, capital=capital)
 
         return newRoute
 
@@ -165,8 +162,9 @@ class Route:
                   impact: float,
                   usdVal: float) -> list['Route']:
 
-        rates: list[list[float]] = [[], []]
         liquidity = []
+        selfRates: list[float] = []
+        reverseRates: list[float] = []
         reverse: 'Route' = self.toReversed(self.swaps, self.prices)
 
         if not self.prices:
@@ -181,37 +179,37 @@ class Route:
             if index == 0:
                 liquidity.append(price[swap.fro])
                 forward = price[swap.to]
-                rates[0].append(rate[0])
+                selfRates.append(rate[0])
             elif index == len(self.swaps) - 1:
-                rates[0].append(rate[0] * rates[0][-1])
+                selfRates.append(rate[0] * selfRates[-1])
                 liquidity += [
                     min(price[swap.fro], forward), price[swap.to]]
             else:
-                rates[0].append(rate[0] * rates[0][-1])
+                selfRates.append(rate[0] * selfRates[-1])
                 liquidity.append(min(price[swap.fro], forward))
                 forward = price[swap.to]
 
-            rates[1].insert(0, rate[1])
+            reverseRates.insert(0, rate[1])
 
         least = min(liquidity)
         reverseLiq = liquidity[::-1]
-        rates[1] = [1] + self.cumSum(rates[1])
-        rates[0] = [1] + rates[0]
+        reverseRates = [1] + self.cumSum(reverseRates)
+        selfRates = [1] + selfRates
 
-        self.capital = least / rates[0][liquidity.index(least)] * impact * 1e18
-        reverse.capital = least / rates[1][reverseLiq.index(least)] * impact * 1e18  # noqa: E501
+        self.capital = least / selfRates[liquidity.index(least)] * impact * 1e18  # noqa: E501
+        reverse.capital = least / reverseRates[reverseLiq.index(least)] * impact * 1e18  # noqa: E501
 
         toEp, froEp = self.simSwap(r1), reverse.simSwap(r1)
 
         self.EP, reverse.EP = toEp * 1e18, froEp * 1e18
-        self.index, reverse.index = rates[0][-1], rates[1][-1]
+        self.index, reverse.index = selfRates[-1], reverseRates[-1]
         self.USD_Value, reverse.USD_Value = toEp * usdVal, froEp * usdVal
 
         return [self, reverse]
 
 
 class BaseBlockchain(ABC):
-    '''Base blockchain implementation'''
+    '''Base blockchain Abstract class'''
     url: str
 
     @property
