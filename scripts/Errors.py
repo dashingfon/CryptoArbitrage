@@ -31,3 +31,7 @@ class CannotInitializeDirectly(Exception):
 
 class PrivateKeyNotSet(Exception):
     pass
+
+
+class EmptyBlockchainUrl(Exception):
+    pass

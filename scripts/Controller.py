@@ -1,15 +1,22 @@
 '''The controller class that prepares and executes arbs'''
 
 from scripts import CONFIG_PATH
-import scripts.Models as models
 import scripts.Errors as errors
+from scripts.Models import (
+    BaseBlockchain,
+    Route
+)
 from scripts.Utills import sortTokens, readJson
 
 import os
 import attr
 import logging
 from web3 import Web3
-from typing import Any
+from typing import (
+    Any,
+    Optional,
+    Type
+    )
 from eth_abi import encode_abi
 from dotenv import load_dotenv
 
@@ -20,29 +27,33 @@ Config: dict = readJson(CONFIG_PATH)
 
 @attr.s
 class Controller():
+    blockchain: Type[BaseBlockchain] = attr.ib()
 
-    def __init__(self, blockchain: Any,
-                 testing: bool = False) -> None:
-
-        self.verifyChain(blockchain)
-        self.contractAbi: list = Cfg.contractAbi
-        self.routerAbi: list = Cfg.routerAbi
-        self.swapFuncSig: str = '0x38ed1739'
-        # 'swapExactTokensForTokens(uint256,uint256,address[],address,uint256)'
-        self.approveFuncSig: str = '0x095ea7b3'
-        # 'approve(address,uint256)'
-        self.optimalAmount: float = 1.009027027
-        self.web3: Web3 = Web3(Web3.HTTPProvider(self.blockchain.url,
-                                           request_kwargs={'timeout': 300}))  # noqa E128
-        self.pv: str | None = os.environ.get('BEACON')
-        self.testing = testing
-
-    def verifyChain(self, blockchain: Any) -> None:
-        if issubclass(type(blockchain), models.BaseBlockchain):
-            self.blockchain: Any = blockchain
-        else:
+    @blockchain.validator
+    def verifyChain(self, attribute, value) -> None:
+        if not issubclass(type(value), BaseBlockchain):
             raise errors.InvalidBlockchainObject(
-                f'Invalid Blockchain Object {blockchain}')
+                f'Invalid Blockchain Object {value}')
+
+        if not value.url:
+            raise errors.EmptyBlockchainUrl(
+                'Blockchain Objects url is empty')
+
+    testing: bool = attr.ib()
+    pv: Optional[str] = attr.ib(default=os.environ.get('BEACON'))
+    contractAbi: list = attr.ib(default=Config['ABIs']["ContractAbi"])
+    routerAbi: list = attr.ib(default=Config['ABIs']["RouterAbi"])
+    optimalAmount: float = attr.ib(default=1.009027027)
+    web3: Web3 = attr.ib(default=(Web3(Web3.HTTPProvider(
+                  blockchain.url, request_kwargs={'timeout': 300}))))
+
+    @property
+    def swapFuncSig(self) -> str:
+        return '0x38ed1739'  # swapExactTokenForTokens()
+
+    @property
+    def approveFuncSig(self) -> str:
+        return '0x095ea7b3'  # approve()
 
     def getContract(self, address: str = '',
                     abi: list = []) -> Any:
@@ -84,54 +95,8 @@ class Controller():
             current = nexxt
         return current
 
-    def getValues(self, item: dict, options: dict) -> dict:
-        '''
-        options contents
-
-        * all items are optional
-
-        tokens :- dict
-        pair :- address
-        factory :- address
-        router :- list
-        '''
-        values = {}
-
-        if 'tokens' in options:
-            values['tokens'] = options['tokens']
-        else:
-            values['tokens'] = self.blockchain.tokens
-
-        values['names'] = names = (
-            item['route'][0]['from'], item['route'][0]['to'])
-
-        if 'routers' in options:
-            assert len(item['route']) == len(options['routers'])
-            values['routers'] = options['routers']
-        else:
-            routers = []
-            for i in item['route']:
-                routers.append(self.blockchain.exchanges[i['via']]['router'])
-            values['routers'] = routers
-
-        if 'pair' in options:
-            values['pair'] = options['pair']
-        else:
-            values['pair'] = self.blockchain.exchanges[
-                item['route'][0]['via']]['pairs'][frozenset((names[0], names[1]))]  # noqa: E501
-
-        if 'factory' in options:
-            values['factory'] = options['factory']
-
-        if 'fee' in options:
-            values['fee'] = options['fee']
-        else:
-            values['fee'] = self.blockchain.exchanges[
-                item['route'][0]['via']]['fee']
-
-        return values
-
-    def prepPayload(self, item, options={}, simulate=False, **others):
+    def prepPayload(self, item, extra: dict,
+                    options: dict = {}, simulate: bool = False):
 
         val = self.getValues(item=item, options=options)
 
@@ -203,28 +168,28 @@ class Controller():
         txReceipt = self.web3.eth.wait_for_transaction_receipt(tranx)
         logging.info(f'tx succesful with hash: {txReceipt.transactionHash.hex()}')  # noqa
 
-    def arb(self, routes=[], amount=10,  keyargs=[]):
+    def arb(self, routes: list[Route] = [],
+            amount: int = 10,
+            extras: list[dict] = []):
 
-        # keyargs is a list of dictionaries
-        if not routes:
-            routes = self.getRoutes()
-        lenght = len(routes)
+        # extras is a list of dictionaries
+        assert len(routes) == len(extras), 'extra parameters must equal routes lenght'  # noqa E501
+        Prospects = self.blockchain.genRoutes(
+                        self.blockchain, routes=routes,
+                        value=self.optimalAmount)
 
-        if keyargs:
-            assert len(keyargs) == lenght
-
-        Prospects = self.getProspect(routes)
+        for prospect in Prospects:
+            pass
 
         try:
             for i in range(amount):
-                print(f'arbing {i + 1} of {lenght} routes')
-                prospect = next(Prospects)
+                prospect = anext(Prospects)
 
-                if not keyargs:
-                    payload = self.prepPayload(prospect, simulate=True)
+                if not extras:
+                    payload = self.prepPayload(self, prospect, simulate=True)
                 else:
-                    payload = self.prepPayload(prospect,
-                                               keyargs[i], simulate=True)
+                    payload = self.prepPayload(self, prospect,
+                                               extras[i], simulate=True)
 
                 if payload['profitable']:
                     self.execute(payload['data'])

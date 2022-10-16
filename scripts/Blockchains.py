@@ -30,13 +30,20 @@ from scripts.Database import (
     )
 import logging
 # import web3
+# from web3.eth import AsyncEth
 import time
 import asyncio
 import aiohttp
 from aiolimiter import AsyncLimiter
 from pycoingecko import CoinGeckoAPI
 from cache import AsyncTTL
-from typing import AsyncGenerator, Callable, Optional, Any, Type
+from typing import (
+    AsyncGenerator,
+    Callable,
+    Optional,
+    Any,
+    Type
+    )
 
 
 Cache: AsyncTTL = AsyncTTL(time_to_live=5, maxsize=150)
@@ -54,6 +61,7 @@ class Blockchain(BaseBlockchain):
         if type(self) == Blockchain:
             raise errors.CannotInitializeDirectly(
                 'Blockchain class can only be used through inheritance')
+
         self.impact: float = 0.00075
         self.r1: float = 0.997
         self.depthLimit: int = 4
@@ -80,16 +88,15 @@ class Blockchain(BaseBlockchain):
         r1: float :- The swap fee on dexs
         depthLimit: int :- Used to determine the longest cycle of swaps
         graph: dict :- a representation of the connected tokens across dexs
+        exchanges: dict
         arbRoutes: list :- a list of the cyclic routes
         header: dict :- requests header
         dataPath: str :- the path to the data directory
-        priceLookupPath: str
-        tableName: str
-        table: Any
-        url: str
-        table: Any
+        priceLookupPath: path to json file containing token prices
+        url: blockchain endpoint url
+        tableName: name of blockchain table in the database
+        table: database table model
         source: str
-        exchanges: dict
         coinGeckoId: str
         geckoTerminalName: str
         '''

@@ -210,11 +210,8 @@ class Route:
 
 class BaseBlockchain(ABC):
     '''Base blockchain Abstract class'''
-    url: str
-
-    @property
-    def arbAddress(self) -> Optional[str]:
-        pass
+    url: str = ''
+    arbAddress: str = ''
 
     @abstractmethod
     async def genRoutes(self, value: float,

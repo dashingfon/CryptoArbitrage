@@ -1,11 +1,11 @@
 '''Module containing all the database methods and functions'''
 
 from sqlmodel import SQLModel, create_engine, Session, select
-import scripts.Models as models
 
 
 if __name__ == '__main__':
     import time
+    import scripts.Models as models
 
     filename = "data\\databae.db"
     url = f'sqlite:///{filename}'

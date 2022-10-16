@@ -10,7 +10,7 @@ import asyncio
 # import pathlib
 # from bs4 import BeautifulSoup
 import web3
-# from web3.eth import AsyncEth
+from web3.eth import AsyncEth
 # import scripts.Config as Cfg
 # import datetime, os
 # from cache import AsyncTTL
@@ -121,11 +121,17 @@ if __name__ == '__main__':
     # evalExchanges(15)
 
     url = f'https://bsc.nownodes.io/{os.environ.get("NowNodesBscKey")}'
-    w3 = web3.Web3(web3.Web3.HTTPProvider(url))
+    # w3 = web3.Web3(web3.HTTPProvider(url))
+    w3 = web3.Web3(web3.AsyncHTTPProvider(url),
+                   modules={'eth': (AsyncEth,)},
+                   middlewares=[])
 
     addresses = [
-        # web3.Web3.toChecksumAddress("0x0ed7e52944161450477ee417de9cd3a859b14fd0"),
-        '0x0ed7e52944161450477ee417de9cd3a859b14fd0'
+        web3.Web3.toChecksumAddress("0x0ed7e52944161450477ee417de9cd3a859b14fd0"),
+        web3.Web3.toChecksumAddress("0x58f876857a02d6762e0101bb5c46a8c1ed44dc16"),
+        web3.Web3.toChecksumAddress("0x7efaef62fddcca950418312c6c91aef321375a00"),
+        web3.Web3.toChecksumAddress("0x0ed7e52944161450477ee417de9cd3a859b14fd0"),
+        web3.Web3.toChecksumAddress("0x804678fa97d91b974ec2af3c843270886528a9e6")
         ]
     abi = [
         {
@@ -168,13 +174,11 @@ if __name__ == '__main__':
 
     async def trid(address, abi=abi):
         Contract = w3.eth.contract(address=address, abi=abi)
-
-        account = w3.eth.account.from_key(os.environ.get('BEACON'))
-        print(str(account.address))
-        e = Contract.functions.getReserves().call({'from': account.address})
+        e = await Contract.functions.getReserves().call()
         return e
 
     async def reed():
+        start = time.perf_counter()
         tasks = []
         for i in addresses:
             tasks.append(asyncio.create_task(trid(i)))
@@ -192,8 +196,9 @@ if __name__ == '__main__':
                 results.append(await item)
             except RuntimeError as e:
                 print(e)'''
-
+        end = time.perf_counter()
         print(len(done))
         print(results)
+        print(f'finished requesting in {end - start} seconds')
 
-    # asyncio.run(reed())
+    asyncio.run(reed())
