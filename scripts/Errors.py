@@ -35,3 +35,7 @@ class PrivateKeyNotSet(Exception):
 
 class EmptyBlockchainUrl(Exception):
     pass
+
+
+class UnequalRouteAndRouters(Exception):
+    pass

@@ -1,7 +1,11 @@
 '''Model module containing the extra data type'''
 
-from abc import ABC, abstractmethod
-from typing import Optional, AsyncGenerator, Callable
+from typing import (
+    Optional,
+    AsyncGenerator,
+    Callable,
+    Protocol
+    )
 from sqlmodel import Field, SQLModel
 from cache import AsyncTTL
 import attr
@@ -208,12 +212,15 @@ class Route:
         return [self, reverse]
 
 
-class BaseBlockchain(ABC):
+class BaseBlockchain(Protocol):
     '''Base blockchain Abstract class'''
     url: str = ''
-    arbAddress: str = ''
+    exchanges: dict = {}
 
-    @abstractmethod
+    @property
+    def arbAddress(self) -> str:
+        return ''
+
     async def genRoutes(self, value: float,
                         routes: list[Route] = [],
                         **kwargs: dict) -> AsyncGenerator:

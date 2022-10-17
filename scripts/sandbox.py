@@ -127,11 +127,16 @@ if __name__ == '__main__':
                    middlewares=[])
 
     addresses = [
-        web3.Web3.toChecksumAddress("0x0ed7e52944161450477ee417de9cd3a859b14fd0"),
-        web3.Web3.toChecksumAddress("0x58f876857a02d6762e0101bb5c46a8c1ed44dc16"),
-        web3.Web3.toChecksumAddress("0x7efaef62fddcca950418312c6c91aef321375a00"),
-        web3.Web3.toChecksumAddress("0x0ed7e52944161450477ee417de9cd3a859b14fd0"),
-        web3.Web3.toChecksumAddress("0x804678fa97d91b974ec2af3c843270886528a9e6")
+        web3.Web3.toChecksumAddress(
+            "0x0ed7e52944161450477ee417de9cd3a859b14fd0"),
+        web3.Web3.toChecksumAddress(
+            "0x58f876857a02d6762e0101bb5c46a8c1ed44dc16"),
+        web3.Web3.toChecksumAddress(
+            "0x7efaef62fddcca950418312c6c91aef321375a00"),
+        web3.Web3.toChecksumAddress(
+            "0x0ed7e52944161450477ee417de9cd3a859b14fd0"),
+        web3.Web3.toChecksumAddress(
+            "0x804678fa97d91b974ec2af3c843270886528a9e6")
         ]
     abi = [
         {

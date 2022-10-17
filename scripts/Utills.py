@@ -1,4 +1,5 @@
 from scripts import CONFIG_PATH
+from scripts.Models import Swap
 
 from functools import wraps
 import time
@@ -38,10 +39,9 @@ fee = config['Test']['fee']
 
 
 def extractTokensFromHtml(content: str,
-                          tokens: dict) -> dict:
+                          swap: Swap) -> dict:
 
     assert content, 'Empty content recieved'
-    assert tokens, 'Empty tokens recieved'
 
     price = {}
     soup = BeautifulSoup(content, 'html.parser')
@@ -57,12 +57,12 @@ def extractTokensFromHtml(content: str,
             symbol = rawPrice[1]
             amount = float(rawPrice[0].replace(',', ''))
 
-            if symbol == tokens['from'].name:
+            if symbol == swap.fro.name:
                 done1 = True
-                price[tokens['from']] = amount
-            elif symbol == tokens['to'].name:
+                price[swap.fro] = amount
+            elif symbol == swap.to.name:
                 done2 = True
-                price[tokens['to']] = amount
+                price[swap.to] = amount
 
         except (IndexError, ValueError) as e:
             logging.exception(f'Error parsing item {raw}, error :- {e}')

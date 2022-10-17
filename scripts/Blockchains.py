@@ -11,7 +11,6 @@ from scripts.Models import (
     Swap,
     Route,
     Routes,
-    BaseBlockchain,
     Price,
     Spliter
     )
@@ -29,8 +28,8 @@ from scripts.Database import (
     select
     )
 import logging
-# import web3
-# from web3.eth import AsyncEth
+import web3
+from web3.eth import AsyncEth
 import time
 import asyncio
 import aiohttp
@@ -52,7 +51,7 @@ Config: dict = readJson(CONFIG_PATH)
 Engine: Any = create_engine(DATABASE_URL)
 
 
-class Blockchain(BaseBlockchain):
+class Blockchain:
     '''Blockchain chain class implementation
     inheriting from the Base Blockchain.
     Must implement genRoutes according to the superclass'''
@@ -80,6 +79,9 @@ class Blockchain(BaseBlockchain):
                           (Routes,),  # noqa E128
                           {'__tablename__': self.tableName},
                           table=True)
+        self.w3 = web3.Web3(web3.AsyncHTTPProvider(self.url),
+                            modules={'eth': (AsyncEth,)},
+                            middlewares=[])
         self.source: str
         self.coinGeckoId: str
         self.geckoTerminalName: str
@@ -112,14 +114,14 @@ class Blockchain(BaseBlockchain):
         return False
 
     @property
-    def arbAddress(self) -> Optional[str]:
+    def arbAddress(self) -> str:
         '''property to get the arbAddress'''
 
         chainContent = Config.get(str(self))
         if chainContent:
             if chainContent.get('arbAddress'):
                 return chainContent.get('arbAddress')
-        return None
+        return ''
 
     def setup(self, supportedExchanges: set[str] = set(),
               saveArtifact: bool = False,
@@ -345,7 +347,7 @@ class Blockchain(BaseBlockchain):
     @Cache
     async def getPriceFromExplorer(self, session: aiohttp.ClientSession,
                                    addr: str,
-                                   swap: dict[str, Token | str],
+                                   swap: Swap,
                                    exchange: str) -> dict:
 
         '''method to get token prices using the explorer'''
@@ -368,8 +370,18 @@ class Blockchain(BaseBlockchain):
         return price
 
     @Cache
-    async def getPrice(self, addr, swap) -> Optional[dict]:
+    async def getPrice(self, addr: str, swap: Swap) -> dict:
         '''method to get the token prices from blockchain nodes'''
+        price: dict[Token, float] = {}
+        abi: list = []
+
+        Contract = self.w3.eth.contract(address=addr, abi=abi)  # type: ignore
+        rawPrice = await Contract.functions.getReserves().call()
+        tokens = sorted([swap.to, swap.fro])
+        price[tokens[0]] = rawPrice[0]
+        price[tokens[1]] = rawPrice[1]
+
+        return price
 
     def convert(self, routes: list[Route]) -> list[dict]:
         '''method to serialize the routes into json'''
