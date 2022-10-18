@@ -13,13 +13,14 @@ import web3
 from web3.eth import AsyncEth
 # import scripts.Config as Cfg
 # import datetime, os
-# from cache import AsyncTTL
+import logging
 from asyncio.proactor_events import _ProactorBasePipeTransport
 # from brownie import interface
+from cache import AsyncTTL
 from dotenv import load_dotenv
 
 load_dotenv()
-
+Cache: AsyncTTL = AsyncTTL(time_to_live=500, maxsize=150)
 
 route = [
     {"from": "TST4", "to": "TST2", "via": "fonswap"},
@@ -92,10 +93,10 @@ if __name__ == '__main__':
         print(distribution)
 
     def evalExchanges2():
-        routes = utills.readJson(chain.routePath)['Data']
+        routes = chain.getArbRoute(save=False)
         distribution = OrderedDict()
         exchanges = chain.exchanges
-        batches = utills.split_list2(routes)
+        batches = utills.spliter(routes)
         print(f'lenght of routes :- {len(routes)}')
         lenght = 0
         store = set()
@@ -103,9 +104,9 @@ if __name__ == '__main__':
         for item in batches:
             count = 0
             for route in item:
-                for swap in route:
-                    load = exchanges[swap['via']]['pairs'][
-                        frozenset([swap['from'], swap['to']])]
+                for swap in route.swaps:
+                    load = exchanges[swap.via]['pairs'][
+                        frozenset([swap.fro, swap.to])]
                     if load not in store:
                         count += 1
                     store.add(load)
@@ -115,12 +116,15 @@ if __name__ == '__main__':
             lenght += 1
 
         print(f'lenght of batches :- {lenght}')
+        print(f'total unique pair addresses :- {len(store)}')
         print(distribution)
 
     # evalExchanges2()
     # evalExchanges(15)
 
-    url = f'https://bsc.nownodes.io/{os.environ.get("NowNodesBscKey")}'
+    url = 'https://bsc-dataseed.binance.org'
+    url2 = f'https://bsc.nownodes.io/{os.environ.get("NowNodesBscKey")}'
+
     # w3 = web3.Web3(web3.HTTPProvider(url))
     w3 = web3.Web3(web3.AsyncHTTPProvider(url),
                    modules={'eth': (AsyncEth,)},
@@ -177,16 +181,16 @@ if __name__ == '__main__':
         },
     ]
 
-    async def trid(address, abi=abi):
+    async def poll(address, abi=abi):
         Contract = w3.eth.contract(address=address, abi=abi)
         e = await Contract.functions.getReserves().call()
         return e
 
-    async def reed():
+    async def bulk(addresses):
         start = time.perf_counter()
         tasks = []
         for i in addresses:
-            tasks.append(asyncio.create_task(trid(i)))
+            tasks.append(asyncio.create_task(poll(i)))
 
         done, pending = await asyncio.wait(
             tasks, return_when=asyncio.FIRST_EXCEPTION)
@@ -197,13 +201,27 @@ if __name__ == '__main__':
 
         for item in done:
             results.append(await item)
-            '''try:
-                results.append(await item)
-            except RuntimeError as e:
-                print(e)'''
         end = time.perf_counter()
-        print(len(done))
-        print(results)
         print(f'finished requesting in {end - start} seconds')
 
-    asyncio.run(reed())
+    # asyncio.run(bulk(addresses))
+
+    @Cache
+    async def fret(num, wait):
+        logging.debug('fretting ...')
+        await asyncio.sleep(wait)
+        return 'fret' * num
+
+    async def composer(num):
+        print(await fret(num, num))
+        tasks = [fret(num, num),
+                 fret(num, num),
+                 fret(num, num),
+                 fret(num, num),
+                 fret(num, num),
+                 fret(num, num)
+                 ]
+        results = await asyncio.gather(*tasks)
+        print(results)
+
+    # asyncio.run(composer(5))

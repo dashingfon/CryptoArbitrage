@@ -21,8 +21,8 @@ getRate: GetRate = lambda price, to, fro, r1: r1 * price[to] / price[fro]  # noq
 @attr.s(slots=True, order=True, frozen=True)
 class Token:
     '''Token class'''
-    name: str = attr.ib(repr=False, order=False)
-    address: str = attr.ib(repr=False, order=str.lower)
+    name: str = attr.ib(repr=True, order=False)
+    address: str = attr.ib(repr=True, order=str.lower)
 
     @property
     def shortJoin(self) -> str:
@@ -34,6 +34,14 @@ class Token:
 
 
 @attr.s(slots=True)
+class Via():
+    name: str = attr.ib()
+    pair: str = attr.ib()
+    fee: float = attr.ib()
+    router: str = attr.ib()
+
+
+@attr.s(slots=True, frozen=True)
 class Swap():
     fro: Token = attr.ib()
     to: Token = attr.ib()
@@ -58,7 +66,7 @@ class Routes(SQLModel):
             long.append(f"{j.fro.fullJoin} {j.to.fullJoin} {j.via}")  # noqa: E501
             short.append(f"{j.fro.shortJoin} {j.to.shortJoin} {j.via}")  # noqa: E501
 
-        return Routes(
+        return cls(
            simplyfied_Sht=' - '.join(short),
            simplyfied_full=' - '.join(long),
            startToken=swaps[0].fro.shortJoin,
@@ -87,8 +95,9 @@ class Route:
     def simplyfy(self, mode: str = 'long') -> str:
         '''function to generate a string repreentation
         from the swap attribute'''
+        modes = {'long', 'short'}
 
-        if mode != "long" or mode != 'short':
+        if mode not in modes:
             raise ValueError(
                 f"expected 'long' or 'short' got {mode}")
 
@@ -137,6 +146,13 @@ class Route:
                        EP=EP, capital=capital)
 
         return newRoute
+
+    @classmethod
+    def fromDict(self, dict) -> 'Route':
+        pass
+
+    def toDict(self) -> dict:
+        pass
 
     @staticmethod
     def cumSum(listItem: list) -> list:

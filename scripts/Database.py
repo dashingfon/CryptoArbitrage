@@ -1,11 +1,13 @@
 '''Module containing all the database methods and functions'''
 
-from sqlmodel import SQLModel, create_engine, Session, select
+from sqlmodel import SQLModel, create_engine, Session, select, inspect
 
 
 if __name__ == '__main__':
     import time
     import scripts.Models as models
+    Test = type('Test', (models.Routes,),
+            {'__tablename__': 'Test'}, table=True)  # noqa
 
     filename = "data\\databae.db"
     url = f'sqlite:///{filename}'
@@ -14,13 +16,17 @@ if __name__ == '__main__':
     def create_db_table():
         SQLModel.metadata.create_all(engine)
 
-    def insert_values():
-        _1 = models.Routes(
+    def insert_values(override: bool = False):
+        if override and inspect(engine).has_table('Test'):
+            Test.__table__.drop(engine)  # type: ignore
+        create_db_table()
+
+        _1 = Test(
             simplyfied_Sht='yeah', simplyfied_full='nah',
             startToken='ETH', startExchanges='binance',
             amountOfSwaps=4, time=time.time()
         )
-        _2 = models.Routes(
+        _2 = Test(
             simplyfied_Sht='yeah', simplyfied_full='nah',
             startToken='ETH', startExchanges='binance',
             amountOfSwaps=6, time=time.time()
@@ -46,8 +52,9 @@ if __name__ == '__main__':
             print(list(sess.exec(statement)))
 
     create_db_table()
-    # insert_values()
+    insert_values(override=True)
+
     '''select_values(
-        (models.Routes.startToken, models.Routes.amountOfSwaps),
-        (models.Routes.amountOfSwaps >= 5, models.Routes.startToken == 'ETH'))
+        (Test.startToken, Test.amountOfSwaps),
+        (Test.amountOfSwaps >= 5, Test.startToken == 'ETH'))
 '''

@@ -1,5 +1,5 @@
 from scripts import CONFIG_PATH
-from scripts.Models import Swap
+from scripts.Models import Token
 
 from functools import wraps
 import time
@@ -38,14 +38,22 @@ PAIR, cap = config['Test']['PAIR'], config['Test']['cap']
 fee = config['Test']['fee']
 
 
+def spliter(listItem, start=0, end=1, growth=True):
+    while start < len(listItem):
+        yield listItem[start:end]
+        start = end
+        end = start * 2 if growth else start + end
+
+
 def extractTokensFromHtml(content: str,
-                          swap: Swap) -> dict:
+                          swap: set[Token]) -> dict:
 
     assert content, 'Empty content recieved'
 
     price = {}
     soup = BeautifulSoup(content, 'html.parser')
 
+    tokens = list(swap)
     tokensList = soup.find_all('li', class_='list-custom')
     # print(tokensList)
     done1, done2, slider = False, False, 0
@@ -57,12 +65,12 @@ def extractTokensFromHtml(content: str,
             symbol = rawPrice[1]
             amount = float(rawPrice[0].replace(',', ''))
 
-            if symbol == swap.fro.name:
+            if symbol == tokens[0].name:
                 done1 = True
-                price[swap.fro] = amount
-            elif symbol == swap.to.name:
+                price[tokens[0]] = amount
+            elif symbol == tokens[1].name:
                 done2 = True
-                price[swap.to] = amount
+                price[tokens[1]] = amount
 
         except (IndexError, ValueError) as e:
             logging.exception(f'Error parsing item {raw}, error :- {e}')
@@ -146,18 +154,6 @@ def setPreparedData():
         result.append(getPayloadBytes(Map[i]))
     config['Test']['PrepedSwapData'] = result
     writeJson(CONFIG_PATH, config)
-
-
-def sortTokens(address1, address2):
-    first = str.encode(address1).hex()
-    second = str.encode(address2).hex()
-
-    if first > second:
-        return (address2, address1)
-    elif first < second:
-        return (address1, address2)
-    else:
-        raise ValueError('addresses are the same')
 
 
 def lookupPrice(Chain):

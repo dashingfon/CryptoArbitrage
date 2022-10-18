@@ -1,4 +1,6 @@
 import scripts.Blockchains as Blc
+from scripts.Utills import readJson
+from scripts import CONFIG_PATH
 import pytest
 
 Data_Available = 0
@@ -9,6 +11,8 @@ def getChain():
 
     if Chain == 'Aurora':
         return Blc.Aurora()
+    elif Chain == ' BSC':
+        return Blc.BSC()
     else:
         raise ValueError('Invalid Chain Argument')
 
@@ -46,7 +50,14 @@ def test_BuildGraph(ChainSetup):
     assert ChainSetup.graph == GRAPH
 
 
+def test_BuildExchanges(ChainSetup):
+    pass
+
+
 class TestArbRoute:
+
+    def test_dive(self, ChainSetup):
+        pass
 
     def test_DLS(self, ChainSetup):
 
@@ -90,22 +101,6 @@ class TestArbRoute:
         assert equal(route, results)
 
 
-class TestRate:
-
-    def test_getRate(self, ChainSetup):
-        r1 = ChainSetup.r1
-        # impact = ChainSetup.impact
-        # rate = r1 * PRICE['WETH'] / (1 + (impact * r1)) / PRICE['WBTC']
-        rate = r1 * PRICE['WETH'] / PRICE['WBTC']
-        assert rate == ChainSetup.getRate(PRICE, 'WETH', 'WBTC')
-
-    @pytest.mark.parametrize('prices', [{'WETH': 2.141651224104825},
-                                        {'WBTC': 0.11160318}])
-    def test_invalidRate(self, ChainSetup, prices):
-        with pytest.raises(ValueError):
-            ChainSetup.getRate(prices, 'WETH', 'WBTC')
-
-
 prices1 = [
     {'AURORA': 21, 'WETH': 32},
     {'WETH': 55, 'NEAR': 41},
@@ -116,19 +111,6 @@ prices2 = [
     {'WETH': 55, 'NEAR': 41},
     {'NEAR': 70, 'AURORA': 40}
 ]
-
-
-def getRates(prices):
-    rates1 = [1, CHAIN.getRate(prices[0], 'WETH', 'AURORA')]
-    rates2 = [1, CHAIN.getRate(prices[2], 'NEAR', 'AURORA')]
-
-    rates1.append(CHAIN.getRate(prices[1], 'NEAR', 'WETH') * rates1[-1])
-    rates2.append(CHAIN.getRate(prices[1], 'WETH', 'NEAR') * rates2[-1])
-
-    rates1.append(CHAIN.getRate(prices[2], 'AURORA', 'NEAR') * rates1[-1])
-    rates2.append(CHAIN.getRate(prices[0], 'AURORA', 'WETH') * rates2[-1])
-
-    return rates1, rates2
 
 
 class TestPollRoutes:

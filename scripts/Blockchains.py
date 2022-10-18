@@ -25,7 +25,8 @@ from scripts.Database import (
     SQLModel,
     create_engine,
     Session,
-    select
+    select,
+    inspect
     )
 import logging
 import web3
@@ -82,6 +83,10 @@ class Blockchain:
         self.w3 = web3.Web3(web3.AsyncHTTPProvider(self.url),
                             modules={'eth': (AsyncEth,)},
                             middlewares=[])
+        self.getAddress: Callable[
+                [Swap], str
+                ] = lambda i: self.exchanges[i.via]['pairs'][frozenset([i.fro, i.to])]  # noqa: E501
+
         self.source: str
         self.coinGeckoId: str
         self.geckoTerminalName: str
@@ -194,8 +199,8 @@ class Blockchain:
                     pass
                 else:
                     new_path = path + [Swap(
-                                       fro=i['to'], to=i['to'], via=i['via'])]
-                    new_path[-1].fro = new_path[-2].to
+                                       fro=path[-1].to,
+                                       to=i['to'], via=i['via'])]
 
                     if i['to'] == goal:
                         result.append(Route(swaps=new_path))
@@ -229,11 +234,23 @@ class Blockchain:
 
         return result
 
-    def toDatabase(self, routes: list[Route]) -> None:
+    def toDatabase(self, routes: list[Route],
+                   override: bool) -> None:
         '''method to get data from the database'''
+
+        if override and not routes:
+            logging.error('Cannot Overide with empty routes')
+            return None
+        elif override and inspect(Engine).has_table(self.tableName):
+            logging.info(f"Overriding the '{self.tableName}' table")
+            print(type(self.table))
+            # mypy doesnt recognise the __table__ from SqlAlchemy
+            self.table.__table__.drop(Engine)  # type: ignore
+
         if routes:
             SQLModel.metadata.create_all(Engine)
 
+            logging.info(f"Saving to '{self.tableName}' table")
             with Session(Engine) as sess:
                 for route in routes:
                     sess.add(self.table.fromSwaps(route.swaps))
@@ -251,11 +268,9 @@ class Blockchain:
             return list(sess.exec(statement))
 
     def getArbRoute(self, tokens: Optional[list[Token]] = [],
-                    exchanges: list = [],
-                    graph: bool = True,
-                    save: bool = True,
+                    exchanges: list = [], graph: bool = True,
+                    override: bool = True, save: bool = True,
                     screen: bool = True) -> list | None:
-
         '''
         The method the produces and optionally saves the Arb routes
         '''
@@ -274,8 +289,9 @@ class Blockchain:
         if screen and routes:
             routes = self.screenRoutes(routes)
 
+        logging.info(f'{len(routes)} routes found')
         if save:
-            self.toDatabase(routes=routes)
+            self.toDatabase(routes=routes, override=override)
             return None
         else:
             return routes
@@ -329,17 +345,17 @@ class Blockchain:
 
         '''method to get the token prices asynchronously'''
 
-        form: Callable[[Any], list] = lambda i: [self.exchanges[i['via']]['pairs'][frozenset([i['from'], i['to']])], i, i['via']]  # noqa: E501
         tasks = []
         if session:
             for i in route.swaps:
                 tasks.append(asyncio.create_task(
-                    self.getPriceFromExplorer(session, *form(i))
+                    self.getPriceFromExplorer(session, self.getAddress(i),
+                                              {i.to, i.fro}, i.via)
                 ))
         else:
             for i in route.swaps:
                 tasks.append(asyncio.create_task(
-                    self.getPrice(*form(i)[:2])
+                    self.getPrice(self.getAddress(i), {i.to, i.fro})
                 ))
 
         return await asyncio.gather(*tasks)
@@ -347,8 +363,7 @@ class Blockchain:
     @Cache
     async def getPriceFromExplorer(self, session: aiohttp.ClientSession,
                                    addr: str,
-                                   swap: Swap,
-                                   exchange: str) -> dict:
+                                   swap: set[Token]) -> dict:
 
         '''method to get token prices using the explorer'''
         price: Price = {}
@@ -359,10 +374,11 @@ class Blockchain:
 
                 if response.status == 200:
                     try:
-                        price = extractTokensFromHtml(await response.text(), swap)  # noqa E501
+                        price = extractTokensFromHtml(await response.text(),
+                                                      swap)
                     except AssertionError:
                         logging.exception(
-                            f'failed request, exchange :- {exchange}, pairs :- {swap}')  # noqa E501
+                            f'failed request, pairs :- {swap}')  # noqa E501
                 else:
                     logging.error(
                         f'error, status code {response.status}')
@@ -370,14 +386,14 @@ class Blockchain:
         return price
 
     @Cache
-    async def getPrice(self, addr: str, swap: Swap) -> dict:
+    async def getPrice(self, addr: str, swap: set[Token]) -> dict:
         '''method to get the token prices from blockchain nodes'''
         price: dict[Token, float] = {}
-        abi: list = []
+        abi: list = Config['ABIs']['PairAbi']
 
         Contract = self.w3.eth.contract(address=addr, abi=abi)  # type: ignore
         rawPrice = await Contract.functions.getReserves().call()
-        tokens = sorted([swap.to, swap.fro])
+        tokens = sorted(swap)
         price[tokens[0]] = rawPrice[0]
         price[tokens[1]] = rawPrice[1]
 
@@ -397,6 +413,24 @@ class Blockchain:
                 }
             )
         return result
+
+    async def adsorb(self, routes: list[Route]) -> None:
+        '''function to cache the routes'''
+
+        uniques: dict[str, set[Token]] = {}
+        tracker: set[Swap] = set()
+        for route in routes:
+            for swap in route.swaps:
+                if swap not in tracker:
+                    uniques[self.getAddress(swap)] = {swap.to, swap.fro}
+                    tracker.add(swap)
+
+        tasks = []
+        for key, value in uniques.items():
+            tasks.append(asyncio.create_task(
+                         self.getPrice(key, value)))
+
+        await asyncio.gather(*tasks)
 
     async def pollRoutes(self, routes: list[Route] = [],
                          save: bool = True, currentPrice: bool = False,

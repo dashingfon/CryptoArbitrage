@@ -1,27 +1,31 @@
 import asyncio
 from asyncio.proactor_events import _ProactorBasePipeTransport
-# from dotenv import load_dotenv
-# from brownie import interface
+# import pprint
+import os
+from dotenv import load_dotenv
 
 import scripts.Blockchains as Blc
-# import scripts.Controller as Ctr
 from scripts.Utills import silence_event_loop_closed
-# load_dotenv()
-# config = readJson('Config.json')
 
 _ProactorBasePipeTransport.__del__ = silence_event_loop_closed(  # type: ignore
         _ProactorBasePipeTransport.__del__)
+load_dotenv()
 
 
-async def main():
+async def pollRoute():
 
-    # url = f'https://bsc.nownodes.io/{os.environ}'
-    Chain = Blc.BSC()
-    Chain.buildGraph()
-    print(Chain.graph)
+    # url = 'https://bsc-dataseed.binance.org'
+    url2 = f'https://bsc.nownodes.io/{os.environ.get("NowNodesBscKey")}'
+    Chain = Blc.BSC(url=url2)
     '''routes = Chain.getArbRoute(tokens='default', save=False)
     await Chain.pollRoutes(routes=routes)'''
 
+
+async def main():
+    # url = f'https://bsc.nownodes.io/{os.environ}'
+    Chain = Blc.BSC()
+    Chain.getArbRoute()
+    # pprint.pprint(Chain.exchanges)
 
 if __name__ == '__main__':
     asyncio.run(main())
