@@ -4,8 +4,10 @@ from sqlmodel import SQLModel, create_engine, Session, select, inspect
 
 
 if __name__ == '__main__':
+
     import time
     import scripts.Models as models
+
     Test = type('Test', (models.Routes,),
             {'__tablename__': 'Test'}, table=True)  # noqa
 
@@ -46,9 +48,6 @@ if __name__ == '__main__':
             for i in where:
                 statement = statement.where(i)
 
-            ''' reut = sess.exec(statement)
-            for r in reut:
-                print(r)'''
             print(list(sess.exec(statement)))
 
     create_db_table()

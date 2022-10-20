@@ -1,5 +1,10 @@
+'''module containing the utility functions'''
+
+from typing import Callable, Any
 from scripts import CONFIG_PATH
-from scripts.Models import Token
+from scripts.Models import (
+    Token
+    )
 
 from functools import wraps
 import time
@@ -11,14 +16,11 @@ from eth_abi import encode_abi
 from bs4 import BeautifulSoup
 
 
-def readJson(path: str) -> dict:
+def readJson(path: str) -> Any:
     '''function to read from json file'''
-    try:
-        with open(path) as PP:
-            temp = json.load(PP)
-    except FileNotFoundError as e:
-        logging.exception(e)
-        temp = {}
+
+    with open(path) as PP:
+        temp = json.load(PP)
     return temp
 
 
@@ -38,7 +40,9 @@ PAIR, cap = config['Test']['PAIR'], config['Test']['cap']
 fee = config['Test']['fee']
 
 
-def spliter(listItem, start=0, end=1, growth=True):
+def spliter(listItem: list, start: int = 0,
+            end: int = 1, growth: bool = True):
+
     while start < len(listItem):
         yield listItem[start:end]
         start = end
@@ -86,7 +90,7 @@ def extractTokensFromHtml(content: str,
     return price
 
 
-def silence_event_loop_closed(func):
+def silence_event_loop_closed(func: Callable):
     @wraps(func)
     def wrapper(self, *args, **kwargs):
         try:
@@ -97,10 +101,10 @@ def silence_event_loop_closed(func):
     return wrapper
 
 
-def RateLimited(maxPerSecond):
+def RateLimited(maxPerSecond: int):
     mininterval = 1.0 / float(maxPerSecond)
 
-    def decorate(func):
+    def decorate(func: Callable):
         lastTimeCalled = [0.0]
 
         @wraps(func)
@@ -117,7 +121,7 @@ def RateLimited(maxPerSecond):
     return decorate
 
 
-def getPaths(contents):
+def getPaths(contents: list):
     num = 1
     result = []
     defs = ['address[]']
@@ -128,7 +132,7 @@ def getPaths(contents):
     return result
 
 
-def getPayloadBytes(Map, pair):
+def getPayloadBytes(Map: dict, pair: str):
     data = getPaths(Map[1])
 
     defs = ['address[]', 'bytes[]', 'address', 'uint256', 'uint256']
@@ -164,7 +168,7 @@ def lookupPrice(Chain):
             logging.debug(f'Token {key}, Address {value} not included')
 
 
-def parseEchanges(item):
+'''def parseEchanges(item):
     new = {}
     try:
         for key, value in item.items():
@@ -175,7 +179,7 @@ def parseEchanges(item):
             new[key]['pairs'] = temp
     except KeyError as e:
         logging.exception(f'incorrect exchange data, KeyError :- {e}')
-    return new
+    return new'''
 
 
 def extractSymbol(content):
@@ -223,8 +227,7 @@ def cache(content, name):
 
     for i in content['included']:
         if i['type'] == 'dex':
-            address = Web3.toChecksumAddress(i['attributes']['identifier'])
-            exchanges[i['id']] = address
+            exchanges[i['id']] = i['attributes']['identifier']
         elif i['type'] == 'token':
             address = Web3.toChecksumAddress(i['attributes']['address'])
             tokens[i['id']] = {'symbol': i['attributes']['symbol'],
@@ -237,7 +240,6 @@ def cache(content, name):
 
 def trim_and_map(blockchain, tokens, exchanges, minSwaps=3):
     logging.info('trimming and mapping ...')
-    exchanges = parseEchanges(exchanges)
     assert exchanges
     tokensResult, exchangesResult, remappingsResult = {}, {}, {}
     swapsCount, distribution = 0, {}
@@ -252,7 +254,7 @@ def trim_and_map(blockchain, tokens, exchanges, minSwaps=3):
     logging.info(f'Total initial exchanges :- {initialExchangeCount}')
 
     session = requests.Session()
-    blockchain.buildGraph(exchanges)
+    blockchain.buildGraph(exchanges=exchanges, tokens=tokens)
 
     for token, swaps in blockchain.graph.items():
         swapLenght = len(swaps)
@@ -354,7 +356,8 @@ def buildData(blockchain, filePath: str, artifactPath: str,
                         'router': '',
                         'factory': ''
                     }
-                exchanges[exchangeCache[dex]]['pairs'][' - '.join(Ts)] = item['attributes']['address']  # noqa: E501
+                exchanges[exchangeCache[dex]][
+                    'pairs'][' - '.join(Ts)] = Web3.toChecksumAddress(item['attributes']['address'])  # noqa: E501
 
         if data['links']['next']:
             url = data['links']['next']
@@ -403,4 +406,5 @@ def setData(chain, dumpPath: str, supportedExchanges: set, temp=True):
 
 
 def setContractAddress(blockchain):
+
     logging.info('Contract address set!')

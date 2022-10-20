@@ -46,7 +46,7 @@ from typing import (
     )
 
 
-Cache: AsyncTTL = AsyncTTL(time_to_live=5, maxsize=150)
+Cache: AsyncTTL = AsyncTTL(time_to_live=500, maxsize=150)
 Limiter: AsyncLimiter = AsyncLimiter(max_rate=25, time_period=1)
 Config: dict = readJson(CONFIG_PATH)
 Engine: Any = create_engine(DATABASE_URL)
@@ -57,24 +57,24 @@ class Blockchain:
     inheriting from the Base Blockchain.
     Must implement genRoutes according to the superclass'''
 
-    def __init__(self) -> None:
+    def __init__(self, url: str) -> None:
         if type(self) == Blockchain:
             raise errors.CannotInitializeDirectly(
                 'Blockchain class can only be used through inheritance')
 
+        self.url: str = url
         self.impact: float = 0.00075
         self.r1: float = 0.997
         self.depthLimit: int = 4
-        self.graph: dict = {}
-        self.exchanges: dict
-        self.arbRoutes: list
+        self.graph: dict[Token, list[dict]] = {}
+        self.exchanges: dict[str, dict] = {}
         self.headers: dict[str, str] = {
             'User-Agent': 'PostmanRuntime/7.29.0',
             "Connection": "keep-alive"
             }
         self.dataPath: str = str(path.joinpath('data'))
-        self.priceLookupPath: str = str(path.joinpath(self.dataPath, 'PriceLookup.json'))  # noqa
-        self.url: str = 'http://127.0.0.1:8545'
+        self.priceLookupPath: str = str(
+            path.joinpath(self.dataPath, 'PriceLookup.json'))
         self.tableName: str = f'{str(self)} Routes'
         self.table: Type[Routes] = type(self.tableName,
                           (Routes,),  # noqa E128
@@ -128,9 +128,13 @@ class Blockchain:
                 return chainContent.get('arbAddress')
         return ''
 
+    @property
+    def storagePath(self) -> str:
+        pass
+
     def setup(self, supportedExchanges: set[str] = set(),
               saveArtifact: bool = False,
-              temp: bool = False) -> None:
+              temp: bool = True) -> None:
 
         '''method to fetch all the token and pair addresses'''
 
@@ -243,7 +247,6 @@ class Blockchain:
             return None
         elif override and inspect(Engine).has_table(self.tableName):
             logging.info(f"Overriding the '{self.tableName}' table")
-            print(type(self.table))
             # mypy doesnt recognise the __table__ from SqlAlchemy
             self.table.__table__.drop(Engine)  # type: ignore
 
@@ -327,6 +330,10 @@ class Blockchain:
         '''
         method to lookup token price with coingecko api wrapper
         '''
+        extract: Callable[
+            [list[Token]], list[str]
+                        ] = lambda lst: [i.address for i in lst]
+
         temp = readJson(self.priceLookupPath)
         prices = {}
 
@@ -335,7 +342,7 @@ class Blockchain:
         coinGecko = CoinGeckoAPI()
         prices = coinGecko.get_token_price(
             id=self.coinGeckoId,
-            contract_addresses=tokenAdresses,
+            contract_addresses=extract(tokenAdresses),
             vs_currencies='usd')
 
         writeJson(self.priceLookupPath, {**temp, **prices})
@@ -344,21 +351,24 @@ class Blockchain:
                         session: aiohttp.ClientSession | None = None) -> list[Price]:  # noqa E501
 
         '''method to get the token prices asynchronously'''
-
-        tasks = []
+        start = time.perf_counter()
+        prices = []
         if session:
             for i in route.swaps:
-                tasks.append(asyncio.create_task(
-                    self.getPriceFromExplorer(session, self.getAddress(i),
-                                              {i.to, i.fro}, i.via)
-                ))
+                prices.append(
+                    await self.getPriceFromExplorer(
+                        session, self.getAddress(i), {i.to, i.fro}, i.via)
+                )
         else:
             for i in route.swaps:
-                tasks.append(asyncio.create_task(
-                    self.getPrice(self.getAddress(i), {i.to, i.fro})
-                ))
+                prices.append(
+                    await self.getPrice(self.getAddress(i), {i.to, i.fro})
+                )
 
-        return await asyncio.gather(*tasks)
+        end = time.perf_counter()
+
+        logging.info(f'finished getting prices in {end - start} seconds for {route}')  # noqa E501
+        return prices
 
     @Cache
     async def getPriceFromExplorer(self, session: aiohttp.ClientSession,
@@ -388,6 +398,7 @@ class Blockchain:
     @Cache
     async def getPrice(self, addr: str, swap: set[Token]) -> dict:
         '''method to get the token prices from blockchain nodes'''
+        start = time.perf_counter()
         price: dict[Token, float] = {}
         abi: list = Config['ABIs']['PairAbi']
 
@@ -397,6 +408,9 @@ class Blockchain:
         price[tokens[0]] = rawPrice[0]
         price[tokens[1]] = rawPrice[1]
 
+        end = time.perf_counter()
+        logging.info(
+            f'finished polling pairs {swap} of address {addr} in {end - start} seconds')  # noqa E501
         return price
 
     def convert(self, routes: list[Route]) -> list[dict]:
@@ -416,7 +430,7 @@ class Blockchain:
 
     async def adsorb(self, routes: list[Route]) -> None:
         '''function to cache the routes'''
-
+        start = time.perf_counter()
         uniques: dict[str, set[Token]] = {}
         tracker: set[Swap] = set()
         for route in routes:
@@ -431,6 +445,10 @@ class Blockchain:
                          self.getPrice(key, value)))
 
         await asyncio.gather(*tasks)
+        end = time.perf_counter()
+
+        logging.info(
+            f'Finished adsorbing {len(routes)} routes in {end - start} seconds')  # noqa E501
 
     async def pollRoutes(self, routes: list[Route] = [],
                          save: bool = True, currentPrice: bool = False,
@@ -462,7 +480,7 @@ class Blockchain:
         logging.info(f'filtering by :- {value}')
         logging.info(f'total of :- {routeLenght}')
 
-        result = []
+        result: list[Route] = []
         routesGen = self.genRoutes(routes=routes, value=value,
                                    currentPrice=currentPrice)
 
@@ -479,7 +497,7 @@ class Blockchain:
 
         export = self.convert(sorted(result))
         if save:
-            writeJson(self.dataPath,
+            writeJson(str(path.joinpath(self.dataPath, 'pollResult.json')),
                       {'MetaData': {
                         'time': time.ctime(),
                         'total': routeLenght
@@ -535,10 +553,12 @@ class Blockchain:
         while not Done:
             try:
                 item = next(subRoutes)
+                await self.adsorb(item)
+                start = time.perf_counter()
                 tasks = []
                 for i in item:
                     marker += 1
-                    UsdVal = priceLookup[i.swaps[0].fro]
+                    UsdVal = priceLookup[i.swaps[0].fro.address]['usd']
                     tasks.append(asyncio.create_task(
                         self.pollRoute(route=i, usdVal=UsdVal)))
 
@@ -554,6 +574,11 @@ class Blockchain:
                     except Exception:
                         logging.exception('Fatal Error')
                         Done = True
+                        break
+
+                end = time.perf_counter()
+
+                logging.info(f'finished polling {len(item)} in {end - start} seconds')  # noqa E501
 
             except StopIteration:
                 logging.info('Done polling tasks')
@@ -565,6 +590,7 @@ class Blockchain:
                     yield route
 
             logging.info(f'route {marker} of {routeLenght}, found {found}')
+
         logging.info('done polling routes')
 
     def screenRoutes(self, routes: list[Route]) -> list:
@@ -589,9 +615,8 @@ class Blockchain:
 
 class Aurora(Blockchain):
 
-    def __init__(self, url: str = '') -> None:
-        super().__init__()
-        if url: self.url = url  # noqa E701
+    def __init__(self, url: str = 'http://127.0.0.1:8545') -> None:
+        super().__init__(url=url)
         self.source = 'https://aurorascan.dev/address/'
         self.coinGeckoId = 'aurora'
         self.geckoTerminalName = 'aurora'
@@ -602,9 +627,8 @@ class Aurora(Blockchain):
 
 class Arbitrum(Blockchain):
 
-    def __init__(self, url: str = '') -> None:
-        super().__init__()
-        if url: self.url = url  # noqa E701
+    def __init__(self, url: str = 'http://127.0.0.1:8545') -> None:
+        super().__init__(url=url)
         self.source = 'https://arbiscan.io/address/'
         self.coinGeckoId = ''
         self.geckoTerminalName = 'arbitrum'
@@ -615,9 +639,8 @@ class Arbitrum(Blockchain):
 
 class BSC(Blockchain):
 
-    def __init__(self, url: str = '') -> None:
-        super().__init__()
-        if url: self.url = url  # noqa E701
+    def __init__(self, url: str = 'http://127.0.0.1:8545') -> None:
+        super().__init__(url=url)
         self.source = 'https://bscscan.com/address/'
         self.coinGeckoId = 'binance-smart-chain'
         self.geckoTerminalName = 'bsc'
@@ -628,9 +651,8 @@ class BSC(Blockchain):
 
 class Fantom(Blockchain):
 
-    def __init__(self, url: str = '') -> None:
-        super().__init__()
-        if url: self.url = url  # noqa E701
+    def __init__(self, url: str = 'http://127.0.0.1:8545') -> None:
+        super().__init__(url=url)
         self.source = ''
         self.coinGeckoId = ''
         self.geckoTerminalName = 'bsc'
@@ -641,9 +663,8 @@ class Fantom(Blockchain):
 
 class Polygon(Blockchain):
 
-    def __init__(self, url: str = '') -> None:
-        super().__init__()
-        if url: self.url = url  # noqa E701
+    def __init__(self, url: str = 'http://127.0.0.1:8545') -> None:
+        super().__init__(url=url)
         self.source = ''
         self.coinGeckoId = ''
         self.geckoTerminalName = 'bsc'

@@ -97,27 +97,6 @@ ROUTES = [
 ]
 
 
-class TestGetRoutes():
-
-    def test_getRoutes(self):
-        routes = list(CtrSetup.getRoutes())
-        print(routes)
-        assert equal(ROUTES, routes)
-
-
-def test_getProspect():
-    prospects = list(CtrSetup.getProspect(ROUTES))
-    ans = [{
-        'route': [{'from': 'TST1', 'to': 'TST2', 'via': 'fonswap'},
-                  {'from': 'TST2', 'to': 'TST3', 'via': 'fonswap'},
-                  {'from': 'TST3', 'to': 'TST1', 'via': 'fonswap'}],
-        'simplified': 'TST1 TST2 fonswap - TST2 TST3 fonswap - TST3 TST1 fonswap',  # noqa: E501
-        'EP': 0.30412659013303345e18,
-        'capital': 0.1919007137570744e18
-    }]
-    assert prospects == ans
-
-
 class TestSortingAddresses():
 
     @pytest.mark.parametrize('address1,address2', [
