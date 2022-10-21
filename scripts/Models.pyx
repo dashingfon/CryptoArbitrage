@@ -1,0 +1,2 @@
+cpdef class Token:
+    pass

@@ -1,16 +1,11 @@
 '''Model module containing the extra data type'''
 
 from typing import (
-    Optional,
     AsyncGenerator,
     Callable,
     Protocol
     )
-from sqlmodel import Field, SQLModel
-from cache import AsyncTTL
 import attr
-import time
-import logging
 
 Price = dict['Token', float]
 GetRate = Callable[[Price, 'Token', 'Token', float], float]
@@ -46,34 +41,6 @@ class Swap():
     fro: Token = attr.ib()
     to: Token = attr.ib()
     via: str = attr.ib()
-
-
-class Routes(SQLModel):
-    '''Route Model class'''
-    id: Optional[int] = Field(default=None, primary_key=True)
-    simplyfied_Sht: str = Field()
-    simplyfied_full: str = Field()
-    startToken: str = Field(index=True)
-    startExchanges: str = Field(index=True)
-    amountOfSwaps: int = Field(index=True)
-    time: float = Field(index=True)
-
-    @classmethod
-    def fromSwaps(cls, swaps: list[Swap]) -> 'Routes':
-
-        short, long = [], []
-        for j in swaps:
-            long.append(f"{j.fro.fullJoin} {j.to.fullJoin} {j.via}")  # noqa: E501
-            short.append(f"{j.fro.shortJoin} {j.to.shortJoin} {j.via}")  # noqa: E501
-
-        return cls(
-           simplyfied_Sht=' - '.join(short),
-           simplyfied_full=' - '.join(long),
-           startToken=swaps[0].fro.shortJoin,
-           startExchanges=swaps[0].via,
-           amountOfSwaps=len(swaps),
-           time=time.time()
-        )
 
 
 @attr.s(slots=True, order=True)
@@ -148,7 +115,7 @@ class Route:
         return newRoute
 
     @classmethod
-    def fromDict(self, dict) -> 'Route':
+    def fromDict(self, dict: dict) -> 'Route':
         pass
 
     def toDict(self) -> dict:
@@ -228,6 +195,10 @@ class Route:
         return [self, reverse]
 
 
+def generate():
+    pass
+
+
 class BaseBlockchain(Protocol):
     '''Base blockchain Abstract class'''
     url: str = ''
@@ -244,39 +215,34 @@ class BaseBlockchain(Protocol):
         pass
 
 
+class Calculator:
+    '''class to calculate the profitable routes'''
+    def __init__(self) -> None:
+        pass
+
+    def calculate(self):
+        pass
+
+    def generate(self):
+        pass
+
+
 class Spliter:
     '''iterator class for spliting a list into batches'''
-    def __init__(self, items: list, cache: AsyncTTL,
+    def __init__(self, items: list,
                  start: int = 0, gap: int = 1) -> None:
 
-        self.cache: AsyncTTL = cache
         self.items: list = items
         self.start: int = start
         self.end: int = self.start + gap
-
-        logging.info(f'Spliter class; List lenght :- {len(self.items)}')
-        logging.info(f'start :- {start} gap :- {gap}')
 
     def __iter__(self) -> 'Spliter':
         return self
 
     def __next__(self) -> list[Route]:
         if self.start < len(self.items):
-            cacheLenght = len(self.cache.ttl)
             start = self.start
             gap = self.end - self.start
-
-            if cacheLenght <= 4 and gap > 1:
-                gap = 1
-            elif 5 <= cacheLenght <= 8 and gap > cacheLenght // 4:
-                gap = cacheLenght // 4
-            elif 6 <= cacheLenght <= 12 and gap > cacheLenght // 3:
-                gap = cacheLenght // 3
-            elif 12 <= cacheLenght <= 30 and gap > cacheLenght // 2:
-                gap = cacheLenght // 2
-
-            logging.info(f'gap :- {gap} start :- {start}')
-
             self.start += gap
             self.end = self.start + gap * 2
             return self.items[start:start + gap]

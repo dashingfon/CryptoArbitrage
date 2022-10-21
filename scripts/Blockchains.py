@@ -4,13 +4,12 @@ The main blockchain class inherits from the BaseBlockchain
 which other Blockchains then inherit from
 '''
 
-from scripts import CONFIG_PATH, DATABASE_URL, path
+from scripts import CONFIG_PATH, path
 import scripts.Errors as errors
 from scripts.Models import (
     Token,
     Swap,
     Route,
-    Routes,
     Price,
     Spliter
     )
@@ -21,13 +20,7 @@ from scripts.Utills import (
     buildData,
     setData
     )
-from scripts.Database import (
-    SQLModel,
-    create_engine,
-    Session,
-    select,
-    inspect
-    )
+
 import logging
 import web3
 from web3.eth import AsyncEth
@@ -36,20 +29,15 @@ import asyncio
 import aiohttp
 from aiolimiter import AsyncLimiter
 from pycoingecko import CoinGeckoAPI
-from cache import AsyncTTL
 from typing import (
     AsyncGenerator,
     Callable,
-    Optional,
-    Any,
-    Type
+    Optional
     )
 
 
-Cache: AsyncTTL = AsyncTTL(time_to_live=5, maxsize=150)
-Limiter: AsyncLimiter = AsyncLimiter(max_rate=25, time_period=1)
+Limiter: AsyncLimiter = AsyncLimiter(max_rate=200, time_period=1)
 Config: dict = readJson(CONFIG_PATH)
-Engine: Any = create_engine(DATABASE_URL)
 
 
 class Blockchain:
@@ -67,19 +55,15 @@ class Blockchain:
         self.depthLimit: int = 4
         self.graph: dict = {}
         self.exchanges: dict
-        self.arbRoutes: list
         self.headers: dict[str, str] = {
             'User-Agent': 'PostmanRuntime/7.29.0',
             "Connection": "keep-alive"
             }
         self.dataPath: str = str(path.joinpath('data'))
+        self.arbPath: str = str(
+            path.joinpath('Database', f'{str(self).split()[0]}_Routes'))
         self.priceLookupPath: str = str(path.joinpath(self.dataPath, 'PriceLookup.json'))  # noqa
         self.url: str = 'http://127.0.0.1:8545'
-        self.tableName: str = f'{str(self)} Routes'
-        self.table: Type[Routes] = type(self.tableName,
-                          (Routes,),  # noqa E128
-                          {'__tablename__': self.tableName},
-                          table=True)
         self.w3 = web3.Web3(web3.AsyncHTTPProvider(self.url),
                             modules={'eth': (AsyncEth,)},
                             middlewares=[])
@@ -234,39 +218,6 @@ class Blockchain:
 
         return result
 
-    def toDatabase(self, routes: list[Route],
-                   override: bool) -> None:
-        '''method to get data from the database'''
-
-        if override and not routes:
-            logging.error('Cannot Overide with empty routes')
-            return None
-        elif override and inspect(Engine).has_table(self.tableName):
-            logging.info(f"Overriding the '{self.tableName}' table")
-            print(type(self.table))
-            # mypy doesnt recognise the __table__ from SqlAlchemy
-            self.table.__table__.drop(Engine)  # type: ignore
-
-        if routes:
-            SQLModel.metadata.create_all(Engine)
-
-            logging.info(f"Saving to '{self.tableName}' table")
-            with Session(Engine) as sess:
-                for route in routes:
-                    sess.add(self.table.fromSwaps(route.swaps))
-                sess.commit()
-
-    def fromDatabase(self, selection: tuple, where: tuple = ()) -> list:
-        '''method to save data to the database'''
-        with Session(Engine) as sess:
-            raw = select(*selection)
-
-            statement = raw
-            for i in where:
-                statement = statement.where(i)
-
-            return list(sess.exec(statement))
-
     def getArbRoute(self, tokens: Optional[list[Token]] = [],
                     exchanges: list = [], graph: bool = True,
                     override: bool = True, save: bool = True,
@@ -350,7 +301,7 @@ class Blockchain:
             for i in route.swaps:
                 tasks.append(asyncio.create_task(
                     self.getPriceFromExplorer(session, self.getAddress(i),
-                                              {i.to, i.fro}, i.via)
+                                              {i.to, i.fro})
                 ))
         else:
             for i in route.swaps:
@@ -360,7 +311,6 @@ class Blockchain:
 
         return await asyncio.gather(*tasks)
 
-    @Cache
     async def getPriceFromExplorer(self, session: aiohttp.ClientSession,
                                    addr: str,
                                    swap: set[Token]) -> dict:
@@ -385,7 +335,6 @@ class Blockchain:
 
         return price
 
-    @Cache
     async def getPrice(self, addr: str, swap: set[Token]) -> dict:
         '''method to get the token prices from blockchain nodes'''
         price: dict[Token, float] = {}
@@ -399,22 +348,7 @@ class Blockchain:
 
         return price
 
-    def convert(self, routes: list[Route]) -> list[dict]:
-        '''method to serialize the routes into json'''
-        result = []
-        for route in routes:
-            result.append(
-                {
-                    'route': route.simplyfied_short,
-                    'EP': route.USD_Value / 1e18,
-                    'USD_Value': route.EP,
-                    'index': route.index,
-                    'capital': route.capital / 1e18
-                }
-            )
-        return result
-
-    async def adsorb(self, routes: list[Route]) -> None:
+    async def buildCache(self, routes: list[Route]) -> dict[Swap, list[float]]:
         '''function to cache the routes'''
 
         uniques: dict[str, set[Token]] = {}
@@ -440,20 +374,6 @@ class Blockchain:
                          amountOfSwaps: int | None = None) -> Optional[list]:
 
         if not routes:
-            filters = []
-            if startTokens:
-                filters.append(self.table.startToken == startTokens)
-            if startExchanges:
-                filters.append(
-                    self.table.startExchanges == startExchanges)
-            if amountOfSwaps:
-                filters.append(
-                    self.table.amountOfSwaps == amountOfSwaps)
-
-            routeFull = self.fromDatabase(
-                (self.table.simplyfied_full,),
-                tuple(filters)
-            )
             routes = [Route.fromFullString(route) for route in routeFull]
 
         routeLenght = len(routes)
@@ -502,26 +422,10 @@ class Blockchain:
         '''
 
         if not routes:
-            filters = []
-            if kwargs.get('startTokens'):
-                filters.append(
-                    self.table.startToken == kwargs.get('startTokens'))
-            if kwargs.get('startExchanges'):
-                filters.append(
-                    self.table.startExchanges == kwargs.get('startExchanges'
-                    ))  # noqa E124
-            if kwargs.get('amountOfSwaps'):
-                filters.append(
-                    self.table.amountOfSwaps == kwargs.get('amountOfSwaps'))
-
-            routeFull = self.fromDatabase(
-                (self.table.simplyfied_full,),
-                tuple(filters)
-            )
             routes = [Route.fromFullString(route) for route in routeFull]
 
         routes = self.screenRoutes(routes)
-        subRoutes = Spliter(routes, Cache)
+        subRoutes = Spliter(routes)
         routeLenght = len(routes)
 
         if kwargs.get('currentPrice'):

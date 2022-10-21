@@ -206,22 +206,26 @@ if __name__ == '__main__':
 
     # asyncio.run(bulk(addresses))
 
-    @Cache
-    async def fret(num, wait):
-        logging.debug('fretting ...')
-        await asyncio.sleep(wait)
-        return 'fret' * num
+    class Dre():
+        def __init__(self, name: str, address: str) -> None:
+            self.name: str = name
+            self.address: str = address
+            self.via: str = 'vianto'
 
-    async def composer(num):
-        print(await fret(num, num))
-        tasks = [fret(num, num),
-                 fret(num, num),
-                 fret(num, num),
-                 fret(num, num),
-                 fret(num, num),
-                 fret(num, num)
-                 ]
-        results = await asyncio.gather(*tasks)
-        print(results)
+        def __eq__(self, __o: object) -> bool:
+            if {self.name, self.address} == {__o.name, __o.address}:
+                return True
+            return False
 
-    # asyncio.run(composer(5))
+        def __hash__(self) -> int:
+            return hash((self.name, self.address)) + hash(self.via)
+            # return hash((self.name, self.address, self.via))
+
+        def __repr__(self) -> str:
+            return f'{self.name}_{self.address}_{self.via}'
+
+    e = Dre('adam', '3 venue')
+    r = Dre('3 venue', 'adam')
+    print(hash(e), hash(r))
+    test = {e: 'yeah', r: 'maybe'}
+    print(test)
