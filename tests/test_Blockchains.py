@@ -4,32 +4,69 @@ from scripts import CONFIG_PATH
 import pytest
 
 Data_Available = 0
-Chain = 'Aurora'
+Config = readJson(CONFIG_PATH)
 
+EXCHANGES = {
+    "trisolaris": {
+        "pairs": {
+            "AURORA_3bc095c - WETH_3bc095c":
+                "0x5eeC60F348cB1D661E4A5122CF4638c7DB7A886e",
+            "NEAR_3bc095c - USDT_3bc095c":
+                "0x03B666f3488a7992b2385B12dF7f35156d7b29cD"
+            },
+        'fee': 94550,
+        'router': '0x03B666f3488a7992b2385B12dF7f35156d7b29cD'
 
-def getChain():
+    },
+    "auroraswap": {
+        "pairs": {
+            "USDT_3bc095c - USDC_3bc095c":
+                "0xec538fafafcbb625c394c35b11252cef732368cd",
+            "USDC_3bc095c - NEAR_3bc095c":
+                "0x480a68ba97d70495e80e11e05d59f6c659749f27"
+            },
+        'fee': 94550,
+        'router': '0x03B666f3488a7992b2385B12dF7f35156d7b29cD'
+    },
+    "wannaswap": {
+        "pairs": {
+            "AURORA_3bc095c - NEAR_3bc095c":
+                "0x7e9ea10e5984a09d19d05f31ca3cb65bb7df359d",
+            "NEAR_3bc095c - WETH_3bc095c":
+                "0x256d03607eee0156b8a2ab84da1d5b283219fe97",
+            "USDC_3bc095c - NEAR_3bc095c":
+                "0xbf560771b6002a58477efbcdd6774a5a1947587b"
+            },
+        'fee': 94550,
+        'router': '0x03B666f3488a7992b2385B12dF7f35156d7b29cD'
+    }
+    }
 
-    if Chain == 'Aurora':
-        return Blc.Aurora()
-    elif Chain == ' BSC':
-        return Blc.BSC()
-    else:
-        raise ValueError('Invalid Chain Argument')
+TOKENS = {
+    'AURORA_3bc095c': "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    'WETH_3bc095c': "0xcb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    'USDC_3bc095c': "0xeb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    'NEAR_3bc095c': "0xfb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    'USDT_3bc095c': "0x1b4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+}
 
-
-CHAIN = getChain()
-
-EXCHANGES = CHAIN.testData['EXCHANGES']
-GRAPH = CHAIN.testData['GRAPH']
-TOKENS = CHAIN.testData['TOKENS']
-PRICE = CHAIN.testData['PRICE']
-ARB_ROUTE = CHAIN.testData['ARB_ROUTE']
+PRICE = Config['TEST_DATA']['PRICE']
 
 
 @pytest.fixture(scope='module')
 def ChainSetup():
-    CHAIN.buildGraph(EXCHANGES)
-    return CHAIN
+    Chain = Blc.Test()
+    Chain.buildGraph(EXCHANGES)
+
+
+@pytest.fixture(scope='module')
+def ChainGraph(ChainSetup):
+    return ChainSetup.graph
+
+    
+@pytest.fixture(scope='module')
+def ChainExchanges(ChainSetup):   
+    return ChainSetup.exchanges
 
 
 def equal(list1, list2):
@@ -46,12 +83,8 @@ def unique(items):
     return True
 
 
-def test_BuildGraph(ChainSetup):
+def test_BuildGraph(ChainGraph_Exchanges):
     assert ChainSetup.graph == GRAPH
-
-
-def test_BuildExchanges(ChainSetup):
-    pass
 
 
 class TestArbRoute:
@@ -81,25 +114,6 @@ class TestArbRoute:
         assert unique(route)
         assert self.complete(ChainSetup, route)
 
-    @pytest.mark.parametrize('toks', [{}, ''])
-    def test_invalidToken(self, ChainSetup, toks):
-        with pytest.raises(ValueError):
-            ChainSetup.getArbRoute(tokens=toks, save=False,
-                                   exchanges='all', graph=False)
-
-    @pytest.mark.parametrize('Exchanges,results',
-                             [(['trisolaris'], ARB_ROUTE[::2]),
-                              (['wannaswap'], ARB_ROUTE[1::2]),
-                              (['auroraswap'], []),
-                              (['trisolaris', 'wannaswap'], ARB_ROUTE)])
-    def test_startExchanges(self, ChainSetup, Exchanges, results):
-        route = ChainSetup.getArbRoute(tokens=TOKENS, save=False,
-                                       exchanges=Exchanges, graph=False,
-                                       screen=False)
-        print(f'routes :- {route}')
-        print(f'results :- {results}')
-        assert equal(route, results)
-
 
 prices1 = [
     {'AURORA': 21, 'WETH': 32},
@@ -111,59 +125,6 @@ prices2 = [
     {'WETH': 55, 'NEAR': 41},
     {'NEAR': 70, 'AURORA': 40}
 ]
-
-
-class TestPollRoutes:
-
-    @pytest.mark.parametrize('least,liquidity,prices', [
-        (21, [21, 32, 41, 40], prices1),
-        (32, [41, 32, 41, 40], prices2),
-        ])
-    def test_pollRoute(self, ChainSetup, least, liquidity, prices):
-        simp = ChainSetup.simplyfy(ARB_ROUTE[0])
-        rates = getRates(prices)
-        reverse = liquidity[::-1]
-
-        cap0 = least / rates[0][liquidity.index(least)] * ChainSetup.impact
-        cap1 = least / rates[1][reverse.index(least)] * ChainSetup.impact
-        ans = (
-            [cap0, rates[0], ChainSetup.simulateSwap(simp[2], cap0, prices)],
-            [cap1, rates[1], ChainSetup.simulateSwap(simp[3], cap1, prices[::-1])]  # noqa E501
-        )
-        res = ChainSetup.pollRoute(simp[2], prices=prices)
-        print(f'answer {ans}')
-        print(f'result {res}')
-        assert ans == res
-
-    def test_accurateReverse(self, ChainSetup):
-        result = ChainSetup.pollRoute(ARB_ROUTE[0], prices=prices1)
-        result2 = ChainSetup.pollRoute(ARB_ROUTE[1], prices=prices1[::-1])
-        print(result)
-        print(result2)
-        assert result[1] == result2[0]
-        assert result[0] == result2[1]
-
-    def test_cumSum(self, ChainSetup):
-        listItem = [2, 3, 1, 4]
-        assert ChainSetup.cumSum(listItem) == [2, 6, 6, 24]
-
-    def test_simplyfy(self, ChainSetup):
-        ans = ['AURORA WETH trisolaris - WETH NEAR wannaswap - NEAR AURORA wannaswap',  # noqa E501
-               'AURORA NEAR wannaswap - NEAR WETH wannaswap - WETH AURORA trisolaris',  # noqa E501
-               ARB_ROUTE[0], ARB_ROUTE[1]]
-        result = ChainSetup.simplyfy(ARB_ROUTE[0])
-        assert result == ans
-
-
-class TestgetPrice:
-
-    @pytest.mark.skip(reason='incomplete')
-    def test_extract(self, ChainSetup):
-        pass
-
-    @pytest.mark.skip(reason='incomplete')
-    def test_getPrice(self, ChainSetup):
-        assert True
 
 
 def test_screenRoute(ChainSetup):

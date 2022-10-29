@@ -5,6 +5,7 @@ import scripts.Utills as utills
 import os
 import time
 # import attr
+# import copy
 import asyncio
 # import aiohttp
 # import pathlib
@@ -13,7 +14,8 @@ import web3
 from web3.eth import AsyncEth
 # import scripts.Config as Cfg
 # import datetime, os
-import logging
+# import logging
+# import typing
 from asyncio.proactor_events import _ProactorBasePipeTransport
 # from brownie import interface
 from cache import AsyncTTL
@@ -206,26 +208,14 @@ if __name__ == '__main__':
 
     # asyncio.run(bulk(addresses))
 
-    class Dre():
-        def __init__(self, name: str, address: str) -> None:
-            self.name: str = name
-            self.address: str = address
-            self.via: str = 'vianto'
+    jeer = Blc.Token(name='jeer', address='0xrrifjdnfjd')
+    beer = Blc.Token(name='bear', address='0xR0slfklsppkfmdmv')
+    jer = Blc.Token(name='jer', address='0xRRifjdnfj')
+    fre = Blc.Via(name='jdjd', pair='djdjdjjdj', fee=9676, router='0xhdhjd')
+    swee = Blc.Swap(fro=jeer, to=jer, via=fre)
+    wee = Blc.Swap(fro=jer, to=beer, via=fre)
+    wree = Blc.Swap(fro=beer, to=jeer, via=fre)
+    tro = Blc.Route(swaps=[swee, wee, wree], UsdValue=5.6)
 
-        def __eq__(self, __o: object) -> bool:
-            if {self.name, self.address} == {__o.name, __o.address}:
-                return True
-            return False
-
-        def __hash__(self) -> int:
-            return hash((self.name, self.address)) + hash(self.via)
-            # return hash((self.name, self.address, self.via))
-
-        def __repr__(self) -> str:
-            return f'{self.name}_{self.address}_{self.via}'
-
-    e = Dre('adam', '3 venue')
-    r = Dre('3 venue', 'adam')
-    print(hash(e), hash(r))
-    test = {e: 'yeah', r: 'maybe'}
-    print(test)
+    print(sorted((jeer, beer, jer)))
+    print(tro.simplyfied_short, tro.reverseSimplyfied())

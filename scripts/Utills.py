@@ -9,6 +9,52 @@ import json
 from web3 import Web3
 from eth_abi import encode_abi
 from bs4 import BeautifulSoup
+import cProfile
+import pstats
+import io
+
+
+def timer(func):
+    '''decorator function time functions'''
+
+    def inner(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        end = time.perf_counter()
+        logging.info(f'took {end - start} seconds to run {func}')
+        return result
+    return inner
+
+
+def asyncTimer(func):
+    '''decorator function time functions'''
+
+    async def inner(*args, **kwargs):
+        start = time.perf_counter()
+        result = await func(*args, **kwargs)
+        end = time.perf_counter()
+        logging.info(f'took {end - start} seconds to run {func}')
+        return result
+    return inner
+
+
+def profiler(fnc):
+
+    """A decorator that uses cProfile to profile functions"""
+
+    def inner(*args, **kwargs):
+        pr = cProfile.Profile()
+        pr.enable()
+        retval = fnc(*args, **kwargs)
+        pr.disable()
+        s = io.StringIO()
+        sortby = 'cumulative'
+        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+        ps.print_stats()
+        logging.info(s.getvalue())
+        return retval
+
+    return inner
 
 
 def readJson(path: str) -> dict:
@@ -38,15 +84,8 @@ PAIR, cap = config['Test']['PAIR'], config['Test']['cap']
 fee = config['Test']['fee']
 
 
-def spliter(listItem, start=0, end=1, growth=True):
-    while start < len(listItem):
-        yield listItem[start:end]
-        start = end
-        end = start * 2 if growth else start + end
-
-
 def extractTokensFromHtml(content: str,
-                          swap: set[Token]) -> dict:
+                          swap: set[Token]) -> dict[Token, int]:
 
     assert content, 'Empty content recieved'
 
@@ -63,14 +102,14 @@ def extractTokensFromHtml(content: str,
             raw = tokensList[slider].find(class_='list-amount').string
             rawPrice = str(raw).split()
             symbol = rawPrice[1]
-            amount = float(rawPrice[0].replace(',', ''))
+            amount = float(rawPrice[0].replace(',', '')) * 1e18
 
             if symbol == tokens[0].name:
                 done1 = True
-                price[tokens[0]] = amount
+                price[tokens[0]] = int(amount)
             elif symbol == tokens[1].name:
                 done2 = True
-                price[tokens[1]] = amount
+                price[tokens[1]] = int(amount)
 
         except (IndexError, ValueError) as e:
             logging.exception(f'Error parsing item {raw}, error :- {e}')

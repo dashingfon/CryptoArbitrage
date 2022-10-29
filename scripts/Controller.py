@@ -3,7 +3,7 @@
 from scripts import CONFIG_PATH
 import scripts.Errors as errors
 from scripts.Models import (
-    BaseBlockchain,
+    Token,
     Route
 )
 from scripts.Utills import readJson
@@ -15,6 +15,7 @@ from web3 import Web3
 from typing import (
     Any,
     Optional,
+    Protocol
     )
 from eth_abi import encode_abi
 from dotenv import load_dotenv
@@ -22,6 +23,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 Config: dict = readJson(CONFIG_PATH)
+Price = dict[Token, int]
+
+
+class BaseBlockchain(Protocol):
+
+    url: str = ''
+    exchanges: dict = {}
+
+    @property
+    def arbAddress(self) -> str:
+        return ''
+
+    async def buildCache(self, routes: list[Route]) -> dict[str, Price]:
+        pass
 
 
 @attr.s
@@ -71,20 +86,14 @@ class Controller():
         else:
             return self.w3.eth.account.from_key(self.pv)
 
-    def getAmountsOut(self, routerAddress: str, amount: int,
-                      addresses: list[str]) -> int:
-        Router = self.getContract(routerAddress, self.routerAbi)
-        amounts = Router.functions.getAmountsOut(amount, addresses).call()
-        return amounts[-1]
+    def findAll(self, cache: dict, routes: list[Route] = [],
+                save: bool = True) -> list[Route]:
+        pass
 
-    def simulateSwap(self, route, routers, cap, tokens):
-        current = int(cap)
-        for index, i in enumerate(route):
-            fro = tokens[i['from']]
-            to = tokens[i['to']]
-            nexxt = self.getAmountsOut(routers[index], current, [fro, to])
-            current = nexxt
-        return current
+    def find(self, cache: dict,
+             routes: list[Route] = []
+             ) -> tuple[Route, int] | None:
+        pass
 
     def prepPayload(self, route: Route, routers: list = [],
                     pair: str = '', fee: float = 0.,
@@ -175,27 +184,7 @@ class Controller():
 
     async def arb(self, routes: list[Route] = [],
                   amount: int = 10,
-                  extras: list[dict] = []):
+                  frequency: int = 60) -> None:
 
-        # extras is a list of dictionaries
-        assert len(routes) == len(extras), 'extra parameters must equal routes lenght'  # noqa E501
-        Prospects = await self.blockchain.genRoutes(
-                        routes=routes,
-                        value=self.optimalAmount)
-
-        count = 0
-        async for prospect in Prospects:
-            if not count < amount:
-                break
-
-            prospect = await anext(Prospects)
-
-            if not extras:
-                payload = self.prepPayload(prospect)
-            else:
-                payload = self.prepPayload(prospect, **extras[count])
-
-            if payload['profitable']:
-                self.execute(payload['data'])
-
-            count += 1
+        if not routes:
+            pass
