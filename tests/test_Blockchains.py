@@ -50,41 +50,28 @@ TOKENS = {
     'USDT_3bc095c': "0x1b4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
 }
 
-PRICE = Config['TEST_DATA']['PRICE']
-
 
 @pytest.fixture(scope='module')
 def ChainSetup():
     Chain = Blc.Test()
     Chain.buildGraph(EXCHANGES)
+    return Chain
 
 
 @pytest.fixture(scope='module')
 def ChainGraph(ChainSetup):
     return ChainSetup.graph
 
-    
+
 @pytest.fixture(scope='module')
-def ChainExchanges(ChainSetup):   
+def ChainExchanges(ChainSetup):
     return ChainSetup.exchanges
 
 
-def equal(list1, list2):
-    list_dif = [i for i in list1 + list2 if i not in list1 or i not in list2]
-    return False if list_dif else True
-
-
-def unique(items):
-    seen = []
-    for i in items:
-        if i in seen:
-            return False
-        seen.append(i)
-    return True
-
-
-def test_BuildGraph(ChainGraph_Exchanges):
-    assert ChainSetup.graph == GRAPH
+def test_BuildGraph(ChainGraph):
+    for key, value in ChainGraph.items():
+        for item in value:
+            assert {'to': key, 'via': item['via']} in ChainGraph[item['to']]
 
 
 class TestArbRoute:
@@ -115,26 +102,5 @@ class TestArbRoute:
         assert self.complete(ChainSetup, route)
 
 
-prices1 = [
-    {'AURORA': 21, 'WETH': 32},
-    {'WETH': 55, 'NEAR': 41},
-    {'NEAR': 70, 'AURORA': 40}
-]
-prices2 = [
-    {'AURORA': 41, 'WETH': 32},
-    {'WETH': 55, 'NEAR': 41},
-    {'NEAR': 70, 'AURORA': 40}
-]
-
-
 def test_screenRoute(ChainSetup):
-    routes = ARB_ROUTE
-    screenedRoute = ARB_ROUTE[::2]
-
-    result = ChainSetup.screenRoutes(routes=routes)
-    assert equal(screenedRoute, result)
-
-
-@pytest.mark.skip(reason='incomplete')
-def test_priceLookup():
     pass

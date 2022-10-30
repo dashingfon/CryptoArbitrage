@@ -41,7 +41,7 @@ class Blockchain:
     '''Blockchain chain class implementation
     Must implement genRoutes according to the superclass'''
 
-    def __init__(self) -> None:
+    def __init__(self, url: str = '') -> None:
         if type(self) == Blockchain:
             raise errors.CannotInitializeDirectly(
                 'Blockchain class can only be used through inheritance')
@@ -60,7 +60,7 @@ class Blockchain:
             path.joinpath('data', 'Database',
                           f'{str(self).split()[0]}_Routes.json'))
         self.priceLookupPath: str = str(path.joinpath(self.dataPath, 'PriceLookup.json'))  # noqa
-        self.url: str = 'http://127.0.0.1:8545'
+        self.url: str = 'http://127.0.0.1:8545' if not url else url
         self.w3 = web3.Web3(web3.AsyncHTTPProvider(self.url),
                             modules={'eth': (AsyncEth,)},
                             middlewares=[])
@@ -331,7 +331,8 @@ class Blockchain:
         cache[addr] = price
 
     @asyncTimer
-    async def buildCache(self, routes: list[Route]) -> dict[str, Price]:
+    async def buildCache(self, routes: list[Route],
+                         save: bool = False) -> dict[str, Price]:
         '''function to cache the routes'''
 
         cache: dict[str, Price] = {}
@@ -346,11 +347,23 @@ class Blockchain:
 
         tasks = []
         for key, value in uniques.items():
-            tasks.append(asyncio.create_task(
-                         self.fetchNset(cache, key, value)))
+            tasks.append(self.fetchNset(cache, key, value))
 
         await asyncio.gather(*tasks)
 
+        if save:
+            result = {}
+            for k, v in cache.items():
+                temp = {}
+                for i, j in v.items():
+                    temp[i.fullJoin] = j
+                result[k] = temp
+
+            cachePath = str(path.joinpath(self.dataPath, 'SampleCache.json'))
+            writeJson(
+                cachePath,
+                result
+            )
         return cache
 
     def screenRoutes(self, routes: list[Route]) -> list:
@@ -373,8 +386,7 @@ class Blockchain:
 class Aurora(Blockchain):
 
     def __init__(self, url: str = '') -> None:
-        super().__init__()
-        if url: self.url = url  # noqa E701
+        super().__init__(url=url)
         self.source = 'https://aurorascan.dev/address/'
         self.coinGeckoId = 'aurora'
         self.geckoTerminalName = 'aurora'
@@ -386,8 +398,7 @@ class Aurora(Blockchain):
 class Arbitrum(Blockchain):
 
     def __init__(self, url: str = '') -> None:
-        super().__init__()
-        if url: self.url = url  # noqa E701
+        super().__init__(url=url)
         self.source = 'https://arbiscan.io/address/'
         self.coinGeckoId = ''
         self.geckoTerminalName = 'arbitrum'
@@ -399,8 +410,7 @@ class Arbitrum(Blockchain):
 class BSC(Blockchain):
 
     def __init__(self, url: str = '') -> None:
-        super().__init__()
-        if url: self.url = url  # noqa E701
+        super().__init__(url=url)
         self.source = 'https://bscscan.com/address/'
         self.coinGeckoId = 'binance-smart-chain'
         self.geckoTerminalName = 'bsc'
@@ -412,8 +422,7 @@ class BSC(Blockchain):
 class Fantom(Blockchain):
 
     def __init__(self, url: str = '') -> None:
-        super().__init__()
-        if url: self.url = url  # noqa E701
+        super().__init__(url=url)
         self.source = ''
         self.coinGeckoId = ''
         self.geckoTerminalName = 'bsc'
@@ -425,8 +434,7 @@ class Fantom(Blockchain):
 class Polygon(Blockchain):
 
     def __init__(self, url: str = '') -> None:
-        super().__init__()
-        if url: self.url = url  # noqa E701
+        super().__init__(url=url)
         self.source = ''
         self.coinGeckoId = ''
         self.geckoTerminalName = 'bsc'

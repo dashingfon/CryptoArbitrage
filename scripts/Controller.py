@@ -4,7 +4,8 @@ from scripts import CONFIG_PATH
 import scripts.Errors as errors
 from scripts.Models import (
     Token,
-    Route
+    Route,
+    BaseBlockchain
 )
 from scripts.Utills import readJson
 
@@ -15,7 +16,6 @@ from web3 import Web3
 from typing import (
     Any,
     Optional,
-    Protocol
     )
 from eth_abi import encode_abi
 from dotenv import load_dotenv
@@ -26,29 +26,9 @@ Config: dict = readJson(CONFIG_PATH)
 Price = dict[Token, int]
 
 
-class BaseBlockchain(Protocol):
-
-    url: str = ''
-    exchanges: dict = {}
-
-    @property
-    def arbAddress(self) -> str:
-        return ''
-
-    async def buildCache(self, routes: list[Route]) -> dict[str, Price]:
-        pass
-
-
 @attr.s
 class Controller():
     blockchain: BaseBlockchain = attr.ib()
-
-    @blockchain.validator
-    def verifyChain(self, attribute, value) -> None:
-        if not value.url:
-            raise errors.EmptyBlockchainUrl(
-                'Blockchain Objects url is empty')
-
     testing: bool = attr.ib()
     pv: Optional[str] = attr.ib(default=os.environ.get('BEACON'))
     contractAbi: list = attr.ib(default=Config['ABIs']["ContractAbi"])
@@ -86,6 +66,12 @@ class Controller():
         else:
             return self.w3.eth.account.from_key(self.pv)
 
+    def getRate(self):
+        pass
+
+    def simSwap(self):
+        pass
+
     def findAll(self, cache: dict, routes: list[Route] = [],
                 save: bool = True) -> list[Route]:
         pass
@@ -95,9 +81,7 @@ class Controller():
              ) -> tuple[Route, int] | None:
         pass
 
-    def prepPayload(self, route: Route, routers: list = [],
-                    pair: str = '', fee: float = 0.,
-                    out: float = 0.):
+    def prepPayload(self, route: Route):
 
         addresses, data = [], []
         amount = int(route.capital)
@@ -106,22 +90,6 @@ class Controller():
         first_token_fro = route.swaps[0].fro
         rem = route.swaps[1:]
         end = len(rem) - 1
-
-        if routers and len(routers) != len(route.swaps):
-            raise errors.UnequalRouteAndRouters(
-                'route and routers have unequal lenght')
-        elif not routers:
-            routers = []
-            for swap in route.swaps:
-                routers.append(
-                    self.blockchain.exchanges[swap.via]['router'])
-
-        if not pair:
-            pair = self.blockchain.exchanges[swap.via]['pairs'][
-                        frozenset([first_token_to, first_token_fro])]
-
-        if not fee:
-            fee = self.blockchain.exchanges[swap.via]['fee']
 
         for index, i in enumerate(rem):
             router = routers[index + 1]
@@ -148,12 +116,7 @@ class Controller():
         DATA = Web3.toHex(encode_abi(defs, args))
         token0 = sorted([first_token_fro, first_token_to])[0]
 
-        if not out:
-            start = self.getAmountsOut(
-                    routers[0], amount,
-                    [first_token_fro.address, first_token_to.address])
-        else:
-            start = int(out)
+        start = int(out)
 
         AMOUNT0 = start if first_token_fro.address == token0 else 0
         AMOUNT1 = 0 if first_token_fro.address == token0 else start
@@ -183,8 +146,17 @@ class Controller():
         logging.info(f'tx succesful with hash: {txReceipt.transactionHash.hex()}')  # noqa
 
     async def arb(self, routes: list[Route] = [],
-                  amount: int = 10,
-                  frequency: int = 60) -> None:
+                  amount: int = 5,
+                  runs: int = 5,
+                  frequency: int = 60,
+                  mode: str = '') -> None:
+        match mode:
+            case 'live':
+                pass
+            case 'highest':
+                pass
+            case _:
+                print('invalid mode')
 
         if not routes:
             pass

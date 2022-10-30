@@ -4,7 +4,7 @@ import scripts.Utills as utills
 # import scripts.Models as models
 import os
 import time
-# import attr
+import attr
 # import copy
 import asyncio
 # import aiohttp
@@ -219,3 +219,4 @@ if __name__ == '__main__':
 
     print(sorted((jeer, beer, jer)))
     print(tro.simplyfied_short, tro.reverseSimplyfied())
+    print(attr.astuple(tro))
