@@ -45,7 +45,6 @@ class Blockchain:
             raise errors.CannotInitializeDirectly(
                 'Blockchain class can only be used through inheritance')
 
-        self.url: str = url
         self.impact: float = 0.00075
         self.r1: float = 0.997
         self.depthLimit: int = 4
@@ -103,13 +102,9 @@ class Blockchain:
                 return chainContent.get('arbAddress')
         return ''
 
-    @property
-    def storagePath(self) -> str:
-        pass
-
     def setup(self, supportedExchanges: set[str] = set(),
               saveArtifact: bool = False,
-              temp: bool = True) -> None:
+              temp: bool = False) -> None:
 
         '''method to fetch all the token and pair addresses'''
 
@@ -275,10 +270,6 @@ class Blockchain:
         '''
         method to lookup token price with coingecko api wrapper
         '''
-        extract: Callable[
-            [list[Token]], list[str]
-                        ] = lambda lst: [i.address for i in lst]
-
         temp = readJson(self.priceLookupPath)
         prices = {}
 
@@ -287,7 +278,7 @@ class Blockchain:
         coinGecko = CoinGeckoAPI()
         prices = coinGecko.get_token_price(
             id=self.coinGeckoId,
-            contract_addresses=extract(tokenAdresses),
+            contract_addresses=tokenAdresses,
             vs_currencies='usd')
 
         writeJson(self.priceLookupPath, {**temp, **prices})
@@ -327,9 +318,6 @@ class Blockchain:
         price[tokens[0]] = rawPrice[0]
         price[tokens[1]] = rawPrice[1]
 
-        end = time.perf_counter()
-        logging.info(
-            f'finished polling pairs {swap} of address {addr} in {end - start} seconds')  # noqa E501
         return price
 
     async def fetchNset(self, cache: dict, addr: str,
@@ -357,10 +345,6 @@ class Blockchain:
             tasks.append(self.fetchNset(cache, key, value))
 
         await asyncio.gather(*tasks)
-        end = time.perf_counter()
-
-        logging.info(
-            f'Finished adsorbing {len(routes)} routes in {end - start} seconds')  # noqa E501
 
         if save:
             result = {}
