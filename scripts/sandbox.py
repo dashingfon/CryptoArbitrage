@@ -4,7 +4,8 @@ import scripts.Utills as utills
 # import scripts.Models as models
 import os
 import time
-# import attr
+import attr
+# import copy
 import asyncio
 # import aiohttp
 # import pathlib
@@ -13,7 +14,8 @@ import web3
 from web3.eth import AsyncEth
 # import scripts.Config as Cfg
 # import datetime, os
-import logging
+# import logging
+# import typing
 from asyncio.proactor_events import _ProactorBasePipeTransport
 # from brownie import interface
 from cache import AsyncTTL
@@ -206,22 +208,15 @@ if __name__ == '__main__':
 
     # asyncio.run(bulk(addresses))
 
-    @Cache
-    async def fret(num, wait):
-        logging.debug('fretting ...')
-        await asyncio.sleep(wait)
-        return 'fret' * num
+    jeer = Blc.Token(name='jeer', address='0xrrifjdnfjd')
+    beer = Blc.Token(name='bear', address='0xR0slfklsppkfmdmv')
+    jer = Blc.Token(name='jer', address='0xRRifjdnfj')
+    fre = Blc.Via(name='jdjd', pair='djdjdjjdj', fee=9676, router='0xhdhjd')
+    swee = Blc.Swap(fro=jeer, to=jer, via=fre)
+    wee = Blc.Swap(fro=jer, to=beer, via=fre)
+    wree = Blc.Swap(fro=beer, to=jeer, via=fre)
+    tro = Blc.Route(swaps=[swee, wee, wree], UsdValue=5.6)
 
-    async def composer(num):
-        print(await fret(num, num))
-        tasks = [fret(num, num),
-                 fret(num, num),
-                 fret(num, num),
-                 fret(num, num),
-                 fret(num, num),
-                 fret(num, num)
-                 ]
-        results = await asyncio.gather(*tasks)
-        print(results)
-
-    # asyncio.run(composer(5))
+    print(sorted((jeer, beer, jer)))
+    print(tro.simplyfied_short, tro.reverseSimplyfied())
+    print(attr.astuple(tro))

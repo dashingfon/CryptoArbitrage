@@ -1,16 +1,10 @@
 '''Model module containing the extra data type'''
 
 from typing import (
-    Optional,
-    AsyncGenerator,
     Callable,
     Protocol
     )
-from sqlmodel import Field, SQLModel
-from cache import AsyncTTL
 import attr
-import time
-import logging
 
 Price = dict['Token', float]
 GetRate = Callable[[Price, 'Token', 'Token', float], float]
@@ -26,7 +20,7 @@ class Token:
 
     @property
     def shortJoin(self) -> str:
-        return f'{self.name}_{self.address[-7:]}'
+        return f'{self.name}_{self.address.lower()[-7:]}'
 
     @property
     def fullJoin(self) -> str:
@@ -45,238 +39,113 @@ class Via():
 class Swap():
     fro: Token = attr.ib()
     to: Token = attr.ib()
-    via: str = attr.ib()
-
-
-class Routes(SQLModel):
-    '''Route Model class'''
-    id: Optional[int] = Field(default=None, primary_key=True)
-    simplyfied_Sht: str = Field()
-    simplyfied_full: str = Field()
-    startToken: str = Field(index=True)
-    startExchanges: str = Field(index=True)
-    amountOfSwaps: int = Field(index=True)
-    time: float = Field(index=True)
-
-    @classmethod
-    def fromSwaps(cls, swaps: list[Swap]) -> 'Routes':
-
-        short, long = [], []
-        for j in swaps:
-            long.append(f"{j.fro.fullJoin} {j.to.fullJoin} {j.via}")  # noqa: E501
-            short.append(f"{j.fro.shortJoin} {j.to.shortJoin} {j.via}")  # noqa: E501
-
-        return cls(
-           simplyfied_Sht=' - '.join(short),
-           simplyfied_full=' - '.join(long),
-           startToken=swaps[0].fro.shortJoin,
-           startExchanges=swaps[0].via,
-           amountOfSwaps=len(swaps),
-           time=time.time()
-        )
+    via: Via = attr.ib()
 
 
 @attr.s(slots=True, order=True)
 class Route:
     '''Route class'''
     swaps: list[Swap] = attr.ib(repr=False, order=False)
-    prices: list[Price] = attr.ib(repr=False, factory=list, order=False)
-    simplyfied: str = attr.ib(init=False, repr=False, order=False)
     simplyfied_short: str = attr.ib(init=False, order=False)
-    USD_Value: float = attr.ib(default=0)
+    UsdValue: float = attr.ib()
     EP: float = attr.ib(default=0)
-    index: float = attr.ib(repr=False, default=0)
-    capital: float = attr.ib(repr=False, default=0, order=False)
+    rates: list = attr.ib(factory=list)
+    capital: float = attr.ib(default=0, order=False)
 
     def __attrs_post_init__(self) -> None:
-        self.simplyfied = self.simplyfy()
-        self.simplyfied_short = self.simplyfy(mode='short')
+        self.simplyfied_short = self.simplyfy()
 
-    def simplyfy(self, mode: str = 'long') -> str:
+    def simplyfy(self, swaps: list = []) -> str:
         '''function to generate a string repreentation
         from the swap attribute'''
-        modes = {'long', 'short'}
 
-        if mode not in modes:
-            raise ValueError(
-                f"expected 'long' or 'short' got {mode}")
+        if not swaps:
+            swaps = self.swaps
 
         result = []
-        if mode == 'long':
-            for j in self.swaps:
-                result.append(f"{j.fro.fullJoin} {j.to.fullJoin} {j.via}")  # noqa: E501
-
-        elif mode == 'short':
-            for j in self.swaps:
-                result.append(f"{j.fro.shortJoin} {j.to.shortJoin} {j.via}")  # noqa: E501
+        for j in swaps:
+            result.append(f"{j.fro.shortJoin} {j.to.shortJoin} {j.via.name}")  # noqa: E501
 
         return ' - '.join(result)
 
+    def reverseSimplyfied(self) -> str:
+        swaps = []
+        for s in self.swaps[::-1]:
+            swaps.append(Swap(
+                fro=s.to,
+                to=s.fro,
+                via=s.via
+            ))
+        return self.simplyfy(swaps)
+
     @classmethod
-    def toReversed(cls, items: list[Swap],
-                   prices: list[Price]) -> 'Route':
-
-        temp = cls(items[::-1])
-        temp.prices = prices[::-1] if prices else []
-
-        return temp
-
-    @classmethod
-    def fromFullString(cls, string: str, prices: list[dict] = [],
-                       usdVal: float = 0, index: float = 0,
-                       EP: float = 0,
-                       capital: float = 0) -> 'Route':
-
-        result: list = []
-        routeList = string.split(' - ')
-        for item in routeList:
-            itemList = item.split()
-            token1 = itemList[0].split('_')
-            token2 = itemList[1].split('_')
-
-            swap = Swap(
-                fro=Token(token1[0], token1[1]),
-                to=Token(token2[0], token2[1]),
-                via=itemList[2]
+    def fromDict(cls, load):
+        swaps = []
+        for swap in load.get('swaps'):
+            swaps.append(
+                Swap(
+                    fro=Token(**(swap.get('fro'))),
+                    to=Token(**(swap.get('to'))),
+                    via=Via(**(swap.get('via')))
+                )
             )
-            result.append(swap)
-
-        newRoute = cls(swaps=result, prices=prices,
-                       USD_Value=usdVal, index=index,
-                       EP=EP, capital=capital)
-
-        return newRoute
+        return cls(
+            swaps=swaps,
+            EP=load.get('EP'),
+            UsdValue=load.get('UsdValue'),
+            rates=load.get('rates'),
+            capital=load.get('capital')
+        )
 
     @classmethod
-    def fromDict(self, dict) -> 'Route':
-        pass
+    def toReverse(cls, _swaps: list[Swap], UsdVal, **kwargs):
+        swaps = []
+        for s in _swaps[::-1]:
+            swaps.append(Swap(
+                fro=s.to,
+                to=s.fro,
+                via=s.via
+            ))
 
-    def toDict(self) -> dict:
-        pass
-
-    @staticmethod
-    def cumSum(listItem: list) -> list:
-        result = [listItem[0]]
-        for i in listItem[1:]:
-            result.append(i*result[-1])
-        return result
-
-    def simSwap(self, r1: float) -> float:
-
-        assert self.capital, 'route object has no capital set'
-        assert len(self.prices) == len(self.swaps), 'unequal route and prices'
-        In = self.capital
-
-        for index, swap in enumerate(self.swaps):
-            price = self.prices[index]
-
-            Out = In * getRate(
-                price,
-                swap.to,
-                swap.fro, r1) / (1 + ((In/price[swap.fro]) * r1))
-            In = Out
-
-        return Out - self.capital
-
-    def calculate(self, r1: float,
-                  impact: float,
-                  usdVal: float) -> list['Route']:
-
-        liquidity = []
-        selfRates: list[float] = []
-        reverseRates: list[float] = []
-        reverse: 'Route' = self.toReversed(self.swaps, self.prices)
-
-        if not self.prices:
-            return [self, reverse]
-
-        for index, swap in enumerate(self.swaps):
-            price: Price = self.prices[index]
-
-            rate = (getRate(price, swap.to, swap.fro, r1),
-                    getRate(price, swap.fro, swap.to, r1))
-
-            if index == 0:
-                liquidity.append(price[swap.fro])
-                forward = price[swap.to]
-                selfRates.append(rate[0])
-            elif index == len(self.swaps) - 1:
-                selfRates.append(rate[0] * selfRates[-1])
-                liquidity += [
-                    min(price[swap.fro], forward), price[swap.to]]
-            else:
-                selfRates.append(rate[0] * selfRates[-1])
-                liquidity.append(min(price[swap.fro], forward))
-                forward = price[swap.to]
-
-            reverseRates.insert(0, rate[1])
-
-        least = min(liquidity)
-        reverseLiq = liquidity[::-1]
-        reverseRates = [1] + self.cumSum(reverseRates)
-        selfRates = [1] + selfRates
-
-        self.capital = least / selfRates[liquidity.index(least)] * impact * 1e18  # noqa: E501
-        reverse.capital = least / reverseRates[reverseLiq.index(least)] * impact * 1e18  # noqa: E501
-
-        toEp, froEp = self.simSwap(r1), reverse.simSwap(r1)
-
-        self.EP, reverse.EP = toEp * 1e18, froEp * 1e18
-        self.index, reverse.index = selfRates[-1], reverseRates[-1]
-        self.USD_Value, reverse.USD_Value = toEp * usdVal, froEp * usdVal
-
-        return [self, reverse]
+        return cls(
+            swaps=swaps,
+            UsdValue=UsdVal,
+            **kwargs
+        )
 
 
 class BaseBlockchain(Protocol):
-    '''Base blockchain Abstract class'''
+
     url: str = ''
     exchanges: dict = {}
+    r1: float
+    impact: float
 
     @property
     def arbAddress(self) -> str:
         return ''
 
-    async def genRoutes(self, value: float,
-                        routes: list[Route] = [],
-                        **kwargs: dict) -> AsyncGenerator:
-
+    async def buildCache(self, routes: list[Route]) -> dict[str, Price]:
         pass
 
 
 class Spliter:
-    '''iterator class for spliting a list into batches'''
-    def __init__(self, items: list, cache: AsyncTTL,
-                 start: int = 0, gap: int = 1) -> None:
 
-        self.cache: AsyncTTL = cache
-        self.items: list = items
-        self.start: int = start
-        self.end: int = self.start + gap
+    def __init__(self, items: list,
+                 start: int, gap: int) -> None:
 
-        logging.info(f'Spliter class; List lenght :- {len(self.items)}')
-        logging.info(f'start :- {start} gap :- {gap}')
+        self.items = items
+        self.start = start
+        self.end = self.start + gap
 
     def __iter__(self) -> 'Spliter':
         return self
 
     def __next__(self) -> list[Route]:
+
         if self.start < len(self.items):
-            cacheLenght = len(self.cache.ttl)
             start = self.start
             gap = self.end - self.start
-
-            if cacheLenght <= 4 and gap > 1:
-                gap = 1
-            elif 5 <= cacheLenght <= 8 and gap > cacheLenght // 4:
-                gap = cacheLenght // 4
-            elif 6 <= cacheLenght <= 12 and gap > cacheLenght // 3:
-                gap = cacheLenght // 3
-            elif 12 <= cacheLenght <= 30 and gap > cacheLenght // 2:
-                gap = cacheLenght // 2
-
-            logging.info(f'gap :- {gap} start :- {start}')
-
             self.start += gap
             self.end = self.start + gap * 2
             return self.items[start:start + gap]

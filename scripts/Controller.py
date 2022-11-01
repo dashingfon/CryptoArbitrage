@@ -3,11 +3,14 @@
 from scripts import CONFIG_PATH
 import scripts.Errors as errors
 from scripts.Models import (
-    BaseBlockchain,
-    Route
+    Token,
+    Route,
+    BaseBlockchain
 )
-from scripts.Utills import readJson
-
+from scripts.Utills import (
+    readJson,
+    profiler
+    )
 import os
 import attr
 import logging
@@ -22,33 +25,30 @@ from dotenv import load_dotenv
 
 load_dotenv()
 Config: dict = readJson(CONFIG_PATH)
+Price = dict[Token, int]
 
 
 @attr.s
 class Controller():
     blockchain: BaseBlockchain = attr.ib()
-
-    @blockchain.validator
-    def verifyChain(self, attribute, value) -> None:
-        if not value.url:
-            raise errors.EmptyBlockchainUrl(
-                'Blockchain Objects url is empty')
-
     testing: bool = attr.ib()
     pv: Optional[str] = attr.ib(default=os.environ.get('BEACON'))
     contractAbi: list = attr.ib(default=Config['ABIs']["ContractAbi"])
     routerAbi: list = attr.ib(default=Config['ABIs']["RouterAbi"])
-    optimalAmount: float = attr.ib(default=1.009027027)
-    w3: Web3 = attr.ib(default=(Web3(Web3.HTTPProvider(
-                  blockchain.url, request_kwargs={'timeout': 300}))))
+    optimalAmount: float = attr.ib(default=1)  # 1.009027027)
+    w3: Web3 = attr.ib(init=False)
+
+    def __attrs_post_init__(self) -> None:
+        self.w3: Web3 = Web3(Web3.HTTPProvider(
+                        self.blockchain.url, request_kwargs={'timeout': 300}))
 
     @property
     def swapFuncSig(self) -> str:
-        return '0x38ed1739'  # swapExactTokenForTokens()
+        return '0x38ed1739'  # swapExactTokensForTokens(uint256,uint256,address[],address,uint256) # noqa E501
 
     @property
     def approveFuncSig(self) -> str:
-        return '0x095ea7b3'  # approve()
+        return '0x095ea7b3'  # approve(address,uint256)
 
     def getContract(self, address: str = '',
                     abi: list = []) -> Any:
@@ -71,56 +71,113 @@ class Controller():
         else:
             return self.w3.eth.account.from_key(self.pv)
 
-    def getAmountsOut(self, routerAddress: str, amount: int,
-                      addresses: list[str]) -> int:
-        Router = self.getContract(routerAddress, self.routerAbi)
-        amounts = Router.functions.getAmountsOut(amount, addresses).call()
-        return amounts[-1]
+    @staticmethod
+    def cumSum(listItem: list) -> list:
+        result = [listItem[0]]
+        for i in listItem[1:]:
+            result.append(i * result[-1])
+        return result
 
-    def simulateSwap(self, route, routers, cap, tokens):
-        current = int(cap)
-        for index, i in enumerate(route):
-            fro = tokens[i['from']]
-            to = tokens[i['to']]
-            nexxt = self.getAmountsOut(routers[index], current, [fro, to])
-            current = nexxt
-        return current
+    def simSwap(self, route: Route,
+                prices: list[dict[Token, int]]) -> int:
+        In = route.capital
 
-    def prepPayload(self, route: Route, routers: list = [],
-                    pair: str = '', fee: float = 0.,
-                    out: float = 0.):
+        for index, swap in enumerate(route.swaps):
+            price = prices[index]
+
+            Out = In * (self.blockchain.r1 * price[swap.to] /
+                        price[swap.fro] / (1 + ((In/price[swap.fro])
+                                                * self.blockchain.r1)))
+            In = Out
+
+        return int((Out - route.capital) * route.UsdValue)
+
+    def calculate(self):
+        pass
+
+    @profiler
+    def findAll(self, cache: dict, routes: list[Route],
+                save: bool = True) -> list[Route]:
+
+        print('finding arb \n')
+        result = []
+        r1 = self.blockchain.r1
+
+        for route in routes:
+            liquidity = []
+            rates: list[float] = []
+            _rates: list[float] = []
+            prices: list[dict[Token, int]] = []
+
+            for index, swap in enumerate(route.swaps):
+                prices.append(cache[swap.via.pair])
+                toPrice = cache[swap.via.pair][swap.to]
+                froPrice = cache[swap.via.pair][swap.fro]
+                toRate = r1 * toPrice / froPrice
+                froRate = r1 * froPrice / toPrice
+                if index == 0:
+                    liquidity.append(froPrice)
+                    forward = toPrice
+                    rates.append(toRate)
+                elif index == len(route.swaps) - 1:
+                    rates.append(toRate * rates[-1])
+                    liquidity += [min(froPrice, forward), toPrice]
+                else:
+                    rates.append(toRate * rates[-1])
+                    liquidity.append(min(froPrice, forward))
+                    forward = toPrice
+
+                _rates.insert(0, froRate)
+
+            least = min(liquidity)
+            reverseLiq = liquidity[::-1]
+            _rates = [1] + self.cumSum(_rates)
+            rates = [1] + rates
+
+            if rates[-1] > self.optimalAmount:
+                route.capital = least / rates[liquidity.index(least)] * \
+                    self.blockchain.impact
+                route.EP = self.simSwap(route, prices)
+                route.rates = rates
+
+                result.append(route)
+            elif _rates[-1] > self.optimalAmount:
+                rroute = Route.toReverse(
+                        _swaps=route.swaps,
+                        UsdVal=route.UsdValue,
+                        capital=least / _rates[reverseLiq.index(least)] *
+                                self.blockchain.impact,  # noqa E131
+                        rates=_rates
+                    )
+                rroute.EP = self.simSwap(rroute, prices[::-1])
+                result.append(rroute)
+        print('done!')
+        return result
+
+    def find(self, cache: dict,
+             routes: list[Route] = []
+             ) -> tuple[Route, int] | None:
+        pass
+
+    @staticmethod
+    def prepPayload(route: Route):
 
         addresses, data = [], []
         amount = int(route.capital)
-
+        pair = route.swaps[0].via.pair
+        fee = route.swaps[0].via.fee
+        out = route.rates[1]
         first_token_to = route.swaps[0].to
         first_token_fro = route.swaps[0].fro
         rem = route.swaps[1:]
         end = len(rem) - 1
 
-        if routers and len(routers) != len(route.swaps):
-            raise errors.UnequalRouteAndRouters(
-                'route and routers have unequal lenght')
-        elif not routers:
-            routers = []
-            for swap in route.swaps:
-                routers.append(
-                    self.blockchain.exchanges[swap.via]['router'])
-
-        if not pair:
-            pair = self.blockchain.exchanges[swap.via]['pairs'][
-                        frozenset([first_token_to, first_token_fro])]
-
-        if not fee:
-            fee = self.blockchain.exchanges[swap.via]['fee']
-
         for index, i in enumerate(rem):
-            router = routers[index + 1]
 
             # to populate the addresses list
             if index == 0 or rem[index - 1].via != i.via:
                 addr = [i.fro.address, i.to.address]
-                addresses.append(router)
+                addresses.append(i.via.router)
                 print(f'addresses snapshot, index {index} :- {addresses}')
             else:
                 addr.append(i.to.address)
@@ -139,12 +196,7 @@ class Controller():
         DATA = Web3.toHex(encode_abi(defs, args))
         token0 = sorted([first_token_fro, first_token_to])[0]
 
-        if not out:
-            start = self.getAmountsOut(
-                    routers[0], amount,
-                    [first_token_fro.address, first_token_to.address])
-        else:
-            start = int(out)
+        start = int(out)
 
         AMOUNT0 = start if first_token_fro.address == token0 else 0
         AMOUNT1 = 0 if first_token_fro.address == token0 else start
@@ -159,7 +211,7 @@ class Controller():
         contract = self.getContract()
         account = self.getAccount()
 
-        if self.testing(self.blockchain):
+        if self.testing:
             tranx = contract.functions.start(
                 *payload).transact({'from': account})
         else:
@@ -174,28 +226,17 @@ class Controller():
         logging.info(f'tx succesful with hash: {txReceipt.transactionHash.hex()}')  # noqa
 
     async def arb(self, routes: list[Route] = [],
-                  amount: int = 10,
-                  extras: list[dict] = []):
+                  amount: int = 5,
+                  runs: int = 5,
+                  frequency: int = 60,
+                  mode: str = '') -> None:
+        match mode:
+            case 'live':
+                pass
+            case 'highest':
+                pass
+            case _:
+                print('invalid mode')
 
-        # extras is a list of dictionaries
-        assert len(routes) == len(extras), 'extra parameters must equal routes lenght'  # noqa E501
-        Prospects = await self.blockchain.genRoutes(
-                        routes=routes,
-                        value=self.optimalAmount)
-
-        count = 0
-        async for prospect in Prospects:
-            if not count < amount:
-                break
-
-            prospect = await anext(Prospects)
-
-            if not extras:
-                payload = self.prepPayload(prospect)
-            else:
-                payload = self.prepPayload(prospect, **extras[count])
-
-            if payload['profitable']:
-                self.execute(payload['data'])
-
-            count += 1
+        if not routes:
+            pass

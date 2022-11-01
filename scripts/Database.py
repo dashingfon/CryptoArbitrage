@@ -1,14 +1,49 @@
 '''Module containing all the database methods and functions'''
 
-from sqlmodel import SQLModel, create_engine, Session, select, inspect
+from sqlmodel import (
+    SQLModel,
+    create_engine,
+    Session,
+    select,
+    inspect,
+    Field
+    )
+from typing import Optional
+
+
+class Routes(SQLModel):
+    '''Route Model class'''
+    id: Optional[int] = Field(default=None, primary_key=True)
+    simplyfied_Sht: str = Field()
+    simplyfied_full: str = Field()
+    startToken: str = Field(index=True)
+    startExchanges: str = Field(index=True)
+    amountOfSwaps: int = Field(index=True)
+    time: float = Field(index=True)
+
+    @classmethod
+    def fromSwaps(cls, swaps: list) -> 'Routes':
+
+        short, long = [], []
+        for j in swaps:
+            long.append(f"{j.fro.fullJoin} {j.to.fullJoin} {j.via}")  # noqa: E501
+            short.append(f"{j.fro.shortJoin} {j.to.shortJoin} {j.via}")  # noqa: E501
+
+        return cls(
+           simplyfied_Sht=' - '.join(short),
+           simplyfied_full=' - '.join(long),
+           startToken=swaps[0].fro.shortJoin,
+           startExchanges=swaps[0].via,
+           amountOfSwaps=len(swaps),
+           time=time.time()
+        )
 
 
 if __name__ == '__main__':
 
     import time
-    import scripts.Models as models
 
-    Test = type('Test', (models.Routes,),
+    Test = type('Test', (Routes,),
             {'__tablename__': 'Test'}, table=True)  # noqa
 
     filename = "data\\databae.db"
