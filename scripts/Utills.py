@@ -57,6 +57,25 @@ def profiler(fnc):
     return inner
 
 
+def asyncProfiler(fnc):
+
+    """A decorator that uses cProfile to profile functions"""
+
+    async def inner(*args, **kwargs):
+        pr = cProfile.Profile()
+        pr.enable()
+        retval = await fnc(*args, **kwargs)
+        pr.disable()
+        s = io.StringIO()
+        sortby = 'cumulative'
+        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+        ps.print_stats()
+        logging.info(s.getvalue())
+        return retval
+
+    return inner
+
+
 def readJson(path: str) -> dict:
     '''function to read from json file'''
     try:

@@ -49,8 +49,8 @@ class Route:
     simplyfied_short: str = attr.ib(init=False, order=False)
     UsdValue: float = attr.ib()
     EP: float = attr.ib(default=0)
-    rates: list = attr.ib(repr=False, factory=list)
-    capital: float = attr.ib(repr=False, default=0, order=False)
+    rates: list = attr.ib(factory=list)
+    capital: float = attr.ib(default=0, order=False)
 
     def __attrs_post_init__(self) -> None:
         self.simplyfied_short = self.simplyfy()
@@ -97,11 +97,29 @@ class Route:
             capital=load.get('capital')
         )
 
+    @classmethod
+    def toReverse(cls, _swaps: list[Swap], UsdVal, **kwargs):
+        swaps = []
+        for s in _swaps[::-1]:
+            swaps.append(Swap(
+                fro=s.to,
+                to=s.fro,
+                via=s.via
+            ))
+
+        return cls(
+            swaps=swaps,
+            UsdValue=UsdVal,
+            **kwargs
+        )
+
 
 class BaseBlockchain(Protocol):
 
     url: str = ''
     exchanges: dict = {}
+    r1: float
+    impact: float
 
     @property
     def arbAddress(self) -> str:

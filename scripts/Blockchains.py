@@ -18,7 +18,7 @@ from scripts.Utills import (
     extractTokensFromHtml,
     buildData,
     setData,
-    asyncTimer
+    asyncProfiler
     )
 
 import logging
@@ -28,7 +28,6 @@ import asyncio
 import aiohttp
 from aiolimiter import AsyncLimiter
 from pycoingecko import CoinGeckoAPI
-from typing import Callable
 from attr import asdict
 
 
@@ -61,13 +60,10 @@ class Blockchain:
                           f'{str(self).split()[0]}_Routes.json'))
         self.priceLookupPath: str = str(path.joinpath(self.dataPath, 'PriceLookup.json'))  # noqa
         self.url: str = 'http://127.0.0.1:8545' if not url else url
-        self.w3 = web3.Web3(web3.AsyncHTTPProvider(self.url),
+        self.w3 = web3.Web3(web3.AsyncHTTPProvider(self.url,
+                            request_kwargs={'timeout': 60}),
                             modules={'eth': (AsyncEth,)},
                             middlewares=[])
-        self.getAddress: Callable[
-                [Swap], str
-                ] = lambda i: self.exchanges[i.via.name]['pairs'][frozenset([i.fro, i.to])]  # noqa: E501
-
         self.source: str
         self.coinGeckoId: str
         self.geckoTerminalName: str
@@ -167,7 +163,7 @@ class Blockchain:
 
         for key, value in self.graph.items():
             for item in value:
-                if {'to': key, 'via': item['via']} not in self.graph[item['to']]:
+                if {'to': key, 'via': item['via']} not in self.graph[item['to']]:  # noqa E501
                     logging.debug(f'{key} not found in {item} list')
 
     def dive(self, depth: int, node: Token, goal: Token,
@@ -330,7 +326,6 @@ class Blockchain:
         price = await self.getPrice(addr=addr, swap=swap)
         cache[addr] = price
 
-    @asyncTimer
     async def buildCache(self, routes: list[Route],
                          save: bool = False) -> dict[str, Price]:
         '''function to cache the routes'''
